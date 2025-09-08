@@ -7,9 +7,9 @@
   :source-paths ["src/clj" "src/cljc"]
   :test-paths ["test/clj"]
   :dependencies [[org.clojure/clojure "1.11.1"]
-                 [org.clojure/clojurescript "1.9.946"]
-                 [ring "1.5.1"]
-                 [compojure "1.1.6"]
+                 [org.clojure/clojurescript "1.11.60"]
+                 [ring "1.8.2"]
+                 [compojure "1.7.0"]
                  [aleph "0.4.2-alpha12"]
                  [clucy "0.4.0"]
                  [watchtower "0.1.1"]
@@ -35,11 +35,16 @@
                  [camel-snake-kebab "0.3.2"]
                  [prismatic/dommy "1.1.0"]
                  [reagent "0.6.0"]
-                 [congomongo "2.6.0"]]
+                 [congomongo "2.6.0"]
+                 [joda-time/joda-time "2.12.5"]
+                 [com.bhauman/figwheel-main "0.2.18"]
+                 [com.bhauman/rebel-readline-cljs "0.1.4"]]
   :repl-options {:init (load-file "reup.clj")}
-  :plugins [[lein-cljsbuild "1.1.5"]
-            [lein-figwheel "0.5.18"]
+  :plugins [[lein-cljsbuild "1.1.8"]
             [cider/cider-nrepl "0.22.3"]]
+  :aliases {"fig"       ["trampoline" "run" "-m" "figwheel.main"]
+            "fig:build" ["trampoline" "run" "-m" "figwheel.main" "-b" "dev" "-r"]
+            "fig:prod"  ["run" "-m" "figwheel.main" "-O" "advanced" "-bo" "prod"]}
   :cljsbuild {:builds
               {:dev  {:source-paths ["src/cljs" "src/cljc"]
                       :compiler {:output-to "resources/public/cljs/clojuredocs.js"
@@ -66,7 +71,7 @@
 
                :prod {:source-paths ["src/cljs" "src/cljc"]
                       :compiler {:output-to "resources/public/cljs/clojuredocs.js"
-                                 :optimizations :advanced
+                                 :optimizations :simple
                                  :main "clojuredocs.main"
                                  :pretty-print false
                                  :preamble ["public/js/morpheus.min.js"
@@ -75,7 +80,4 @@
                                  :externs ["externs/morpheus.js"
                                            "externs/marked.js"
                                            "externs/fastclick.js"]}
-                      :jar true}}}
-  :figwheel {:http-server-root "resources/public"
-             :css-dirs ["resources/public/css"]
-             :repl false})
+                       :jar true}}})
