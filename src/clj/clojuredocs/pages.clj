@@ -333,14 +333,6 @@
   (GET "/u/:login" [login] (user/page-handler login "github"))
   (GET "/uc/:login" [login] (user/page-handler login "clojuredocs"))
 
-  ;; Account Migration
-  (GET "/migrate-account" [] user/migrate-account-handler)
-  (POST "/migrate-account/send-email" [] user/send-email-handler)
-  (GET "/migrate-account/migrate/:migration-key" [migration-key]
-    (user/migrate-account-migrate-handler migration-key))
-  (POST "/migrate-account/migrate/:migration-key" [migration-key]
-    (user/post-migrate-account-migrate-handler migration-key))
-
   ;; Dev Stuff
   (GET "/dev/styleguide" [] dev/styleguide-handler)
   (GET "/dev/styleguide/search" [] dev/search-styleguide-handler)
