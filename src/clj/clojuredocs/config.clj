@@ -54,15 +54,15 @@
     :required? false
     :default false}
 
-   {:key :mailgun-api-key
+   {:key :new-relic-browser-id
     :type :string
-    :doc "Mailgun API key"
-    :required? true}
+    :doc "New Relic Browser perf tracking id"
+    :required? false}
 
-   {:key :mailgun-api-endpoint
+   {:key :new-relic-browser-key
     :type :string
-    :doc "Mailgun message endpoint (including domain to send from)."
-    :required? true}
+    :doc "New Relic Browser perf tracking key"
+    :required? false}
 
    {:key :ga-tracking-id
     :type :string
@@ -74,32 +74,7 @@
     :type :bool
     :doc "Cache markdown from disk for duration of app process?"
     :required? false
-    :default false}
-
-   {:key :from-email
-    :type :string
-    :doc "Email address to put in 'from' field "
-    :default "ClojureDocs Development <dev@clojuredocs.org>"}
-
-   {:key :new-relic-app-name
-    :type :string
-    :doc "App name for display in new relic, ex `cd-dev`, `cd-staging`"
-    :required? false}
-
-   {:key :new-relic-license-key
-    :type :string
-    :doc "New Relic license key"
-    :required? false}
-
-   {:key :new-relic-browser-id
-    :type :string
-    :doc "New Relic Browser perf tracking id"
-    :required? false}
-
-   {:key :new-relic-browser-key
-    :type :string
-    :doc "New Relic Browser perf tracking key"
-    :required? false}])
+    :default false}])
 
 (defn get-env [lookup key]
   (let [{:keys [key type doc required? default] :as env-var-schema}
@@ -146,16 +121,6 @@
 (def debug-exceptions? (get-env env-vars :debug-exceptions))
 
 (def log-exceptions? (get-env env-vars :log-exceptions))
-
-(def mailgun-api-key (get-env env-vars :mailgun-api-key))
-(def mailgun-api-endpoint (get-env env-vars :mailgun-api-endpoint))
-
-(def from-email (get-env env-vars :from-email))
-
-(def mailgun-config
-  {:endpoint mailgun-api-endpoint
-   :api-key mailgun-api-key
-   :from from-email})
 
 (def new-relic-browser-key (get-env env-vars :new-relic-browser-key))
 

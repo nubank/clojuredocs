@@ -142,9 +142,7 @@
       [:div.top-contribs
        (if-not (empty? top-contribs)
          (map util/$avatar top-contribs)
-         [:div.null-state "Uh-oh, no contributors!"])
-       [:div.migrate-account
-        [:a {:href "/migrate-account"} "Migrate your old ClojureDocs account"]]]]
+         [:div.null-state "Uh-oh, no contributors!"])]]
      #_[:section
         ($jobs-preview (take 3 jobs/DATA))]
      [:section
