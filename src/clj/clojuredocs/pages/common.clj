@@ -1,6 +1,7 @@
 (ns clojuredocs.pages.common
   (:require [clojure.string :as str]
             [clojuredocs.util :as util]
+            [nsfw.util]
             [clojuredocs.config :as config]
             [clojuredocs.env :as env]
             [clojuredocs.github :as gh]
@@ -89,7 +90,7 @@
     [:ul.navbar-nav.mobile-navbar-nav.nav
      [:li
       [:a {:href "/core-library"} "Core Library"
-       [:span.clojure-version "(1.11.1)"]]]
+       [:span.clojure-version "(1.12.1)"]]]
      [:li [:a {:href "/quickref"} "Quick Reference"]]
      (if user
        ($user-area user)
@@ -158,7 +159,7 @@
     font-awesome-link
     bootstrap-link
     app-link
-    [:script "// <![CDATA[\nwindow.PAGE_DATA=" (util/to-json (pr-str page-data)) ";\n//]]>"]]
+    [:script "// <![CDATA[\nwindow.PAGE_DATA=" (util/to-json (nsfw.util/to-transit page-data)) ";\n//]]>"]]
    [:body
     (when body-class
       {:class body-class})
