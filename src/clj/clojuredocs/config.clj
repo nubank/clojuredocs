@@ -64,12 +64,6 @@
     :doc "New Relic Browser perf tracking key"
     :required? false}
 
-   {:key :ga-tracking-id
-    :type :string
-    :doc "GA id (UA-...)"
-    :required? false
-    :default "UA-17348828-3"}
-
    {:key :cache-markdown
     :type :bool
     :doc "Cache markdown from disk for duration of app process?"
@@ -107,8 +101,6 @@
 (def base-url (get-env env-vars :base-url))
 
 (def staging-banner? (get-env env-vars :staging-banner))
-
-(def ga-tracking-id (get-env env-vars :ga-tracking-id))
 
 (def cljs-dev? (get-env env-vars :cljs-dev))
 
