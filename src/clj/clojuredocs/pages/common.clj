@@ -14,15 +14,18 @@
              {:redirect-uri (config/url redirect-url)}))))
 
 
-(defn $ga-script-tag [ga-tracking-id]
-  (when ga-tracking-id
-    [:script "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', '" ga-tracking-id "', 'auto');
-  ga('send', 'pageview');"]))
+(defn $matomo-script-tag []
+  [:script "var _paq = window._paq = window._paq || [];
+   /* tracker methods like \"setCustomDimension\" should be called before \"trackPageView\" */
+   _paq.push(['trackPageView']);
+   _paq.push(['enableLinkTracking']);
+   (function() {
+                var u=\"https://cognitect.matomo.cloud/\";
+                _paq.push(['setTrackerUrl', u+'matomo.php']);
+                _paq.push(['setSiteId', '15']);
+                var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+                g.async=true; g.src='https://cdn.matomo.cloud/cognitect.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
+                })();"])
 
 (defn $user-area [user]
   [:li.user-area
@@ -196,7 +199,7 @@
     (when (env/bool :cljs-dev)
       [:script {:src "/js/marked.min.js"}])
     clojuredocs-script
-    ($ga-script-tag config/ga-tracking-id)
+    ($matomo-script-tag)
     ;; mobile safari home screen mode
     [:script
      "if((\"standalone\" in window.navigator) && window.navigator.standalone){
