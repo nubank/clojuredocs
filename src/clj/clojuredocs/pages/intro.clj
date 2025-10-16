@@ -162,7 +162,7 @@
       [:ul
        [:li
         [:h4 [:i.fa.fa-comment-o] "Give Feedback"]
-        [:p "Please " [:a {:href "https://github.com/zk/clojuredocs/issues"} "open a ticket"] " if you have an idea of how we can improve ClojureDocs."]]
+        [:p "Please " [:a {:href "https://github.com/nubank/clojuredocs/issues"} "open a ticket"] " if you have an idea of how we can improve ClojureDocs."]]
        [:li
         [:h4 [:i.fa.fa-indent] "Add an Example"]
         [:p "Sharing your knowledge with fellow Clojurists is easy:"]
