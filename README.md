@@ -9,7 +9,7 @@ The clojuredocs.org webapp
 
 A few ways to contribute:
 
-* Find & report bugs: https://github.com/zk/clojuredocs/issues
+* Find & report bugs: https://github.com/nubank/clojuredocs/issues
 * Suggestions on how to make development on the site more friendly
   (docs, codebase organization).
 
