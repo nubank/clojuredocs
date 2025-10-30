@@ -66,7 +66,7 @@
        (when show-stars?
          [:li
           [:iframe.gh-starred-count
-           {:src "/github-btn.html?user=zk&repo=clojuredocs&type=watch&count=true"
+           {:src "/github-btn.html?user=nubank&repo=clojuredocs&type=watch&count=true"
             :allowtransparency "true"
             :frameborder "0"
             :scrolling "0"
@@ -93,7 +93,7 @@
     [:ul.navbar-nav.mobile-navbar-nav.nav
      [:li
       [:a {:href "/core-library"} "Core Library"
-       [:span.clojure-version "(1.12.2)"]]]
+       [:span.clojure-version "(1.12.3)"]]]
      [:li [:a {:href "/quickref"} "Quick Reference"]]
      (if user
        ($user-area user)
