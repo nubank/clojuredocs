@@ -21,6 +21,11 @@
 (def color-red "#a55")
 (def color-light-pink "#fcc")
 
+(def font-12 "12px")
+(def font-16 "16px")
+(def font-20 "20px")
+(def font-28 "28px")
+
 (def intro-page
   [[:.xkcd {:display 'block
             :margin-left 'auto
@@ -32,17 +37,16 @@
      {:margin-bottom "40px"}
      (nc/at-bp {:margin-bottom "20px"})]
     [:.quick-lookup-wrapper
-     {:background-color 'white
-      :margin "-30px -25px"
+     {:margin "-30px -25px"
       :padding "30px 25px"}
      (nc/at-bp {:margin 0
                 :padding 0})
      [:input.query
-      {:font-size "20px"
+      {:font-size font-20
        :padding "10px 15px"}
-      (nc/at-bp {:font-size "16px"})]]
+      (nc/at-bp {:font-size font-16})]]
     [:.code-example
-     [:font-size "14px"
+     [:font-size font-16
       :padding "20px"
       :border "solid transparent 1px"
       :background-color color-lightest]]
@@ -59,7 +63,7 @@
                  :height 'auto})]]
     [:.migrate-account
      {:text-align 'right
-      :font-size "12px"}]
+      :font-size font-12}]
     [:.getting-started-resources
      {:margin-bottom "20px"}
      [:li {:list-style-type 'disc
@@ -69,11 +73,11 @@
       :overflow 'auto
       :overflow-y 'hidden
       :font-family monospace-font
-      :font-size "15px"
+      :font-size font-16
       :line-height "1.3em"}
-     (nc/at-bp :md {:font-size "12px"})
-     (nc/at-bp :sm {:font-size "13px"})
-     (nc/at-bp :xs {:font-size "12px"})
+     (nc/at-bp :md {:font-size font-12})
+     (nc/at-bp :sm {:font-size font-16})
+     (nc/at-bp :xs {:font-size font-12})
      [:table {:margin "0 auto"}]]
     [:ul
      [:h4
@@ -90,8 +94,8 @@
       (nc/at-bp :md {:max-height "35px"})
       (nc/at-bp :sm {:max-height "50px"})]]
     [:.recently-updated
-     {:margin-bottom "5px"
-      :font-size "13px"
+     {:margin-bottom "20px"
+      :font-size font-16
       :color color-dark
       :line-height "17px"
       :clear 'both}
@@ -102,7 +106,7 @@
        :display 'inline-block
        :padding-top "2px"}]]]
    [:.not-finding {:text-align 'right
-                   :font-size "12px"
+                   :font-size font-12
                    :line-height "18px"
                    :opacity 0.8
                    :margin-top "5px"}]])
@@ -136,12 +140,12 @@
      {:position 'absolute
       :right 0
       :top 0
-      :font-size "10px"
+      :font-size font-12
       :text-transform 'uppercase
       :color color-light
       :line-height "12px"}]
     [:p {:margin-bottom "10px"}]
-    [:.see-alsos {:font-size "14px"
+    [:.see-alsos {:font-size font-16
                   :color color-light}
      [:.see-also-label {:margin-right "10px"}]
      [:ul {:display 'inline-block}
@@ -165,7 +169,7 @@
     [:.ac-metadata
      {:font-weight 'normal
       :color color-dark
-      :font-size "12px"
+      :font-size font-12
       :white-sapce 'nowrap}]]])
 
 (def var-page
@@ -174,7 +178,7 @@
      {:margin-bottom "5px"}]
     [:.var-meta
      {:margin-bottom "10px"
-      :font-size "13px"
+      :font-size font-16
       :line-height "1.3em"
       :color color-dark
       :text-align 'right}
@@ -186,7 +190,7 @@
     [:.arglists {:margin-left 0
                  :padding-left 0
                  :font-family monospace-font
-                 :font-size "14px"}
+                 :font-size font-16}
      [:li {:margin 0
            :display 'inline-block
            :margin-right "10px"
@@ -203,20 +207,20 @@
     [:.docstring
      [:pre {:background-color color-lightest
             :color color-dark
-            :font-size "15px"
+            :font-size font-16
             :line-height "1.4em"
             :margin-bottom 0
             :padding "15px 10px"}
-      (nc/at-bp :md {:font-size "12px"})
-      (nc/at-bp :sm {:font-size "13px"})
-      (nc/at-bp :xs {:font-size "12px"})]
+      (nc/at-bp :md {:font-size font-12})
+      (nc/at-bp :sm {:font-size font-16})
+      (nc/at-bp :xs {:font-size font-12})]
      [:.copyright {:text-align 'right
-                   :font-size "10px"
+                   :font-size font-12
                    :color color-light}
       [:a {:color color-light}]]]
     [:.example {:margin-bottom "30px"}]]
    [:.example-meta :.note-meta
-    {:font-size "10px"
+    {:font-size font-12
      :margin-bottom 0
      :line-height "1.3em"
      :margin-right "5px"
@@ -229,9 +233,9 @@
    [:.note-meta {:margin-bottom "10px"}
     [:.avatar {:margin "0 2px"}]]
    (let [r [:&
-            {:font-size "15px"}
-            (nc/at-bp :md {:font-size "12.5px"})
-            (nc/at-bp :sm {:font-size "11.5px"})]]
+            {:font-size font-16}
+            (nc/at-bp :md {:font-size font-12})
+            (nc/at-bp :sm {:font-size font-12})]]
      [[:.var-example [:.syntaxify r]]
       [:.tabbed-editor
        [:.example-editor
@@ -274,8 +278,8 @@
      :background-color color-lightest
      :border-top "solid #ddd 5px"}]
    [:.ns-tree
-    {:font-size "14px"}
-    [:h3 {:font-size "12px"}]
+    {:font-size font-16}
+    [:h3 {:font-size font-12}]
     [:li {:margin-bottom 0}]
     ["li > ul" {:margin-left "10px"}]
     [:.current {:font-weight 'bold}]]
@@ -301,7 +305,7 @@
    [:.add-note
     [:.instructions
      {:color color-dark
-      :font-size "12px"}]
+      :font-size font-12}]
     [:textarea {:height "200px"}]]
    [:.examples-styleguide-content
     [:.syntaxify {:margin-bottom "20px"
@@ -314,7 +318,7 @@
   [[:.toc {:margin-bottom "20px"}
     [:h5 {:margin 0
           :margin-bottom "10px"
-          :font-size "12px"
+          :font-size font-12
           :margin-right 0
           :margin-top 0}]
     [:h6 {:margin-top 0}]
@@ -324,14 +328,14 @@
      [:ul {:padding 0
            :margin-bottom "15px"}]
      [:li {:margin-left "10px"
-           :font-size "12px"
+           :font-size font-12
            :margin-bottom 0
            :line-height "1.5em"}]]]
    [:.quickref-mobile-toc
     [:h5 {:color 'white
           :margin-bottom "5px"
           :margin-top 0}]
-    [:.categories {:font-size "12px"
+    [:.categories {:font-size font-12
                    :line-height "16px"}]]
    [:.sticky {:position 'fixed
               :overflow 'auto
@@ -341,7 +345,7 @@
      {:display 'inline-block
       :margin 0
       :margin-bottom "10px"}]
-    [:h4 {:font-size "14px"
+    [:h4 {:font-size font-16
           :font-weight 500}]
     [:.sphere-header
      {:border-bottom "solid orange 3px"
@@ -359,14 +363,14 @@
     [:.quickref-header
      [:.header-reference
       {:color color-dark
-       :font-size "14px"}]]
+       :font-size font-16}]]
     [:.examples-count
      {:color color-light}]
     [:.dl-row
      {:clear 'both
       :padding "3px 0"}
      [:&:hover {:background-color color-light}]]
-    [:dl {:font-size "13px"}]
+    [:dl {:font-size font-16}]
     [:dt {:width "130px"
           :text-align 'right
           :margin-right "10px"
@@ -404,7 +408,7 @@
     [:textarea {:font-family monospace-font
                 :margin-bottom 0
                 :padding "10px"
-                :font-size "13px"}]
+                :font-size font-16}]
     [:.add-example-controls
      {:margin-bottom "10px"}]
     [:.add-example-content
@@ -412,7 +416,7 @@
       :background-color color-lightest}]]
    [:p.example-instructions
     {:margin-bottom "10px"
-     :font-size "12px"
+     :font-size font-12
      :line-height "20px"
      :color color-dark}]])
 
@@ -468,14 +472,14 @@
      [:.comp
       {:margin-top "3px"
        :color color-light
-       :font-size "13px"}]]
+       :font-size font-16}]]
     [:.job-info
      [:.section-header
       {:border-bottom "solid #eee 1px"
        :color color-dark
-       :font-size "20px"}]
+       :font-size font-20}]
      [:ul {:margin-bottom "20px"}]
-     [:h1 {:font-size "20px"
+     [:h1 {:font-size font-20
            :font-weight 'bold}]]
     [:.btn {:border-radius 0}]
     [:.job-description :.company-description
@@ -498,31 +502,31 @@
                  :font-family "\"Helvetica Neue\", Helvetica, sans-serif"
                  :color color-darkest
                  :background-color color-lightest}]
-   [:body {:font-size "16px"
+   [:body {:font-size font-16
            :line-height "1.5em"
            :transition "all 0.2s ease-in"
            :height "100%"}
     [:&.search-active {:background-color color-darkest}]]
    [:img {:max-width "100%"}]
    [:h1 :h2 :h3 :h4 :h5 :h6 {:font-weight 'normal}]
-   [:h1 {:font-size "28px"
+   [:h1 {:font-size font-28
          :line-height "36px"
          :margin-bottom "20px"}
     [:&:first-of-type {:margin-top 0}]]
    (at-media {:max-width "767px"}
-             [:h1 {:font-size "20px"
+             [:h1 {:font-size font-20
                    :line-height "30px"}])
 
-   [:h2 {:font-size "24px"
+   [:h2 {:font-size font-28
          :line-height "34px"
          :margin-bottom "20px"}]
-   [:h5 {:font-size "15px"
+   [:h5 {:font-size font-16
          :font-weight 500
          :text-transform 'uppercase
          :letter-spacing "1px"
          :color color-dark
          :margin-bottom "10px"}]
-   [:p {:font-size "17px"
+   [:p {:font-size font-20
         :margin-bottom "1.4em"
         :line-height "1.6em"}]
    [:li {:margin-bottom "0.5em"
@@ -532,7 +536,7 @@
           :word-wrap 'normal}]
    [:ul {:padding 0}]
    [:section {:margin-bottom "40px"}]
-   [:code {:font-size "14px"}]
+   [:code {:font-size font-16}]
    ["a > code" {:color blue}]
    [:.badge {:background-color #_"rgba(0,0,0,0.05)" 'transparent
              :color "rgba(0,0,0,0.2)"
@@ -540,7 +544,7 @@
              :padding "1px 5px"
              :font-weight 500
              :margin-left "5px"
-             :font-size "14px"
+             :font-size font-16
              :line-height "22px"}]
 
    ;; check
@@ -549,9 +553,9 @@
    [:footer :.sticky-push {:height "200px"}]
    [:footer
     {:text-align 'center
-     :font-size "12px"
+     :font-size font-12
      :padding-top "130px"}
-    [:.divider {:font-size "16px"}]
+    [:.divider {:font-size font-16}]
     [:.ctas {:line-height "30px"}
      [:iframe {:margin-bottom "-6px"
                :margin-left "10px"}]
@@ -565,8 +569,8 @@
    [:.avatar
     {:display 'inline-block
      :border-radius "3px"
-     :width "48px"
-     :height "48px"}]
+     :width "32px"
+     :height "32px"}]
    [:body.user-page
     [:.user-avatar
      [:.avatar {:width "200px"
@@ -593,15 +597,15 @@
                     :padding-left 0}])
     [:.btn.mobile-menu {:border 'none
                         :margin-top "5px"
-                        :font-size "18px"
+                        :font-size font-20
                         :display 'none}
      [:i {:margin 0}]]
-    [:.user-area {:font-size "14px"
+    [:.user-area {:font-size font-16
                   :color color-dark}]
     [:.navbar-nav {:padding-right 0
                    :margin 0}
      [:li {:margin-bottom 0
-           :font-size "14px"}]]
+           :font-size font-16}]]
     [:.nav-search-widget
      [:form
       {:margin-right "10px"}]]
@@ -611,7 +615,7 @@
       :margin-left "10px"}]
     [:.clojure-version
      {:font-weight 300
-      :font-size "12px"
+      :font-size font-12
       :font-family monospace-font
       :color color-light
       :line-height "21px"}
@@ -637,7 +641,7 @@
      {:float 'right}]]
    [:.mobile-nav-menu
     [:.badge
-     {:font-size "16px"
+     {:font-size font-16
       :color "rgba(255,255,255,0.5)"
       :font-weight 300
       :float 'right
@@ -687,7 +691,7 @@
                     :border-bottom "solid rgba(255,255,255,0.3) 1px"
                     :margin 0
                     :color "rgba(255,255,255,0.8)"
-                    :font-size "14px"
+                    :font-size font-16
                     :letter-spacing "1px"
                     :font-weight 500}
                [:i {:margin-right "5px"}]]
@@ -714,7 +718,7 @@
                                  :color "rgba(255,255,255,0.7)"
                                  :font-family monospace-font
                                  :margin-left "5px"
-                                 :font-size "10px"}])
+                                 :font-size font-12}])
 
 
 
@@ -734,9 +738,9 @@
       [:&:hover {:color blue}]]]
     [:p {:color color-dark
          :margin-bottom 0
-         :font-size "15px"}]
+         :font-size font-16}]
     [:.var-title {:margin-bottom "3px"}]
-    [:.meta {:font-size "10px"
+    [:.meta {:font-size font-12
              :color color-light
              :text-transform 'uppercase}
      [:a {:color color-light}]]
@@ -752,7 +756,7 @@
      {:border-radius 0
       :min-width "200px"
       :height "100%"
-      :font-size "14px"
+      :font-size font-16
       :padding "6px 12px"}]
     [:input.placeholder {:visibility 'hidden}]]
 
@@ -772,7 +776,7 @@
 
    [:.example-body
     {:padding "10px"
-     :font-size "14px"
+     :font-size font-16
      :background-color color-lightest
      :margin-bottom "10px"}]
 
@@ -780,9 +784,9 @@
     {:background-color color-lightest
      :margin-bottom "0px"
      :padding "15px"
-     :font-size "14px"}]
+     :font-size font-16}]
    [:.recent-pages
-    {:font-size "14px"
+    {:font-size font-16
      :margin-bottom "30px"}
     [:li {:margin-bottom 0}]
     (nc/at-bp :xs
@@ -807,7 +811,7 @@
     [:.dl-row {:clear 'both
                :padding "3px 0"}
      [:&:hover {:background-color color-light}]]
-    [:dl {:font-size "13px"}]
+    [:dl {:font-size font-16}]
     [:dt {:min-width "150px"
           :text-align 'right
           :margin-right "10px"
@@ -833,19 +837,19 @@
      [:.name {:text-align 'right}]
      [".name > span" {:padding-right "20px"
                       :font-family monospace-font
-                      :font-size "12px"
+                      :font-size font-12
                       :line-height "24px"
                       :vertical-align 'middle}]
      [:.doc
       nc/ellipsis-text
       {:line-height "24px"
-       :font-size "14px"}]
+       :font-size font-16}]
      [:.heading {:margin-top "20px"
                  :margin-bottom "5px"
                  :border-bottom "solid #ccc 2px"}]]]
    [:.error-page
     [:h1 {:text-align 'center
-          :font-size "20px"
+          :font-size font-20
           :color color-darkest}]
     [:a.four-oh-four
      {:max-width "300px"
@@ -861,17 +865,17 @@
     {:text-align 'center
      :background-color "rgb(201,48,44)"
      :color "rgba(255,255,255, 0.8)"
-     :font-size "14px"
+     :font-size font-16
      :font-weight 400
      :padding "3px"}]
    [:.toggle-controls :.login-required-message
     {:text-align 'right
      :margin-bottom "4px"
-     :font-size "12px"}]
+     :font-size font-12}]
    [:.toggle-link {:color light-blue}]
-   [:.sidenav {:font-size "14px"
+   [:.sidenav {:font-size font-16
                :max-height "100%"}
-    [:h5 {:font-size "14px"
+    [:h5 {:font-size font-16
           :margin-top 0}]
     ["& > ul" {:margin-bottom "20px"}]
     [:li {:margin-bottom 0}]
@@ -890,7 +894,7 @@
     [:.empty-live-preview
      {:text-align 'center
       :color color-light
-      :font-size "14px"
+      :font-size font-16
       :padding "10px"}]]
    [:.ac-results-widget {:margin "0 -20px"
                          :padding "0 20px"}]
@@ -928,7 +932,7 @@
       :background-color color-lightest
       :padding "5px"
       :color color-dark
-      :font-size "11px"
+      :font-size font-12
       :letter-spacing "1px"}]]
    [:.field-schemas :table.schema
     [:td {:padding-right "10px"
@@ -938,7 +942,7 @@
      :width "100%"}
     [:td {:border 'none
           :padding "5px"}]
-    [:.aside {:font-size "12px"}]]
+    [:.aside {:font-size font-12}]]
    [:.test-result
     {:padding "3px"
      :color 'white}
@@ -948,8 +952,8 @@
     [:&.pending {:background-color color-dark}]]
    [:.add-example-page
     [:.syntaxify
-     [:code {:font-size "12px"}]]
-    [:textarea :pre {:font-size "12px"}]]
+     [:code {:font-size font-12}]]
+    [:textarea :pre {:font-size font-12}]]
    [:.tabbed-editor
     [:.example-editor
      {:border-color color-light
@@ -1016,7 +1020,7 @@
       [:pre {:margin 0}]]]]
    [:.migrate-user-page
     [:.controls {:text-align 'center}
-     [:.btn {:font-size "30px"
+     [:.btn {:font-size font-28
              :padding "5px 30px"}]]]
    [:.var-namespace-group
     [:h2 {:border-bottom "solid orange 2px"}]]
@@ -1042,23 +1046,23 @@
      [:h1 {:border-bottom "solid #ccc 2px"}]
      [:h2 {:margin-top "5px"
            :margin-bottom 0
-           :font-size "24px"}]
+           :font-size font-28}]
      [:h3 {:margin-top 0
            :margin-bottom "5px"
-           :font-size "16px"
+           :font-size font-16
            :font-weight 500
            :color color-dark}]
      [:p {:margin-bottom "5px"
-          :font-size "16px"
+          :font-size font-16
           :line-height "24px"}]
-     [:.examples-count {:font-size "13px"
+     [:.examples-count {:font-size font-16
                         :color color-dark}]
      [:.arglists
       {:margin-left 0
        :margin-bottom 0
        :padding-left 0
        :font-family monospace-font
-       :font-size "14px"}
+       :font-size font-16}
       [:li {:margin 0
             :display 'inline-block
             :margin-right "10px"
@@ -1066,7 +1070,7 @@
             :padding "0 5px"
             :background-color color-lightest}]]
      [:.meta-info
-      {:font-size "13px"
+      {:font-size font-16
        :color color-dark
        :line-height "20px"}]
      [:.see-alsos
@@ -1088,6 +1092,6 @@
      :text-align 'center
      :padding "3px"
      :font-weight '300
-     :font-size "13px"}
+     :font-size font-16}
     [:a {:color 'white
          :text-decoration 'underline}]]])
