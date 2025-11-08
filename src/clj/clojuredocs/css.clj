@@ -2,17 +2,24 @@
   (:require [garden.stylesheet :refer [at-media]]
             [nsfw.css :as nc]))
 
-(def blue "rgba(66, 139, 202, 1)")
+(def monospace-font "Monaco, Menlo, Consolas, \"Courier New\", monospace")
 
+(def blue "rgba(66, 139, 202, 1)")
 (def light-blue "rgba(66, 139, 202, 0.8)")
 
-(def lightest-blue "rgba(66, 139, 202, 0.1)")
+(def gray-1 "#333")
+(def gray-2 "#777")
+(def gray-3 "#bbb")
+(def gray-4 "#f8f8f8")
 
-(def light-black "rgba(0,0,0,0.05);")
+(def color-darkest (str "light-dark(" gray-1 ", " gray-4 ")"))
+(def color-dark (str "light-dark(" gray-2 ", " gray-3 ")"))
+(def color-light (str "light-dark(" gray-3 ", " gray-2 ")"))
+(def color-lightest (str "light-dark(" gray-4 ", " gray-1 ")"))
 
-(def code-bg "rgba(0,0,0,0.01)")
-
-(def monospace-font "Monaco, Menlo, Consolas, \"Courier New\", monospace")
+(def color-green "#5a5")
+(def color-red "#a55")
+(def color-light-pink "#fcc")
 
 (def intro-page
   [[:.xkcd {:display 'block
@@ -38,7 +45,7 @@
      [:font-size "14px"
       :padding "20px"
       :border "solid transparent 1px"
-      :background-color "#fafafa"]]
+      :background-color color-lightest]]
     [:.row
      {:margin-bottom "0px"}]
     [:.top-contribs
@@ -48,8 +55,8 @@
        :margin-bottom "0.53%"
        :height 'auto}
       (nc/at-bp :xs
-        {:width "7.80%"
-         :height 'auto})]]
+                {:width "7.80%"
+                 :height 'auto})]]
     [:.migrate-account
      {:text-align 'right
       :font-size "12px"}]
@@ -85,7 +92,7 @@
     [:.recently-updated
      {:margin-bottom "5px"
       :font-size "13px"
-      :color "#999"
+      :color color-dark
       :line-height "17px"
       :clear 'both}
      [:.clear {:clear 'both}]
@@ -106,7 +113,7 @@
 
    [:.ac-result
     [:td {:padding "10px"}]
-    [:.docstring {:color "#444"}]]
+    [:.docstring {:color color-darkest}]]
 
    [:ul.ac-results
     {:margin-left 0
@@ -121,7 +128,7 @@
      [:&.highlighted {:background-color "rgba(0,0,0,0.02)"}]
      [:p {:margin-bottom 0}]
      [:i {:margin-left 0
-          :color "#666"
+          :color color-dark
           :width "15px"
           :text-align 'right}]]]
    [:.ac-entry {:position 'relative}
@@ -131,11 +138,11 @@
       :top 0
       :font-size "10px"
       :text-transform 'uppercase
-      :color "#aaa"
+      :color color-light
       :line-height "12px"}]
     [:p {:margin-bottom "10px"}]
     [:.see-alsos {:font-size "14px"
-                  :color "#aaa"}
+                  :color color-light}
      [:.see-also-label {:margin-right "10px"}]
      [:ul {:display 'inline-block}
       [:li {:margin 0
@@ -154,10 +161,10 @@
      [:.docstring {:vertical-align 'top
                    :max-width "700px"}
       [:a {:display 'block
-           :color "#444"}]]]
+           :color color-darkest}]]]
     [:.ac-metadata
      {:font-weight 'normal
-      :color "#999"
+      :color color-dark
       :font-size "12px"
       :white-sapce 'nowrap}]]])
 
@@ -169,7 +176,7 @@
      {:margin-bottom "10px"
       :font-size "13px"
       :line-height "1.3em"
-      :color "#888"
+      :color color-dark
       :text-align 'right}
      (nc/at-bp :xs {:text-align 'left})
      [:h2 {:margin-bottom "5px"}]
@@ -185,7 +192,7 @@
            :margin-right "10px"
            :margin-bottom "10px"
            :padding "0 5px"
-           :background-color "#f8f8f8"}]]]
+           :background-color color-lightest}]]]
 
    [:.var-page :.example-page
     [:h1 :h2 {:margin-top 0}]
@@ -194,8 +201,8 @@
     [:section.search {:margin-bottom "1em"}]
     [:.null-state {:margin-bottom "30px"}]
     [:.docstring
-     [:pre {:background-color "#f8f8f8"
-            :color "#555"
+     [:pre {:background-color color-lightest
+            :color color-dark
             :font-size "15px"
             :line-height "1.4em"
             :margin-bottom 0
@@ -205,15 +212,15 @@
       (nc/at-bp :xs {:font-size "12px"})]
      [:.copyright {:text-align 'right
                    :font-size "10px"
-                   :color "#bbb"}
-      [:a {:color "#bbb"}]]]
+                   :color color-light}
+      [:a {:color color-light}]]]
     [:.example {:margin-bottom "30px"}]]
    [:.example-meta :.note-meta
     {:font-size "10px"
      :margin-bottom 0
      :line-height "1.3em"
      :margin-right "5px"
-     :color "#888"}
+     :color color-dark}
     [:.avatar {:width "25px"
                :height "25px"
                :opacity 0.8}
@@ -241,7 +248,7 @@
     [:.example {:margin-bottom "30px"}]
     [:.syntaxify [:table {:margin 0}]]]
    [:.example-meta
-    {:color "#aaa"}
+    {:color color-light}
     [:.avatar {:margin-right "5px"}]
     [:.contributors :.created :.last-updated :.links
      {:display 'inline-block
@@ -264,7 +271,7 @@
      [:.created {:display 'block}]]]
    [:.example-code
     {:margin-bottom "15px"
-     :background-color "#fafafa"
+     :background-color color-lightest
      :border-top "solid #ddd 5px"}]
    [:.ns-tree
     {:font-size "14px"}
@@ -281,24 +288,24 @@
     [:input {:border-radius 0}]
     [:.error-message {:padding "5px"}
      [:i {:margin-right "5px"}]]
-    [:.ac-results {:color "#555"}]]
+    [:.ac-results {:color color-dark}]]
    [:.note-body
-    {:background-color "#fafafa"
+    {:background-color color-lightest
      :padding "10px"
      :word-wrap 'normal}
     [:p {:margin-bottom "10px"}]]
    [:.add-example
     [:.add-example-content
      {:padding "10px"
-      :background-color "#fafafa"}]]
+      :background-color color-lightest}]]
    [:.add-note
     [:.instructions
-     {:color "#555"
+     {:color color-dark
       :font-size "12px"}]
     [:textarea {:height "200px"}]]
    [:.examples-styleguide-content
     [:.syntaxify {:margin-bottom "20px"
-                  :background-color code-bg}]
+                  :background-color color-darkest}]
     [:ul {:margin-bottom "30px"}]
     [:li {:list-style-type 'disc
           :margin-left "25px"}]]])
@@ -345,20 +352,20 @@
     [:.category
      {:margin-bottom "40px"}]
     [:.header-reference
-     {:color "#bbb"
+     {:color color-light
       :font-weight 'normal
       :float 'right
       :margin-right 0}]
     [:.quickref-header
      [:.header-reference
-      {:color "#999"
+      {:color color-dark
        :font-size "14px"}]]
     [:.examples-count
-     {:color "#bbb"}]
+     {:color color-light}]
     [:.dl-row
      {:clear 'both
       :padding "3px 0"}
-     [:&:hover {:background-color "#eee"}]]
+     [:&:hover {:background-color color-light}]]
     [:dl {:font-size "13px"}]
     [:dt {:width "130px"
           :text-align 'right
@@ -373,17 +380,17 @@
      (nc/at-bp :sm {:width "380px"})]
     [:dt {:font-weight 'normal}]
     (nc/at-bp :xs
-      [:.dl-row {:padding 0}]
-      [:dt {:display 'block
-            :text-align 'left
-            :padding-top "10px"
-            :clear 'both}]
-      [:dd {:display 'block
-            :border-bottom "solid #ddd 1px"
-            :padding-bottom "10px"
-            :text-align 'left
-            :width "100%"
-            :margin-left 0}])]
+              [:.dl-row {:padding 0}]
+              [:dt {:display 'block
+                    :text-align 'left
+                    :padding-top "10px"
+                    :clear 'both}]
+              [:dd {:display 'block
+                    :border-bottom "solid #ddd 1px"
+                    :padding-bottom "10px"
+                    :text-align 'left
+                    :width "100%"
+                    :margin-left 0}])]
    [:.quickref-other
     {:display 'inline-block}
     [:li {:display 'inline-block}]]])
@@ -392,7 +399,7 @@
   [[:.example-editor
     {:background-color 'white
      :margin-bottom "10px"}
-    [:&.disabled {:background-color "#eee"}]
+    [:&.disabled {:background-color color-light}]
     [:form {:margin-bottom "20px"}]
     [:textarea {:font-family monospace-font
                 :margin-bottom 0
@@ -402,19 +409,18 @@
      {:margin-bottom "10px"}]
     [:.add-example-content
      {:padding "30px"
-      :background-color "#f8f8f8"}]
-    ]
+      :background-color color-lightest}]]
    [:p.example-instructions
     {:margin-bottom "10px"
      :font-size "12px"
      :line-height "20px"
-     :color "#888"}]])
+     :color color-dark}]])
 
 (def styleguide-page
-  [(let [color "#f0f0f0"
+  [(let [color color-lightest
          size 40]
      [:.checker-bg
-      {:background-color "#fafafa"
+      {:background-color color-lightest
        :background-image (str "linear-gradient(45deg,"
                               color
                               " 25%,transparent 25%,transparent 75%,"
@@ -451,7 +457,7 @@
 (def jobs
   [[:.job-preview
     [:.job-location :.comp :.remote-ok :.comp-equity :.comp-cash
-     {:color "#888"}]]
+     {:color color-dark}]]
    [:.jobs-page
     [:.job-preview-wrapper
      :.list-jobs-header
@@ -461,12 +467,12 @@
     [:.job-preview
      [:.comp
       {:margin-top "3px"
-       :color "#aaa"
+       :color color-light
        :font-size "13px"}]]
     [:.job-info
      [:.section-header
       {:border-bottom "solid #eee 1px"
-       :color "#888"
+       :color color-dark
        :font-size "20px"}]
      [:ul {:margin-bottom "20px"}]
      [:h1 {:font-size "20px"
@@ -486,16 +492,17 @@
 
 (def app
   [nc/flex-defaults
-
+   [":root" {:color-scheme "light dark"}]
    [:html :body {:-webkit-font-smothing 'antialiased
                  :height "100%"
                  :font-family "\"Helvetica Neue\", Helvetica, sans-serif"
-                 :color "#444"}]
+                 :color color-darkest
+                 :background-color color-lightest}]
    [:body {:font-size "16px"
            :line-height "1.5em"
            :transition "all 0.2s ease-in"
            :height "100%"}
-    [:&.search-active {:background-color light-black}]]
+    [:&.search-active {:background-color color-darkest}]]
    [:img {:max-width "100%"}]
    [:h1 :h2 :h3 :h4 :h5 :h6 {:font-weight 'normal}]
    [:h1 {:font-size "28px"
@@ -503,8 +510,8 @@
          :margin-bottom "20px"}
     [:&:first-of-type {:margin-top 0}]]
    (at-media {:max-width "767px"}
-     [:h1 {:font-size "20px"
-           :line-height "30px"}])
+             [:h1 {:font-size "20px"
+                   :line-height "30px"}])
 
    [:h2 {:font-size "24px"
          :line-height "34px"
@@ -513,7 +520,7 @@
          :font-weight 500
          :text-transform 'uppercase
          :letter-spacing "1px"
-         :color "#777"
+         :color color-dark
          :margin-bottom "10px"}]
    [:p {:font-size "17px"
         :margin-bottom "1.4em"
@@ -553,7 +560,7 @@
     [:.right {:text-align 'left}]
 
     (nc/at-bp :xs
-      [:.left :.right {:text-align 'center}])]
+              [:.left :.right {:text-align 'center}])]
 
    [:.avatar
     {:display 'inline-block
@@ -590,7 +597,7 @@
                         :display 'none}
      [:i {:margin 0}]]
     [:.user-area {:font-size "14px"
-                  :color "#999"}]
+                  :color color-dark}]
     [:.navbar-nav {:padding-right 0
                    :margin 0}
      [:li {:margin-bottom 0
@@ -606,10 +613,10 @@
      {:font-weight 300
       :font-size "12px"
       :font-family monospace-font
-      :color "#ccc"
+      :color color-light
       :line-height "21px"}
      [:a {:line-height "20px"
-          :color "#ccc"
+          :color color-light
           :font-weight 300}]]]
    [:.mobile-nav-bar {:display 'none}]
    [:.navbar-nav
@@ -638,102 +645,102 @@
       :margin 0
       :padding 0}]]
    (nc/at-bp :xs
-     [:header.navbar
-      [:.btn.mobile-menu
-       {:display 'block
-        :margin-right "-11px"}]
-      [:.nav-search-widget {:display 'none}]
-      [:.navbar-nav {:display 'none}]]
-     [:.mobile-push-wrapper
-      (merge
-        {:right 0
-         :position 'relative
-         :padding-top "60px"
-         :transform "translate3d(0,0,0)"}
-        (nc/transition "all 0.2s ease"))]
-     [:.desktop-nav-bar :.desktop-side-nav {:display 'none}]
-     [:.mobile-nav-bar
-      (nc/transition "all 0.2s ease")
-      {:background-color 'white
-       :position 'fixed
-       :top 0
-       :width "100%"
-       :z-index 1000
-       :display 'block}
-      [:header {:margin-bottom 0}]]
-     [:.mobile-nav-menu
-      (nc/transition "all 0.2s ease")
-      {:transform "translate3d(200px,0,0)"}
-      {:display 'block
-       :position 'fixed
-       :width "200px"
-       :z-index 10000
-       :background-color "#47a3da"
-       :color 'white
-       :font-weight 300
-       :top 0
-       :bottom 0
-       :right 0
-       :margin 0
-       :overflow-y 'scroll}
-      [:h4 {:padding "5px 10px"
-            :border-bottom "solid rgba(255,255,255,0.3) 1px"
-            :margin 0
-            :color "rgba(255,255,255,0.8)"
-            :font-size "14px"
-            :letter-spacing "1px"
-            :font-weight 500}
-       [:i {:margin-right "5px"}]]
-      [:li {:margin 0}
-       [:a {:color 'white}
-        [:&:hover {:background-color "#258ecd"}]]]
-      [:.navbar-nav {:margin 0}]]
-     [:.mobile-push-wrapper.mobile-push
-      (nc/transition "all 0.2s ease")
-      {:transform "translate3d(-200px,0,0)"
-       :right 0}]
-     [:.mobile-nav-menu.mobile-push
-      (nc/transition "all 0.2s ease")
-      {:transform "translate3d(0,0,0)"}
-      [:header.navbar
-       (nc/transition "all 0.2s ease")
-       {:right "200px"}]]
-     [:.mobile-nav-bar.mobile-push
-      (nc/transition "all 0.2s ease")
-      {:transform "translate3d(-200px,0,0)"}]
-     [:.page-toc {:display 'none}]
-     [:body.search-active {:background-color 'transparent}]
-     [:.clojure-version {:font-weight 300
-                         :color "rgba(255,255,255,0.7)"
-                         :font-family monospace-font
-                         :margin-left "5px"
-                         :font-size "10px"}])
+             [:header.navbar
+              [:.btn.mobile-menu
+               {:display 'block
+                :margin-right "-11px"}]
+              [:.nav-search-widget {:display 'none}]
+              [:.navbar-nav {:display 'none}]]
+             [:.mobile-push-wrapper
+              (merge
+               {:right 0
+                :position 'relative
+                :padding-top "60px"
+                :transform "translate3d(0,0,0)"}
+               (nc/transition "all 0.2s ease"))]
+             [:.desktop-nav-bar :.desktop-side-nav {:display 'none}]
+             [:.mobile-nav-bar
+              (nc/transition "all 0.2s ease")
+              {:background-color 'white
+               :position 'fixed
+               :top 0
+               :width "100%"
+               :z-index 1000
+               :display 'block}
+              [:header {:margin-bottom 0}]]
+             [:.mobile-nav-menu
+              (nc/transition "all 0.2s ease")
+              {:transform "translate3d(200px,0,0)"}
+              {:display 'block
+               :position 'fixed
+               :width "200px"
+               :z-index 10000
+               :background-color light-blue
+               :color 'white
+               :font-weight 300
+               :top 0
+               :bottom 0
+               :right 0
+               :margin 0
+               :overflow-y 'scroll}
+              [:h4 {:padding "5px 10px"
+                    :border-bottom "solid rgba(255,255,255,0.3) 1px"
+                    :margin 0
+                    :color "rgba(255,255,255,0.8)"
+                    :font-size "14px"
+                    :letter-spacing "1px"
+                    :font-weight 500}
+               [:i {:margin-right "5px"}]]
+              [:li {:margin 0}
+               [:a {:color 'white}
+                [:&:hover {:background-color blue}]]]
+              [:.navbar-nav {:margin 0}]]
+             [:.mobile-push-wrapper.mobile-push
+              (nc/transition "all 0.2s ease")
+              {:transform "translate3d(-200px,0,0)"
+               :right 0}]
+             [:.mobile-nav-menu.mobile-push
+              (nc/transition "all 0.2s ease")
+              {:transform "translate3d(0,0,0)"}
+              [:header.navbar
+               (nc/transition "all 0.2s ease")
+               {:right "200px"}]]
+             [:.mobile-nav-bar.mobile-push
+              (nc/transition "all 0.2s ease")
+              {:transform "translate3d(-200px,0,0)"}]
+             [:.page-toc {:display 'none}]
+             [:body.search-active {:background-color 'transparent}]
+             [:.clojure-version {:font-weight 300
+                                 :color "rgba(255,255,255,0.7)"
+                                 :font-family monospace-font
+                                 :margin-left "5px"
+                                 :font-size "10px"}])
 
 
 
-   [:.null-state {:background-color "#fafafa"
+   [:.null-state {:background-color color-lightest
                   :text-align 'center
                   :padding "20px"
-                  :color "#888"}
-    [:code {:color "#888"}]
+                  :color color-dark}
+    [:code {:color color-dark}]
     [:a {:color "rgba(66, 139, 202, 0.7)"}]]
 
    intro-page
 
    [:.see-also
     {:margin-bottom "20px"}
-    [:a {:color "#999"}
-     [:.name {:color "#428bca"}
-      [:&:hover {:color "#2a6496"}]]]
-    [:p {:color "#555"
+    [:a {:color color-dark}
+     [:.name {:color light-blue}
+      [:&:hover {:color blue}]]]
+    [:p {:color color-dark
          :margin-bottom 0
          :font-size "15px"}]
     [:.var-title {:margin-bottom "3px"}]
     [:.meta {:font-size "10px"
-             :color "#ccc"
+             :color color-light
              :text-transform 'uppercase}
-     [:a {:color "#ccc"}]]
-    [:.delete-confirmation [:a {:color "#428bca"}]]]
+     [:a {:color color-light}]]
+    [:.delete-confirmation [:a {:color light-blue}]]]
 
    [:input.loading
     {:background-image "url('/img/loading.gif')"
@@ -766,11 +773,11 @@
    [:.example-body
     {:padding "10px"
      :font-size "14px"
-     :background-color "#fafafa"
+     :background-color color-lightest
      :margin-bottom "10px"}]
 
    [:pre.raw-example
-    {:background-color "#fafafa"
+    {:background-color color-lightest
      :margin-bottom "0px"
      :padding "15px"
      :font-size "14px"}]
@@ -779,14 +786,14 @@
      :margin-bottom "30px"}
     [:li {:margin-bottom 0}]
     (nc/at-bp :xs
-      [:& {:margin-bottom "10px"}]
-      [:h3 {:display 'inline-block
-            :margin-right "20px"}]
-      [:ul {:display 'inline-block}]
-      [:li {:display 'inline-block
-            :margin-right "10px"
-            :background-color "#fafafa"
-            :padding "0 5px"}])]
+              [:& {:margin-bottom "10px"}]
+              [:h3 {:display 'inline-block
+                    :margin-right "20px"}]
+              [:ul {:display 'inline-block}]
+              [:li {:display 'inline-block
+                    :margin-right "10px"
+                    :background-color color-lightest
+                    :padding "0 5px"}])]
    [:.var-page-nav {:margin-bottom "20px"}]
    [:.ns-page
     [:h1 {:margin-bottom "20px"}]
@@ -799,7 +806,7 @@
           :border-bottom "solid #ccc 2px"}]
     [:.dl-row {:clear 'both
                :padding "3px 0"}
-     [:&:hover {:background-color "#eee"}]]
+     [:&:hover {:background-color color-light}]]
     [:dl {:font-size "13px"}]
     [:dt {:min-width "150px"
           :text-align 'right
@@ -812,15 +819,15 @@
      (nc/at-bp :md {:width "460px"})
      (nc/at-bp :sm {:width "400px"})]
     (nc/at-bp :xs
-      [:.dl-row {:padding 0}]
-      [:dt {:display 'block
-            :text-align 'left
-            :padding-top "10px"}]
-      [:dd {:display 'block
-            :border-bottom "solid #ddd 1px"
-            :width "100%"
-            :padding-bottom "10px"}])
-    [:.no-doc {:color "#aaa"}]
+              [:.dl-row {:padding 0}]
+              [:dt {:display 'block
+                    :text-align 'left
+                    :padding-top "10px"}]
+              [:dd {:display 'block
+                    :border-bottom "solid #ddd 1px"
+                    :width "100%"
+                    :padding-bottom "10px"}])
+    [:.no-doc {:color color-light}]
     [:.ns-table
      {:width "100%"}
      [:.name {:text-align 'right}]
@@ -839,16 +846,16 @@
    [:.error-page
     [:h1 {:text-align 'center
           :font-size "20px"
-          :color "#333"}]
+          :color color-darkest}]
     [:a.four-oh-four
      {:max-width "300px"
       :max-height "100%"
       :display 'block
       :margin "20px auto"}]]
-   [:.muted {:color "#aaa"}]
+   [:.muted {:color color-light}]
    [:.var-link
-    {:color "#888"}
-    [:.namespace {:color "#888"}]
+    {:color color-dark}
+    [:.namespace {:color color-dark}]
     [:.name {:color blue}]]
    [:.staging-banner
     {:text-align 'center
@@ -876,13 +883,13 @@
                     :overflow-y 'scroll
                     :overflow-x 'hidden}]]
    [:.live-preview
-    {:background-color "#fafafa"
+    {:background-color color-lightest
      :margin-bottom "10px"
      :word-wrap 'normal
      :overflow-x 'scroll}
     [:.empty-live-preview
      {:text-align 'center
-      :color "#aaa"
+      :color color-light
       :font-size "14px"
       :padding "10px"}]]
    [:.ac-results-widget {:margin "0 -20px"
@@ -897,7 +904,7 @@
       [:&:last-child {:margin-bottom "20px"}]]]]
    [:.core-library-page
     [:pre :.syntaxify
-     {:background-color code-bg
+     {:background-color color-darkest
       :padding "20px"}]
     [:h2 {:border-bottom "solid #ddd 2px"}]
     [:h3 {:margin-top "30px"}]]
@@ -918,9 +925,9 @@
      :padding "3px"}
     [:.caption
      {:text-align 'center
-      :background-color "#fafafa"
+      :background-color color-lightest
       :padding "5px"
-      :color "#999"
+      :color color-dark
       :font-size "11px"
       :letter-spacing "1px"}]]
    [:.field-schemas :table.schema
@@ -930,28 +937,27 @@
     {:border-top "solid #ccc 3px"
      :width "100%"}
     [:td {:border 'none
-          :padding "5px"
-          }]
+          :padding "5px"}]
     [:.aside {:font-size "12px"}]]
    [:.test-result
     {:padding "3px"
      :color 'white}
-    [:&.pass {:background-color "#5a5"}]
-    [:&.fail {:background-color "#a55"}]
-    [:&.error {:background-color "#555"}]
-    [:&.pending {:background-color "#999"}]]
+    [:&.pass {:background-color color-green}]
+    [:&.fail {:background-color color-red}]
+    [:&.error {:background-color color-dark}]
+    [:&.pending {:background-color color-dark}]]
    [:.add-example-page
     [:.syntaxify
      [:code {:font-size "12px"}]]
     [:textarea :pre {:font-size "12px"}]]
    [:.tabbed-editor
     [:.example-editor
-     {:border-color "#eee"
+     {:border-color color-light
       :border "solid #eee 1px"
       :border-top 'none}
      [:.columns-guide
       {:background-color 'transparent
-       :color "#ccc"
+       :color color-light
        :margin 0}]]
     [:.null-state
      {:background-color 'white
@@ -967,16 +973,15 @@
       :box-shadow 'none}
      [:&:focus {:box-shadow 'none}]]
     [:.nav-tabs
-     {:background-color "#eee"
+     {:background-color color-light
       :border-bottom 'none}
      [:li {:margin-bottom 0
            :border-bottom 'none}
       ["& > li.active" {:border-bottom 'none}
-       [:&:hover {:border-color "#eee"}]
-       ["& > a:focus" {:border-color "#eee"}]
-       ]]
+       [:&:hover {:border-color color-light}]
+       ["& > a:focus" {:border-color color-light}]]]
      ["li.active > a" "li.active>a:hover" "li.active>a:focus"
-      {:border-color "#eee"
+      {:border-color color-light
        :border-bottom 'none}
       [:&:hover {:border-bottom 'none
                  :margin-bottom 0}]]
@@ -991,7 +996,7 @@
       :border "solid #eee 1px"
       :border-top 'none
       :padding "10px"
-      :background-color "#fafafa"}
+      :background-color color-lightest}
      [:li {:margin-left "20px"
            :list-style-type 'disc
            :margin-bottom 0}]]]
@@ -1001,13 +1006,13 @@
       {:width "100%"
        :border "solid #eee 1px"
        :padding "5px"}
-      [:&.error {:background-color "#fcc"}]]]
+      [:&.error {:background-color color-light-pink}]]]
     [:.sg-inspector-outlets
      [:.message
       {:margin-bottom "10px"}
       [:h6 {:padding "3px"
             :margin 0
-            :color "#555"}]
+            :color color-dark}]
       [:pre {:margin 0}]]]]
    [:.migrate-user-page
     [:.controls {:text-align 'center}
@@ -1020,14 +1025,14 @@
     [:ul.var-list
      [:li {:display 'inline-block
            :margin-right "4px"
-           :background-color "#eee"
+           :background-color color-light
            :padding "0 4px"}]]]
    [:.search-results-page
     [:.search-results-header
      {:border-bottom "solid #ddd 1px"
       :margin-bottom "20px"}
      [:h1 {:margin-bottom 0}]
-     [:p {:color "#888"
+     [:p {:color color-dark
           :margin-bottom "5px"}]]
     [:.search-results
      {:margin-bottom "30px"}]
@@ -1042,12 +1047,12 @@
            :margin-bottom "5px"
            :font-size "16px"
            :font-weight 500
-           :color "#888"}]
+           :color color-dark}]
      [:p {:margin-bottom "5px"
           :font-size "16px"
           :line-height "24px"}]
      [:.examples-count {:font-size "13px"
-                        :color "#888"}]
+                        :color color-dark}]
      [:.arglists
       {:margin-left 0
        :margin-bottom 0
@@ -1059,10 +1064,10 @@
             :margin-right "10px"
             :margin-bottom "10px"
             :padding "0 5px"
-            :background-color "#f8f8f8"}]]
+            :background-color color-lightest}]]
      [:.meta-info
       {:font-size "13px"
-       :color "#888"
+       :color color-dark
        :line-height "20px"}]
      [:.see-alsos
       [:.see-also
@@ -1070,15 +1075,15 @@
         :margin-bottom 0
         :line-height "12px"}
        [:a {:color blue}]
-       [:.ns {:color "#888"}]]]]
+       [:.ns {:color color-dark}]]]]
     [:.search-controls
      {:text-align 'center
-      :color "#888"}]]
+      :color color-dark}]]
 
    jobs
 
    [:.header-banner
-    {:background-color "#3498db"
+    {:background-color blue
      :color 'white
      :text-align 'center
      :padding "3px"
