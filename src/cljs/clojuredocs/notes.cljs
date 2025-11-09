@@ -19,18 +19,18 @@
   "A textarea the expands downward with the content (no scroll)"
   [text opts]
   (let [rows (Math/max
-               (+ (->> text
-                       (filter #(= "\n" %))
-                       count)
+              (+ (->> text
+                      (filter #(= "\n" %))
+                      count)
                  3)
-               10)]
+              10)]
     [:textarea
      (merge
-       {:class "form-control"
-        :cols 80
-        :rows rows
-        :value text}
-       opts)]))
+      {:class "form-control"
+       :cols 80
+       :rows rows
+       :value text}
+      opts)]))
 
 (defn eighty-columns []
   (let [text " 80 columns "
@@ -41,64 +41,64 @@
         pre-n (Math/ceil (/ n 2))
         post-n (Math/floor (/ n 2))]
     (str
-      pre-text
-      (apply str (repeat pre-n char))
-      text
-      (apply str (repeat post-n char))
-      post-text)))
+     pre-text
+     (apply str (repeat pre-n char))
+     text
+     (apply str (repeat post-n char))
+     post-text)))
 
 (defn $tabbed-markdown-editor
   [!state bus]
   (let [{:keys [error text create-success? loading? active] :as app} @!state]
     (rea/create-class
-      {:component-did-update (fn [this prev]
-                               (when (and (not (-> prev second :expanded?))
-                                          (-> this rea/argv second :expanded?))
-                                 (let [$el (dommy/sel1
-                                             (rea/dom-node this)
-                                             "textarea")]
-                                   (.focus $el))))
-       :reagent-render
-       (fn []
-         (let [{:keys [text active]
-                :or {active :editor}} @!state]
-           [:div.tabbed-editor
-            [:ul.nav.nav-tabs
-             [:li
-              {:class (when (= :editor active) "active")}
-              [:a {:href "#"
-                   :on-click (fn [e]
-                               (.preventDefault e)
-                               (swap! !state assoc :active :editor)
-                               nil)}
-               [:i.fa.fa-code] " Editor"]]
-             [:li
-              {:class (when (= :preview active) "active")}
-              [:a {:href "#"
-                   :on-click (fn [e]
-                               (.preventDefault e)
-                               (swap! !state assoc :active :preview)
-                               nil)}
-               [:i.fa.fa-eye] " Preview"]]]
-            [:div {:class (when (= :preview active) "hidden")}
-             [:div.example-editor
-              {:class (when loading? "disabled")}
-              ($expando-ta
-                text
-                {:on-change (fn [e]
-                              (let [v (.. e -target -value)]
-                                (swap! !state assoc :text v)
-                                (ops/send bus ::text-change v)
-                                false))
-                 :value text
-                 :disabled (when loading? "disabled")
-                 :placeholder "Note Here"})
-              [:pre.columns-guide (eighty-columns)]]]
-            [:div.live-preview.markdown
-             {:class (when (= :editor active) "hidden")}
-             (if-not (empty? text)
-               [:div {:dangerouslySetInnerHTML {:__html (util/markdown text)}}]
-               [:div.null-state "Live Preview"])]]))})))
+     {:component-did-update (fn [this prev]
+                              (when (and (not (-> prev second :expanded?))
+                                         (-> this rea/argv second :expanded?))
+                                (let [$el (dommy/sel1
+                                           (rea/dom-node this)
+                                           "textarea")]
+                                  (.focus $el))))
+      :reagent-render
+      (fn []
+        (let [{:keys [text active]
+               :or {active :editor}} @!state]
+          [:div.tabbed-editor
+           [:ul.nav.nav-tabs
+            [:li
+             {:class (when (= :editor active) "active")}
+             [:a {:href "#"
+                  :on-click (fn [e]
+                              (.preventDefault e)
+                              (swap! !state assoc :active :editor)
+                              nil)}
+              [:i.fa.fa-code] " Editor"]]
+            [:li
+             {:class (when (= :preview active) "active")}
+             [:a {:href "#"
+                  :on-click (fn [e]
+                              (.preventDefault e)
+                              (swap! !state assoc :active :preview)
+                              nil)}
+              [:i.fa.fa-eye] " Preview"]]]
+           [:div {:class (when (= :preview active) "hidden")}
+            [:div.example-editor
+             {:class (when loading? "disabled")}
+             ($expando-ta
+              text
+              {:on-change (fn [e]
+                            (let [v (.. e -target -value)]
+                              (swap! !state assoc :text v)
+                              (ops/send bus ::text-change v)
+                              false))
+               :value text
+               :disabled (when loading? "disabled")
+               :placeholder "Note Here"})
+             [:pre.columns-guide (eighty-columns)]]]
+           [:div.live-preview.markdown
+            {:class (when (= :editor active) "hidden")}
+            (if-not (empty? text)
+              [:div {:dangerouslySetInnerHTML {:__html (util/markdown text)}}]
+              [:div.null-state "Live Preview"])]]))})))
 
 (defn $add [!state bus]
   (let [{:keys [expanded? body text error loading?]} @!state
@@ -113,8 +113,8 @@
                       (swap! !state assoc :expanded? (not expanded?))
                       (when (not expanded?)
                         (anim/scroll-to
-                          (rea/dom-node comp)
-                          {:pad 10}))
+                         (rea/dom-node comp)
+                         {:pad 10}))
                       nil)}
          (if-not expanded?
            "Add Note"
@@ -135,9 +135,9 @@
                  :on-click (fn [e]
                              (.preventDefault e)
                              (swap! !state
-                               assoc
-                               :expanded? false
-                               :text nil)
+                                    assoc
+                                    :expanded? false
+                                    :text nil)
                              nil)}
         "Cancel"]
        [:button {:class "btn btn-success pull-right"
@@ -170,8 +170,8 @@
                     :on-click (fn [e]
                                 (.preventDefault e)
                                 (swap! !local assoc
-                                  :editing? false
-                                  :text nil)
+                                       :editing? false
+                                       :text nil)
                                 nil)}
            "Cancel"]
           [:button {:class "btn btn-success pull-right"
@@ -191,9 +191,7 @@
                   can-edit? editing? delete-state _id] :as note} @!state]
       [:div.note
        [:div.note-meta
-        "By "
         (util/$avatar author)
-        ", created "
         (util/timeago created-at)
         " ago"
         (when (not= created-at updated-at)
@@ -266,10 +264,10 @@
         [:ul
          (->> notes
               (map-indexed
-                (fn [i note]
-                  (with-meta
-                    [$note (rea/cursor !state [:notes i]) bus]
-                    {:key (:_id note)}))))])]
+               (fn [i note]
+                 (with-meta
+                   [$note (rea/cursor !state [:notes i]) bus]
+                   {:key (:_id note)}))))])]
      (if user
        [$add (rea/cursor !state [:add-note]) bus]
        [:div.login-required-message
