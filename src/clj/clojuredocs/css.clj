@@ -526,12 +526,14 @@
          :letter-spacing "1px"
          :color color-dark
          :margin-bottom "10px"}]
-   [:p {:font-size font-20
+   [:p {:font-size font-16
         :margin-bottom "1.4em"
         :line-height "1.6em"}]
    [:li {:margin-bottom "0.5em"
          :list-style-type 'none}]
    [:pre {:border-radius "0px"
+          :color color-darkest
+          :background-color color-lightest
           :border 'none
           :word-wrap 'normal}]
    [:ul {:padding 0}]
@@ -539,7 +541,8 @@
    [:code {:font-size font-16}]
    ["a > code" {:color blue}]
    [:.badge {:background-color #_"rgba(0,0,0,0.05)" 'transparent
-             :color "rgba(0,0,0,0.2)"
+             :color color-darkest
+             :opacity 0.2
              :border-radius "3px"
              :padding "1px 5px"
              :font-weight 500
@@ -909,6 +912,7 @@
    [:.core-library-page
     [:pre :.syntaxify
      {:background-color color-darkest
+      :color color-lightest
       :padding "20px"}]
     [:h2 {:border-bottom "solid #ddd 2px"}]
     [:h3 {:margin-top "30px"}]]
