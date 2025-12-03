@@ -857,6 +857,17 @@
      :font-size "14px"
      :font-weight 400
      :padding "3px"}]
+   [:.survey-banner
+    {:text-align 'center
+     :background-color "rgb(91,164,207)"
+     :color "rgba(255,255,255, 0.95)"
+     :font-size "14px"
+     :font-weight 400
+     :padding "8px"}
+    [:a {:color "rgba(255,255,255, 1)"
+         :text-decoration 'underline
+         :font-weight 600}
+     [:&:hover {:color "rgba(255,255,255, 0.85)"}]]]
    [:.toggle-controls :.login-required-message
     {:text-align 'right
      :margin-bottom "4px"

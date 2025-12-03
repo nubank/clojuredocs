@@ -169,13 +169,16 @@
     ($mobile-navbar-nav opts)
     [:div.mobile-nav-bar
      ($navbar opts)]
-    [:div.sticky-wrapper.mobile-push-wrapper
-     (when config/staging-banner?
-       [:div.staging-banner
-        "This is the ClojureDocs staging site, where you'll find all the neat things we're working on."])
-     [:div.desktop-nav-bar
-      ($navbar opts)]
-     [:div
+     [:div.sticky-wrapper.mobile-push-wrapper
+      (when config/staging-banner?
+        [:div.staging-banner
+         "This is the ClojureDocs staging site, where you'll find all the neat things we're working on."])
+      [:div.survey-banner
+       " Take the 2025 State of Clojure Survey! Help shape the future of Clojure. "
+       [:a {:href "https://www.surveymonkey.com/r/clojure2025" :target "_blank"} "Take Survey →"]]
+      [:div.desktop-nav-bar
+       ($navbar opts)]
+      [:div
       {:class (if full-width?
                 "container-fluid"
                 "container")}
