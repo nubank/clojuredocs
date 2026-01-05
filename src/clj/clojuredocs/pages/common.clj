@@ -145,8 +145,7 @@
                      user
                      page-data
                      meta
-                     full-width?
-                     show-survey-banner?] :as opts}]
+                     full-width?] :as opts}]
   [:html5
    [:head
     [:meta {:name "viewport" :content "width=device-width, maximum-scale=1.0"}]
@@ -173,9 +172,6 @@
       (when config/staging-banner?
         [:div.staging-banner
          "This is the ClojureDocs staging site, where you'll find all the neat things we're working on."])
-      [:div.survey-banner
-       " Take the 2025 State of Clojure Survey! Help shape the future of Clojure. "
-       [:a {:href "https://www.surveymonkey.com/r/clojure2025" :target "_blank"} "Take Survey →"]]
       [:div.desktop-nav-bar
        ($navbar opts)]
       [:div
