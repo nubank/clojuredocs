@@ -15,7 +15,8 @@
             [clojuredocs.pages.quickref :as quickref]
             [clojuredocs.pages.vars :as vars]
             [clojuredocs.pages.nss :as nss]
-            [clojuredocs.pages.jobs :as jobs]))
+            [clojuredocs.pages.jobs :as jobs]
+            [clojuredocs.pages.tools-build :as tb]))
 
 (def robots-resp
   (fn [r]
@@ -315,6 +316,10 @@
 
   (GET "/core-library" [] core-library-handler)
   (GET "/core-library/vars" [] core-library-vars-handler)
+
+  ;; tools.build library overview and vars pages
+  (GET "/tools-build" [] tb/tools-build-library-handler)
+  (GET "/tools-build/vars" [] tb/tools-build-library-vars-handler)
 
   (GET "/concepts/:concept" [concept] (concept-page-handler concept))
 

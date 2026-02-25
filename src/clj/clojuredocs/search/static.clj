@@ -37,7 +37,10 @@
     clojure.tools.deps.interop
     clojure.walk
     clojure.xml
-    clojure.zip])
+clojure.zip])
+
+(def tools-build-namespaces
+  '[clojure.tools.build.api])
 
 (def special-forms
   (->> [{:name 'def
