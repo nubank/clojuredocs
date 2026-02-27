@@ -108,44 +108,22 @@
       gather-namespaces
       gather-vars))
 
-;; tools.build library metadata -- mirrors clojure-lib structure
-(def tools-build-lib
-  (-> {:library-url "https://github.com/clojure/tools.build"
-       :version "0.9.2"
-       :source-base-url "https://github.com/clojure/tools.build/blob/master/src"
-       :gh-tag-url "https://github.com/clojure/tools.build/tree/master"
-       :namespaces static/tools-build-namespaces}
-      gather-namespaces
-      gather-vars))
-
-(def all-libs [clojure-lib tools-build-lib])
-
-(defn library-for
-  "Return metadata for a given namespace string or var map." [ns-or-var]
-  (let [ns-str (if (map? ns-or-var)
-                 (:ns ns-or-var)
-                 ns-or-var)]
-    (cond
-      (and ns-str (.startsWith ns-str "clojure.tools.build")) tools-build-lib
-      :else clojure-lib)))
-
 (def searchable-vars
-  (->> all-libs
-       (mapcat :vars)
+  (->> clojure-lib
+       :vars
        (map #(assoc % :keywords (tokenize-name (:name %))))))
 
 (def searchable-nss
-  (->> all-libs
-       (mapcat (fn [lib]
-                 (map (fn [{:keys [name]}]
-                        {:name name
-                         :keywords (str name " "
-                                         (->> (str/split name #"\.")
-                                              (interpose " ")
-                                              (apply str)))
-                         :type "namespace"
-                         :library lib})
-                      (:namespaces lib))))
+  (->> static/clojure-namespaces
+       (map (fn [sym]
+              {:name (str sym)
+               :keywords (str
+                           (str sym)
+                           " "
+                           (->> (str/split (str sym) #"\.")
+                                (interpose " ")
+                                (apply str)))
+               :type "namespace"}))
        (map (fn [{:keys [name] :as ns}]
               (assoc ns :href (str "/" name))))))
 
