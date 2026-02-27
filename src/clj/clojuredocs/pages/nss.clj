@@ -7,16 +7,16 @@
             [clojure.string :as str]))
 
 (defn library-for [ns]
-  (search/library-for ns))
+  search/clojure-lib)
 
 (defn namespace-for [ns]
-  (->> (library-for ns)
+  (->> search/clojure-lib
        :namespaces
        (filter #(= ns (:name %)))
        first))
 
 (defn vars-for [ns]
-  (->> (library-for ns)
+  (->> search/clojure-lib
        :vars
        (filter #(= ns (:ns %)))))
 

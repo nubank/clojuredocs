@@ -17,8 +17,8 @@
                     (apply str))
                "...")))
 
-(defn library-for [v]
-  (search/library-for v))
+(defn library-for [{:keys [ns]}]
+  search/clojure-lib)
 
 (defn $arglist [name a]
   [:li.arglist
