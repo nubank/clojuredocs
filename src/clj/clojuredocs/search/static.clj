@@ -34,13 +34,11 @@
     clojure.test
     clojure.test.junit
     clojure.test.tap
+    clojure.tools.build.api
     clojure.tools.deps.interop
     clojure.walk
     clojure.xml
-clojure.zip])
-
-(def tools-build-namespaces
-  '[clojure.tools.build.api])
+    clojure.zip])
 
 (def special-forms
   (->> [{:name 'def
