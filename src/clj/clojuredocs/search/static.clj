@@ -34,6 +34,7 @@
     clojure.test
     clojure.test.junit
     clojure.test.tap
+    clojure.tools.build.api
     clojure.tools.deps.interop
     clojure.walk
     clojure.xml
