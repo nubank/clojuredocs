@@ -4,5 +4,6 @@ Clojure library for defining and running build processes using code.  tools.buil
 
 **Resources**
 
+* [tools.build Guide](https://clojure.org/guides/tools_build)
 * [Official docs](https://clojure.github.io/tools.build/)
 * [GitHub repository](https://github.com/clojure/tools.build)
