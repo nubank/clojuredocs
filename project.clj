@@ -18,6 +18,7 @@
                  [unk "0.9.1"]
                  [org.clojure/core.async "1.6.681"]
                  [org.clojure/core.logic "0.8.11"]
+                 [org.clojure/tools.build "0.9.2"]
                  [com.vladsch.flexmark/flexmark-all "0.64.8"]
                  [clj-fuzzy "0.1.8"]
                  [prone "0.6.0"]
