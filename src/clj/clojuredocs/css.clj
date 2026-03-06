@@ -716,8 +716,8 @@
       [:.navbar-nav {:margin 0}]]
      [:.mobile-push-wrapper.mobile-push
       (nc/transition "all 0.2s ease")
-      {:transform "translate3d(-200px,0,0)"}
-       :right 0]
+      {:transform "translate3d(-200px,0,0)"
+       :right 0}]
      [:.mobile-nav-menu.mobile-push
       (nc/transition "all 0.2s ease")
       {:transform "translate3d(0,0,0)"}
