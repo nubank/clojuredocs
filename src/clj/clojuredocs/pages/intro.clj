@@ -196,5 +196,6 @@
     (-> {:content ($index (recently-updated))
       :body-class "intro-page"
       :user user
+      :hide-search true
       :show-stars? true}
      common/$main))
