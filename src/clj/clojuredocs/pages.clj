@@ -48,6 +48,7 @@
      :title "Clojure's Core Library | ClojureDocs - Community-Powered Clojure Documentation and Examples"
      :user user
      :page-uri uri
+     :hide-search false
      :mobile-nav [{:title "Core Library"
                    :links [[:a {:href "/core-library"} "Overview"]
                            [:a {:href "/core-library/vars"} "All The Vars"]]}
@@ -95,6 +96,7 @@
      :title "All Functions, Macros, and Vars in Clojure's Core Library | ClojureDocs - Community-Powered Clojure Documentation and Examples"
      :page-uri uri
      :user user
+     :hide-search false
      :mobile-nav
      [{:title "Core Library"
        :links [[:a {:href "/core-library"} "Overview"]
