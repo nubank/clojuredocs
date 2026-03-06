@@ -34,6 +34,7 @@ TAGS
 /data
 
 # Ignore all tooling and linting files and directories
+.calva/
 .portal
 .portal/*
 /clj-kondo
