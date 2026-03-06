@@ -12,7 +12,7 @@ Calva's **Jack-In** command does not source `bin/.devenv`, so the app will be mi
 
 1. Start the REPL manually in a terminal (see [dev-setup.md](dev-setup.md#starting-the-repl))
 2. Run **Calva: Connect to a Running REPL Server** from the command palette
-3. Choose **Generic** → enter `localhost` and the port from `.nrepl-port`
+3. Choose **Leiningen** → enter `localhost` and the port from `.nrepl-port`
 
 ### Alternative: Configure Jack-In env vars
 

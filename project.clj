@@ -23,7 +23,7 @@
                  [com.vladsch.flexmark/flexmark-all "0.64.8"]
                  [clj-fuzzy "0.1.8"]
                  [prone "0.6.0"]
-                 [nrepl "0.6.0"]
+                 [nrepl "1.6.0"]
                  [javax.xml.bind/jaxb-api "2.4.0-b180830.0359"]
                  [org.clojure/data.csv "1.0.1"]
                  [clojure-interop/java.security "1.0.5"]
@@ -43,7 +43,7 @@
                  [com.bhauman/rebel-readline-cljs "0.1.4"]]
   :repl-options {:init (load-file "reup.clj")}
   :plugins [[lein-cljsbuild "1.1.8"]
-            [cider/cider-nrepl "0.22.3"]]
+            [cider/cider-nrepl "0.58.0"]]
   :aliases {"fig"       ["trampoline" "run" "-m" "figwheel.main"]
             "fig:build" ["trampoline" "run" "-m" "figwheel.main" "-b" "dev" "-r"]
             "fig:prod"  ["run" "-m" "figwheel.main" "-O" "advanced" "-bo" "prod"]}
