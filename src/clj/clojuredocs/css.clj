@@ -948,7 +948,7 @@
     [:h3 {:margin-top "30px"}]]
    [:.nav-search-widget
     {:z-index 1100
-     :position 'relative'}]
+     :position 'relative}]
    [:.markdown
     [:ol :ul
      {:padding-left 0
