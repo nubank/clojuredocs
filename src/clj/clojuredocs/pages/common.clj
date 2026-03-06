@@ -75,10 +75,12 @@
       (when-not hide-search
         [:div.nav-search-widget.navbar-right.navbar-form
          [:form.search
-          {:autocomplete "off"}
+          {:autocomplete "off"
+           :action "/search"
+           :method :get}
           [:input.placeholder.form-control
            {:type "text"
-            :name "query"
+            :name "q"
             :placeholder "Looking for? (ctrl-s)"
             :autocomplete "off"}]]])]]
     (when-not hide-search
@@ -110,7 +112,7 @@
 (defn md5-path [path]
   (try
     (-> path slurp util/md5)
-    (catch java.io.FileNotFoundException e
+    (catch java.io.FileNotFoundException _e
       nil)))
 
 (def clojuredocs-script
@@ -138,11 +140,9 @@
           :type "application/opensearchdescription+xml"
           :title "ClojureDocs"}])
 
-(defn $main [{:keys [page-uri
-                     content
+(defn $main [{:keys [content
                      title
                      body-class
-                     user
                      page-data
                      meta
                      full-width?] :as opts}]
@@ -221,7 +221,7 @@ document.location.href = noddy.href;
 },false);
 }"]]])
 
-(defn $avatar [{:keys [email login avatar-url] :as user}]
+(defn $avatar [{:keys [email login avatar-url]}]
   [:a {:href (str "/u/" login)}
    [:img.avatar
     {:src (or avatar-url
@@ -249,7 +249,7 @@ document.location.href = noddy.href;
        (map #(str/split % #"\."))
        (group-levels nil (set nss) current-ns)))
 
-(defn $ns-tree [{:keys [part path ns cs current?]}]
+(defn $ns-tree [{:keys [part ns cs current?]}]
   [:li
    [:span {:class (when current? "current")}
     (if ns
@@ -263,7 +263,7 @@ document.location.href = noddy.href;
     [:ul.ns-tree
      (map $ns-tree ns-trees)]))
 
-(defn $library-nav [{:keys [name namespaces]} & [current-ns]]
+(defn $library-nav [{:keys [namespaces]} & [current-ns]]
   (when-not (empty? namespaces)
     [:div.library-nav
      [:h5 "Namespaces"]
@@ -315,7 +315,7 @@ document.location.href = noddy.href;
     (-> path
         slurp
         util/markdown)
-    (catch java.io.FileNotFoundException e
+    (catch java.io.FileNotFoundException _e
       nil)))
 
 (defn prep-for-syntaxhighligher [s]
