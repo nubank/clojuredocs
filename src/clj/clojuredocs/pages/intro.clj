@@ -72,7 +72,7 @@
        [:form.search {:method :get :action "/search" :autocomplete "off"}
         [:input.form-control.placeholder
          {:type "text"
-          :name "query"
+          :name "q"
           :placeholder "Looking for?"
           :autoFocus "autofocus"
           :autoComplete "off"}]
