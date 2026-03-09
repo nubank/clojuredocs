@@ -270,8 +270,11 @@
     {:font-size "14px"}
     [:h3 {:font-size "12px"}]
     [:li {:margin-bottom 0}]
-    ["li > ul" {:margin-left "10px"}]
-    [:.current {:font-weight 'bold}]]
+    ["li ul" {:margin-left "10px"}]
+    [:.current {:font-weight 'bold}]
+    [:summary {:display 'list-item}]
+    ["details > summary::marker" {:content "'+ '"}]
+    ["details[open] > summary::marker" {:content "'- '"}]]
    [:.syntaxify [:* {:font-family monospace-font}]]
    [:.add-see-also
     [:.add-see-also-content

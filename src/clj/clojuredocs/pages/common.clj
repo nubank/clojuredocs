@@ -250,13 +250,12 @@ document.location.href = noddy.href;
        (group-levels nil (set nss) current-ns)))
 
 (defn $ns-tree [{:keys [part path ns cs current?]}]
-  [:li
-   [:span {:class (when current? "current")}
-    (if ns
-      [:a {:href (str "/" ns)} part]
-      part)]
-   (when-not (empty? cs)
-     [:ul (map $ns-tree cs)])])
+  (let [summary [:span {:class (when current? "current")}
+                 (if ns [:a {:href (str "/" ns)} part] part)]
+        details (when-not (empty? cs) [:ul (map $ns-tree cs)])]
+   [:li (if details
+          [:details {:open true} [:summary summary] details]
+          summary)]))
 
 (defn $namespaces [namespaces & [current-ns]]
   (let [ns-trees (group-namespaces namespaces current-ns)]
