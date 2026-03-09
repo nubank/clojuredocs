@@ -11,7 +11,7 @@
 (defmethod $render-recently-updated :example
   [{:keys [var author created-at]}]
   [:div.recently-updated
-   (util/$avatar author)
+   (util/$avatar author {:size 48})
    [:span.content
     (:login author)
     " authored an example for "
@@ -27,7 +27,7 @@
 (defmethod $render-recently-updated :see-also
   [{:keys [from-var to-var author created-at]}]
   [:div.recently-updated
-   (util/$avatar author)
+   (util/$avatar author {:size 48})
    [:span.content
     (:login author)
     " added a see-also from "
@@ -48,7 +48,7 @@
 (defmethod $render-recently-updated :note
   [{:keys [var author created-at]}]
   [:div.recently-updated
-   (util/$avatar author)
+   (util/$avatar author {:size 48})
    [:span.content
     (:login author)
     " authored a note for "
