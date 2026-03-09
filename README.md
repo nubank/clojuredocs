@@ -66,7 +66,6 @@ sudo service clojuredocs-web-2 restart
 * [JCE Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html)
 * [lein](http://leiningen.org)
 * [foreman](https://github.com/ddollar/foreman) (see `Procfile`, `bin/dev`)
-* [less](http://lesscss.org/#using-less-installation)
 * [entr](http://entrproject.org/) (available in homebrew)
 * MongoDB
 
