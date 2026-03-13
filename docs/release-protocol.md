@@ -1,21 +1,24 @@
 # Release & Announcement Protocol
 
-How we ship and communicate changes for the Nubank fork of ClojureDocs.
+How we ship and communicate changes for the public Nubank fork of ClojureDocs.
 
-This document describes the **current state** of our release and deploy
-process. Much of the infrastructure is inherited from the upstream
+This document is an audit describing the **status quo** of our release and deploy
+process. Infrastructure is inherited from the upstream
 [zk/clojuredocs](https://github.com/zk/clojuredocs) project and has not
-yet been verified or modernized for the Nubank fork. Sections marked
+yet been verified or modernized. Sections marked
 **[goal]** describe where we intend to converge — toward Clojure ecosystem
 conventions and tooling.
 
-> **AI disclosure.** The first draft of this document and `CHANGELOG.md`
-> were AI-generated and contained errors: an invented `1.0.0-nu` version
-> tag that was never created in git, a `-nu` semver suffix convention that
-> doesn't exist in the Clojure ecosystem, and a deploy section that
-> presented the upstream AWS procedure as current without verifying it.
-> These have been corrected. The `CHANGELOG.md` AI cleanup section tracks
-> other AI-introduced issues that were caught and fixed.
+> **AI Disclaimer**: This research was conducted and drafted by Claude (Opus 4.6) via GitHub Copilot in VS Code. Trust nothing — AI-generated content may contain false statements. All code references and updates should be verified against the repository (or by talking to a human) at the time of reading.
+>
+> The first draft of this document and `CHANGELOG.md` contained errors:
+> an invented `1.0.0-nu` version tag that was never created in git, a
+> `-nu` semver suffix convention that doesn't exist in the Clojure
+> ecosystem, and a deploy section that presented the upstream AWS
+> procedure as current without verifying it. These have been corrected. See the Version History at the end of
+> this document for full history
+> Please inventory and track errata made by AI in the `CHANGELOG.md` AI cleanup section which tracks other AI-introduced anti patterns and issues
+> that were caught and fixed.
 
 ---
 
@@ -90,7 +93,7 @@ Post to the agreed channel (TBD — Slack, GitHub Discussions, or both):
 
 ### [goal] Automate via GitHub Releases
 
-Once we have CI, tag pushes should automatically generate a GitHub
+Once we have CI, tag pushes could automatically generate a GitHub
 Release with the changelog section, removing the need for manual
 announcements.
 
@@ -98,36 +101,62 @@ announcements.
 
 ### Status quo
 
-The deploy infrastructure is inherited from upstream and has **two
-conflicting descriptions** that need to be reconciled:
+Production runs on an **AWS EC2 instance** (t2.micro). An nginx
+reverse proxy balances to two JVM processes managed by Upstart,
+enabling zero-downtime rolling restarts.
 
-- **README** describes an AWS t2.micro with nginx + Upstart managing
-  two JVMs for zero-downtime rolling restarts.
-- **`bin/ship`** pushes to Heroku (`git push git@heroku.com:clojuredocs-$1.git`).
-- **`system.properties`** sets `java.runtime.version=1.7`, which is a
-  Heroku convention.
+> **Note:** `bin/ship` and `system.properties` reference Heroku — these
+> are upstream leftovers and are **not** the active deploy path.
 
-**Before the first Nubank fork deploy, we need to determine which
-environment is current and document it here.**
+#### SSH access
 
-#### If AWS (per README)
+SSH config (in `~/.ssh/config`):
+
+```
+Host clojuredocs
+  HostName <prod-ip>
+  User ubuntu
+  IdentityFile ~/.ssh/ClojureDocs.pem
+  IdentitiesOnly yes
+```
+
+Then connect with:
 
 ```bash
-# On the production box:
+ssh clojuredocs
+```
+
+The PEM key is shared out-of-band (ask the team lead).
+
+#### Deploy steps
+
+```bash
+# 1. SSH into the production box
+ssh clojuredocs
+
+# 2. Stop the first JVM process
 cd $REPO
 sudo service clojuredocs-web-1 stop
+
+# 3. Pull latest code
 git pull origin master
+
+# 4. Build (compiles CLJS, runs tests, AOT compiles)
 bin/build
+
+# 5. Start the first process back up
 sudo service clojuredocs-web-1 start
+
+# 6. Wait for it to begin serving, then rolling-restart the second
 sleep 15
 sudo service clojuredocs-web-2 restart
 ```
 
-#### If Heroku (per bin/ship)
+#### Regenerate Upstart scripts (if process config changes)
 
 ```bash
-bin/ship <environment>
-# pushes master to heroku remote
+cd $REPO
+sudo foreman export -a clojuredocs -e ./.env -u ubuntu -c "web=2" upstart /etc/init/
 ```
 
 ### Smoke Test Checklist
@@ -139,7 +168,7 @@ After deploy, verify manually:
 - [ ] Var page renders (`/clojure.core/map`)
 - [ ] Examples section loads on a var page
 - [ ] Mobile layout — search bar visible and sticky
-- [ ] tools.build namespace page loads (`/clojure.tools.build.api`)
+- [ ] newly added namespace page loads (example `/clojure.tools.build.api`)
 
 ## 5. Rollback
 
@@ -155,7 +184,7 @@ bin/build
 
 ### Status quo
 
-- **Leiningen** (`project.clj`) — all builds, REPL, CLJS compilation
+- **Leiningen** (`project.clj`) — all builds, REPL, CLJS compilation (dev build broken)
 - **cljsbuild** — ClojureScript prod builds (`:simple` optimization)
 - **foreman** — local dev process management (`Procfile.dev`)
 
@@ -163,8 +192,15 @@ bin/build
 
 - [ ] Migrate from Leiningen to **deps.edn + tools.build** (consistent
   with Clojure core and contrib libraries)
-- [ ] Replace cljsbuild with **figwheel-main** for prod builds (already
-  a dependency, used for dev but not prod)
+- [ ] Modernize cljsbuild (figwheel or shadow)
 - [ ] Update `system.properties` from Java 1.7 to current LTS
 - [ ] Add GitHub Actions CI to run `bin/build` on every PR
-- [ ] Add a `/health` endpoint for automated monitoring
+
+---
+
+## Version History
+
+| Date | Summary |
+|------|--------|
+| 2026-03-13 | Rewrite: document status quo honestly, flag AI-introduced errors, surface AWS vs Heroku ambiguity, propose date-based versioning. |
+| 2026-03-13 | Initial draft created (AI-generated). Contained invented version scheme and unverified deploy procedure. |

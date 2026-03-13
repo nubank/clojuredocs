@@ -28,36 +28,25 @@ If you're looking for a project:
 
 ## Deploy
 
-Production is deployed on an AWS t2.micro instance. There's an nginx
-process running on the box, balancing to two JVMs managed by Upstart
-to support zero-downtime deploys.
+Production runs on an AWS EC2 instance (t2.micro) with nginx
+reverse-proxying to two Upstart-managed JVMs for zero-downtime deploys.
 
-To regenerate the upstart scripts:
+```bash
+# 1. SSH into the production box (requires ClojureDocs.pem — ask the team lead)
+ssh clojuredocs
 
-```
+# 2. Rolling deploy
 cd $REPO
-sudo foreman export -a clojuredocs -e ./.env -u ubuntu -c "web=2" upstart /etc/init/
-```
-
-To start the app processes:
-
-```
-sudo service clojuredocs-web-1 start
-sudo service clojuredocs-web-2 start
-```
-
-To redeploy:
-
-```
-# in $REPO
 sudo service clojuredocs-web-1 stop
 git pull origin master
-# This will compile assets & run tests
-bin/build
+bin/build                            # compiles CLJS, runs tests, AOT compiles
 sudo service clojuredocs-web-1 start
-# Wait for proc 1 to start serving requests
+sleep 15
 sudo service clojuredocs-web-2 restart
 ```
+
+See [docs/release-protocol.md](docs/release-protocol.md) for the full
+release checklist, SSH setup, Upstart regeneration, and smoke tests.
 
 
 ## Reqs
