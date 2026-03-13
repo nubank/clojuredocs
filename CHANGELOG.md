@@ -9,16 +9,23 @@ Changes are relative to the upstream [zk/clojuredocs](https://github.com/zk/cloj
 
 ## [Unreleased]
 
-### Fixed
-- Fix test-paths in `project.clj` so `lein test` discovers tests (#20)
-- Replace broken placeholder test with passing one
+All changes since forking from upstream (commit `31d4bd2`). No version
+has been tagged yet — these will be grouped into the first release once
+the versioning scheme and deploy target are confirmed.
 
----
+### AI cleanup
 
-## [1.0.0-nu] — 2026-03-13
+Items introduced by AI tooling that were incorrect or premature and
+have been corrected:
 
-First tagged release of the Nubank fork. Encompasses all changes since forking
-from upstream `zk/clojuredocs` (commit `31d4bd2`).
+- Removed invented `1.0.0-nu` version tag — no such tag exists in git
+  and the versioning scheme has not been decided yet
+- Removed invented `-nu` semver suffix convention — not a Clojure
+  ecosystem pattern
+- Fixed `test-paths` in `project.clj` (`"test/clj"` → `"test"`) — AI
+  did not verify the path matched the actual test directory
+- Replaced deliberately-failing placeholder test (`(= 0 1)`) that
+  `bin/build` would have caught if `test-paths` had been correct
 
 ### Added
 - **tools.build library support**: new namespace `clojure.tools.build.api` with
@@ -68,5 +75,4 @@ from upstream `zk/clojuredocs` (commit `31d4bd2`).
 ---
 
 <!-- Links -->
-[Unreleased]: https://github.com/nubank/clojuredocs/compare/v1.0.0-nu...HEAD
-[1.0.0-nu]: https://github.com/nubank/clojuredocs/compare/31d4bd2...v1.0.0-nu
+[Unreleased]: https://github.com/nubank/clojuredocs/compare/31d4bd2...HEAD
