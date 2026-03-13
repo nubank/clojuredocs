@@ -26,6 +26,10 @@ have been corrected:
   upstream AWS procedure as the current deploy path without verifying it,
   while `bin/ship` and `system.properties` referenced Heroku. Both are
   now documented; AWS has since been confirmed as current.
+- Reverted Copilot Autofix commit `8e5f827` on PR #20 — the reviewer
+  suggested requiring `clojuredocs.core` and testing `(find-ns
+  'clojuredocs.core)`, but that namespace does not exist. This was the
+  same error present in the original test file that the PR was fixing.
 
 ### Fixed
 - Fixed `test-paths` in `project.clj` (`"test/clj"` → `"test"`) — this
