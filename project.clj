@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :min-lein-version "2.0.0"
   :source-paths ["src/clj" "src/cljc"]
-  :test-paths ["test/clj"]
+  :test-paths ["test"]
   :dependencies [[org.clojure/clojure "1.12.4"]
                  [org.clojure/clojurescript "1.12.134"]
                  [ring "1.13.0"]
