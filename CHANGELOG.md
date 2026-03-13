@@ -22,10 +22,17 @@ have been corrected:
   and the versioning scheme has not been decided yet
 - Removed invented `-nu` semver suffix convention — not a Clojure
   ecosystem pattern
-- Fixed `test-paths` in `project.clj` (`"test/clj"` → `"test"`) — AI
-  did not verify the path matched the actual test directory
-- Replaced deliberately-failing placeholder test (`(= 0 1)`) that
-  `bin/build` would have caught if `test-paths` had been correct
+- Rewrote `docs/release-protocol.md` deploy section — AI presented the
+  upstream AWS procedure as the current deploy path without verifying it,
+  while `bin/ship` and `system.properties` referenced Heroku. Both are
+  now documented; AWS has since been confirmed as current.
+
+### Fixed
+- Fixed `test-paths` in `project.clj` (`"test/clj"` → `"test"`) — this
+  was a Leiningen scaffolding default from the initial commit, not an AI
+  error
+- Replaced deliberately-failing placeholder test (`(= 0 1)`) — also a
+  `lein new` default from the initial commit
 
 ### Added
 - **tools.build library support**: new namespace `clojure.tools.build.api` with
