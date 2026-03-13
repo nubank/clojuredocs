@@ -1,6 +1,7 @@
 (ns clojuredocs.core-test
-  (:require [clojure.test :refer :all]))
+  (:require [clojure.test :refer :all]
+            [clojuredocs.core :as core]))
 
-(deftest placeholder-test
-  (testing "Placeholder — real tests coming soon"
-    (is (= 1 1))))
+(deftest core-namespace-loads
+  (testing "core namespace loads successfully"
+    (is (find-ns 'clojuredocs.core))))
