@@ -55,8 +55,19 @@ Before every release:
 
 Production runs on an **AWS EC2 instance** with a single JVM process
 managed by **systemd** (`clojuredocs.service`). Nginx reverse-proxies
-port 80 to `127.0.0.1:4000`. The server was provisioned with
-`~/ClojureDocs/provision.sh` (on the EC2 box).
+port 80 to `127.0.0.1:4000`.
+
+> **Important:** The app defaults to port 8080 (hardcoded in
+> `clojuredocs.main`). `PORT=4000` must be set in `~/ClojureDocs/.env`
+> on the server so the app listens where nginx expects it. If this
+> variable is missing, the site will return 502.
+
+> **Note:** The two-process Upstart rolling-restart procedure previously
+> documented here was outdated; the server uses a single systemd service.
+> `bin/ship` and `system.properties` (Heroku leftovers from upstream)
+> have been removed. `~/ClojureDocs/provision.sh` on the server reflects
+> the original provisioning but does not match the running config exactly
+> (e.g. it assumed port 4000 without setting `PORT` in `.env`).
 
 #### SSH access
 
@@ -93,6 +104,10 @@ sudo -u ubuntu /usr/local/bin/lein compile
 sudo -u ubuntu /usr/local/bin/lein cljsbuild once prod
 sudo systemctl restart clojuredocs
 ```
+
+> **Note:** This restarts the service in-place — there is a brief
+> period of downtime (~30s) while the JVM starts. During this window
+> users will see a 502 from nginx.
 
 To check status after deploy:
 ```bash
