@@ -13,24 +13,6 @@ All changes since forking from upstream (commit `31d4bd2`). No version
 has been tagged yet — these will be grouped into the first release once
 the versioning scheme and deploy target are confirmed.
 
-### AI cleanup
-
-Items introduced by AI tooling that were incorrect or premature and
-have been corrected:
-
-- Removed invented `1.0.0-nu` version tag — no such tag exists in git
-  and the versioning scheme has not been decided yet
-- Removed invented `-nu` semver suffix convention — not a Clojure
-  ecosystem pattern
-- Rewrote `docs/release-protocol.md` deploy section — AI presented the
-  upstream AWS procedure as the current deploy path without verifying it,
-  while `bin/ship` and `system.properties` referenced Heroku. Both are
-  now documented; AWS has since been confirmed as current.
-- Reverted Copilot Autofix commit `8e5f827` on PR #20 — the reviewer
-  suggested requiring `clojuredocs.core` and testing `(find-ns
-  'clojuredocs.core)`, but that namespace does not exist. This was the
-  same error present in the original test file that the PR was fixing.
-
 ### Fixed
 - Fixed `test-paths` in `project.clj` (`"test/clj"` → `"test"`) — this
   was a Leiningen scaffolding default from the initial commit, not an AI
@@ -87,6 +69,23 @@ have been corrected:
 - Ring reverted from 1.15.3 to 1.13.0 (breaking API change), then
   commons-io upgraded to 2.21.0 to resolve CVEs independently
 
+### AI cleanup
+
+Items suggested or introduced by AI tooling that were incorrect or premature and
+have been corrected:
+
+- Removed invented `1.0.0-nu` version tag — no such tag exists in git
+  and the versioning scheme has not been decided yet
+- Removed invented `-nu` semver suffix convention — not a Clojure
+  ecosystem pattern
+- Rewrote `docs/release-protocol.md` deploy section — AI presented the
+  upstream AWS procedure as the current deploy path without verifying it,
+  while `bin/ship` and `system.properties` referenced Heroku. Both are
+  now documented; AWS has since been confirmed as current.
+- Reverted Copilot Autofix commit `8e5f827` on PR #20 — the reviewer
+  suggested requiring `clojuredocs.core` and testing `(find-ns
+  'clojuredocs.core)`, but that namespace does not exist. This was the
+  same error present in the original test file that the PR was fixing.
 ---
 
 <!-- Links -->
