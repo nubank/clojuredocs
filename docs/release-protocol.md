@@ -7,20 +7,7 @@ process. Infrastructure is inherited from the upstream
 [zk/clojuredocs](https://github.com/zk/clojuredocs) project and has not
 yet been verified or modernized. Sections marked
 **[goal]** describe where we intend to converge — toward Clojure ecosystem
-conventions and tooling.
-
-> **AI Disclaimer**: This research was conducted and drafted by Claude (Opus 4.6) via GitHub Copilot in VS Code. Trust nothing — AI-generated content may contain false statements. All code references and updates should be verified against the repository (or by talking to a human) at the time of reading.
->
-> The first draft of this document and `CHANGELOG.md` contained errors:
-> an invented `1.0.0-nu` version tag that was never created in git, a
-> `-nu` semver suffix convention that doesn't exist in the Clojure
-> ecosystem, and a deploy section that presented the upstream AWS
-> procedure as current without verifying it. These have been corrected. See the Version History at the end of
-> this document for full history
-> Please inventory and track errata made by AI in the `CHANGELOG.md` AI cleanup section which tracks other AI-introduced anti patterns and issues
-> that were caught and fixed.
-
----
+conventions and tooling. 
 
 ## 1. Versioning
 
@@ -197,6 +184,9 @@ bin/build
 - [ ] Add GitHub Actions CI to run `bin/build` on every PR
 
 ---
+> **AI Disclaimer**: Initial draft and research conducted and drafted by Claude (Opus 4.6) via GitHub Copilot in VS Code. Information has been reviewed by a human, corrected where applicable and noted in Version History below. 
+>
+
 
 ## Version History
 
