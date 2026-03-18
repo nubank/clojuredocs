@@ -47,44 +47,9 @@ Before every release:
    git tag -a <version> -m "Release <version>"
    git push origin <version>
    ```
-4. **Deploy** (see §4 below).
-5. **Post the announcement** (see §3 below).
+4. **Deploy** (see §3 below).
 
-## 3. Announcements
-
-### Template
-
-Post to the agreed channel (TBD — Slack, GitHub Discussions, or both):
-
-```markdown
-## ClojureDocs <version> released
-
-**Date:** YYYY-MM-DD
-
-### Highlights
-- (1-3 bullet summary of the most user-visible changes)
-
-### Full changelog
-→ https://github.com/nubank/clojuredocs/blob/master/CHANGELOG.md#<anchor>
-
-### Deploy status
-- [ ] Deployed to production
-- [ ] Smoke-tested (search, var pages, examples, login)
-
-### Known issues
-- (any known regressions or deferred work)
-```
-
-**Who posts:** whoever runs the deploy.
-**When:** immediately after deployment is confirmed healthy.
-
-### [goal] Automate via GitHub Releases
-
-Once we have CI, tag pushes could automatically generate a GitHub
-Release with the changelog section, removing the need for manual
-announcements.
-
-## 4. Deploy
+## 3. Deploy
 
 ### Status quo
 
@@ -167,7 +132,7 @@ bin/build
 # restart application processes per deploy method above
 ```
 
-## 6. Build Tooling
+## 4. Build Tooling
 
 ### Status quo
 
