@@ -53,12 +53,10 @@ Before every release:
 
 ### Status quo
 
-Production runs on an **AWS EC2 instance** (t2.micro). An nginx
-reverse proxy balances to two JVM processes managed by Upstart,
-enabling zero-downtime rolling restarts.
-
-> **Note:** `bin/ship` and `system.properties` reference Heroku — these
-> are upstream leftovers and are **not** the active deploy path.
+Production runs on an **AWS EC2 instance** with a single JVM process
+managed by **systemd** (`clojuredocs.service`). Nginx reverse-proxies
+port 80 to `127.0.0.1:4000`. The server was provisioned with
+`~/ClojureDocs/provision.sh` (on the EC2 box).
 
 #### SSH access
 
@@ -71,44 +69,34 @@ Host clojuredocs
   IdentityFile ~/.ssh/ClojureDocs.pem
   IdentitiesOnly yes
 ```
-
-Then connect with:
-
-```bash
-ssh clojuredocs
-```
-
 The PEM key is shared out-of-band (ask the team lead).
 
 #### Deploy steps
+
+The deploy script lives on the server at `~/deploy.sh`. It pulls the
+latest code, builds, and restarts the service:
 
 ```bash
 # 1. SSH into the production box
 ssh clojuredocs
 
-# 2. Stop the first JVM process
-cd $REPO
-sudo service clojuredocs-web-1 stop
-
-# 3. Pull latest code
-git pull origin master
-
-# 4. Build (compiles CLJS, runs tests, AOT compiles)
-bin/build
-
-# 5. Start the first process back up
-sudo service clojuredocs-web-1 start
-
-# 6. Wait for it to begin serving, then rolling-restart the second
-sleep 15
-sudo service clojuredocs-web-2 restart
+# 2. Run the deploy script
+~/deploy.sh
 ```
 
-#### Regenerate Upstart scripts (if process config changes)
-
+`deploy.sh` does the following:
 ```bash
-cd $REPO
-sudo foreman export -a clojuredocs -e ./.env -u ubuntu -c "web=2" upstart /etc/init/
+cd /home/ubuntu/ClojureDocs
+git pull
+sudo -u ubuntu /usr/local/bin/lein deps
+sudo -u ubuntu /usr/local/bin/lein compile
+sudo -u ubuntu /usr/local/bin/lein cljsbuild once prod
+sudo systemctl restart clojuredocs
+```
+
+To check status after deploy:
+```bash
+sudo systemctl status clojuredocs
 ```
 
 ### Smoke Test Checklist
@@ -124,12 +112,14 @@ After deploy, verify manually:
 
 ## 5. Rollback
 
-Tag-based rollback (once tags are in use):
-
 ```bash
-git checkout <previous-tag>
-bin/build
-# restart application processes per deploy method above
+ssh clojuredocs
+cd ~/ClojureDocs
+git checkout <previous-tag-or-commit>
+sudo -u ubuntu /usr/local/bin/lein deps
+sudo -u ubuntu /usr/local/bin/lein compile
+sudo -u ubuntu /usr/local/bin/lein cljsbuild once prod
+sudo systemctl restart clojuredocs
 ```
 
 ## 4. Build Tooling
@@ -145,11 +135,10 @@ bin/build
 - [ ] Migrate from Leiningen to **deps.edn + tools.build** (consistent
   with Clojure core and contrib libraries)
 - [ ] Modernize cljsbuild (figwheel or shadow)
-- [ ] Update `system.properties` from Java 1.7 to current LTS
 - [ ] Add GitHub Actions CI to run `bin/build` on every PR
 
 ---
-> **AI Disclaimer**: Initial draft and research conducted and drafted by Claude (Opus 4.6) via GitHub Copilot in VS Code. Information has been reviewed by a human, corrected where applicable and noted in Version History below. 
+> **AI Disclaimer**: Initial draft and research conducted and drafted by Claude (Opus 4.6) via GitHub Copilot in VS Code. Information has been reviewed by a human, corrected where applicable and noted in Version History below.
 >
 
 
@@ -157,5 +146,6 @@ bin/build
 
 | Date | Summary |
 |------|--------|
+| 2026-03-18 | §3 Deploy: replaced outdated two-process Upstart rolling-restart with verified single-service systemd deploy (from server `deploy.sh` and `provision.sh`). §5 Rollback: updated to match actual deploy commands. Removed `system.properties` migration goal (file deleted). Removed `bin/ship` and `system.properties` (Heroku vestiges). |
 | 2026-03-13 | Rewrite: document status quo honestly, flag AI-introduced errors, surface AWS vs Heroku ambiguity, propose date-based versioning. |
 | 2026-03-13 | Initial draft created (AI-generated). Contained invented version scheme and unverified deploy procedure. |
