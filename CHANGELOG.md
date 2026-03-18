@@ -48,6 +48,10 @@ have been corrected:
   ([#6](https://github.com/nubank/clojuredocs/pull/6))
 - **Glossary**: 21-term glossary for codebase analysis (issue #4)
   ([#10](https://github.com/nubank/clojuredocs/pull/10))
+
+### Removed
+- `bin/ship` — Heroku deploy script (unused; production deploys via `~/deploy.sh` on the EC2 box)
+- `system.properties` — Heroku buildpack file specifying Java 1.7 (server runs JDK 17)
 - **Research**: data-model coupling audit
   ([#19](https://github.com/nubank/clojuredocs/pull/19))
 - Clojure survey banner (later removed)
