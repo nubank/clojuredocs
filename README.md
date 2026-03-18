@@ -28,41 +28,25 @@ If you're looking for a project:
 
 ## Deploy
 
-Production is deployed on an AWS t2.micro instance. There's an nginx
-process running on the box, balancing to two JVMs managed by Upstart
-to support zero-downtime deploys.
+Production runs on an AWS EC2 instance with nginx proxying to a single
+systemd-managed JVM process.
 
-To regenerate the upstart scripts:
+```bash
+# 1. SSH into the production box (requires ClojureDocs.pem — ask the team lead)
+ssh clojuredocs
 
-```
-cd $REPO
-sudo foreman export -a clojuredocs -e ./.env -u ubuntu -c "web=2" upstart /etc/init/
-```
-
-To start the app processes:
-
-```
-sudo service clojuredocs-web-1 start
-sudo service clojuredocs-web-2 start
+# 2. Deploy
+~/deploy.sh
 ```
 
-To redeploy:
-
-```
-# in $REPO
-sudo service clojuredocs-web-1 stop
-git pull origin master
-# This will compile assets & run tests
-bin/build
-sudo service clojuredocs-web-1 start
-# Wait for proc 1 to start serving requests
-sudo service clojuredocs-web-2 restart
-```
+This pulls latest, builds (deps, compile, CLJS), and restarts the
+service. See [docs/release-protocol.md](docs/release-protocol.md) for
+the full release checklist, SSH setup, and smoke tests.
 
 
 ## Reqs
 
-* Java (JDK 8+)
+* Java (JDK 8+) (note prod build installs and runs `openjdk-17-jdk` )
 * [JCE Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html)
 * [lein](http://leiningen.org)
 * [foreman](https://github.com/ddollar/foreman) (see `Procfile`, `bin/dev`)
@@ -73,14 +57,20 @@ sudo service clojuredocs-web-2 restart
 
 ## Dev
 
-Run `bin/dev`, which will start all the things (repl, web process,
-scss compiler, etc). See `Procfile` for more info.
+> **Note:** The dev CLJS build (figwheel via `lein fig:build`) is
+> currently broken. Use `bin/prod-local` to compile and run locally
+> with the production CLJS build instead.
 
-Connect to the repl and / or visit http://localhost:4000
+To start the server and connect a REPL:
 
-You'll notice that var information is already populated. In an effort to not make the same mistakes again, all core-related var info is loaded from the runtime version of Clojure on start up.
+1. Run `bin/prod-local` in one terminal (compiles CLJS, starts the web
+   server on port 4000)
+2. Connect to the running nREPL with `lein repl :connect` (nREPL port
+   is printed at startup)
 
-OTOH, examples, see-alsos, and notes (and any other user-generated content) are stored in the database.
+Visit http://localhost:4000 to verify. 
+
+See `docs/dev-setup.md` and `docs/dev-setup-vscode.md` for more.
 
 
 ### Local Data
@@ -89,7 +79,7 @@ The app uses a MongoDB database named `clojuredocs` to store data. Run `bin/db-r
 
 ### Prod Local
 
-Occasionally you'll need to compile and run things as they would be in production (checking advanced cljs compilation, for example): `bin/prod-local`.
+Compile and run things as they would be in production (checking advanced cljs compilation, for example): `bin/prod-local`.
 
 
 ### CLJS Source Maps
