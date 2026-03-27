@@ -10,13 +10,13 @@ Examples on ClojureDocs are accurate, executable, and written by real practition
 
 The data model is explicit, documented, and separated from business logic. Adding a new feature — a scoring system, a REPL widget, a new library — does not require understanding the entire codebase. Contributors ship improvements without fear of breaking unrelated functionality. The architecture supports multi-library documentation, not just `clojure.core`. The system is AI-legible: loosely coupled, well-contracted, and independently testable — qualities that make it safe for both human and agentic contributors.
 
-Every var page has an embedded REPL. Examples are executable — input and output are visible, and users can modify and re-run them in place. This is not just a convenience. In a world where AI tools threaten to eliminate the repetition necessary to build skills, the REPL is where developers put in the reps. Learning Clojure on ClojureDocs feels like pair programming, not reading a textbook. The gap between "reading about a function" and "using a function" is eliminated.
+Every var page has an embedded REPL. Examples are executable — input and output are visible, and users can modify and re-run them in place. This is not just a convenience. In a world where AI tools threaten to eliminate the repetition necessary to build skills, the REPL is where developers put in the reps. Learning Clojure on ClojureDocs is active, not passive learning. The gap between "reading about a function" and "using a function" is eliminated.
 
-Docs are not a dead end. Each var and namespace is a hub connecting to blog posts, talks, GitHub usage, mob programming sessions, and pairing opportunities. Engineers discovering a function also discover the humans and resources around it. ClojureDocs is an entry point into the Clojure community, not a static reference page.
+Docs are not a dead end. Each var and namespace is a hub connecting to blog posts, talks, GitHub usage, mob programming sessions, and pairing opportunities. Engineers discovering a function or a library also discover the humans and resources around it. ClojureDocs is an entry point into the Clojure community, not a static reference page.
 
 We understand how people actually use the site. Analytics are instrumented, baselines are established, and decisions are driven by data. We know which pages matter, which are dead zones, and where users drop off.
 
-ClojureDocs is a place where engineers can demonstrate the skills that matter most in the next era of software development — not by writing code from scratch, but by doing the harder work that AI can't replace. Contributing to ClojureDocs exercises the exact capabilities that distinguish effective developers in an AI-assisted world: reviewing and verifying code written by others, writing clear specifications that define what "correct" means, designing systems that enforce quality through structure rather than process, thinking architecturally about data models and extension points, and making judgment calls about what's useful versus what's merely correct. An engineer who ships a contribution to ClojureDocs — whether it's a verified example, a hardened validation rule, a data model improvement, or a new library integration — has produced a public, verifiable artifact that demonstrates these skills in a way no interview question can simulate. The codebase is intentionally designed to reward this kind of work: loosely coupled so contributions are independently testable, explicitly modeled so changes are safe to make, and enforced by machines so human effort goes toward the decisions that require judgment. ClojureDocs is not just an open source project. It's a portfolio piece for the kind of engineer the industry needs most.
+ClojureDocs implementation exeplifies modern good quality code conventions and serves as a project template for modern clojure/clojurescript applications. The code is configured with built in guidelines for AI. As an open source project it is a place where engineers can demonstrate the skills that matter most in the next era of software development. Contributing to ClojureDocs exercises the capabilities that distinguish effective developers in an AI-assisted world: reviewing and verifying code written by others, writing and referencing clear specifications that define what "correct" means, designing systems that enforce quality through structure rather than process, thinking architecturally about data models and extension points, and making judgment calls about what's useful versus what's merely correct. An engineer who ships a contribution to ClojureDocs — whether it's a verified example, a hardened validation rule, a data model improvement, or a new library integration — has produced a public, verifiable artifact that demonstrates these skills in a way no interview question can simulate. The codebase is intentionally designed to reward this kind of work: loosely coupled so contributions are independently testable, explicitly modeled so changes are safe to make, and enforced by machines so human effort goes toward the decisions that require judgment. ClojureDocs is not just an open source project. It's practicing the skills the industry needs most.
 
 ---
 
@@ -26,7 +26,7 @@ ClojureDocs is a place where engineers can demonstrate the skills that matter mo
 
 ## We will make the data model explicit and extensible, decoupled from business logic.
 
-**Why:** The current system encodes its data model implicitly across business logic. Every new feature risks breaking something unrelated. This is the keystone investment — without a clean, explicit schema, multi-library support, quality scoring, REPL integration, and every other improvement requires scattered changes across the codebase. We will use a Branch by Abstraction strategy: introduce the new model behind an abstraction layer, run dual-path (old + new) during migration, and gradually cut over. An explicit model unlocks safe, parallel iteration and lowers the barrier for contributors — human and agentic alike.
+**Why:** The current system encodes its data model implicitly across business logic. Every new feature risks breaking something unrelated. This is the keystone investment — without a clean, explicit schema, multi-library support, quality scoring, REPL integration, and every other improvement requires scattered changes across the codebase. An explicit model unlocks safe, parallel iteration and lowers the barrier for contributors.
 
 ## We will build a verification pipeline that structurally rejects incorrect examples rather than relying on moderation alone.
 
@@ -38,7 +38,7 @@ ClojureDocs is a place where engineers can demonstrate the skills that matter mo
 
 ## We will embed an interactive REPL on every var page with executable examples.
 
-**Why:** Clojure is learned at the REPL, but ClojureDocs is a static text site. This is a fundamental mismatch. Executable examples — where input and output are visible and modifiable in place — collapse the distance between reading documentation and writing code. This also directly addresses a risk the industry is learning the hard way: AI tools threaten to eliminate the repetition necessary to build skills. The REPL is where developers build muscle memory, develop critical thinking about how functions behave, and earn the kind of trustworthiness that comes from knowing things deeply. This is the single biggest experiential upgrade we can ship.
+**Why:** Clojure is learned at the REPL, but ClojureDocs is a static text site. This is a fundamental mismatch. Executable examples — where input and output are visible and modifiable in place — collapse the distance between reading documentation and writing code. This also directly addresses a risk the industry is learning the hard way: AI tools threaten to eliminate the repetition necessary to build skills. The REPL is where developers build muscle memory, develop critical thinking about how functions behave, and earn the kind of trustworthiness that comes from knowing things deeply. 
 
 ## We will support documentation for libraries beyond `clojure.core`.
 
@@ -53,19 +53,7 @@ ClojureDocs is a place where engineers can demonstrate the skills that matter mo
 ## Strategic Bets
 
 1. **Human signal over volume.** We are explicitly not competing with AI-generated docs. Our moat is trust. The industry evidence is clear: companies that replaced human judgment with AI volume saw quality degrade and [reversed course](https://customerservicemanager.com/the-truth-about-klarnas-backtrack-on-ai-and-the-rehiring-of-humans/). We bet on the opposite direction.
-2. **Enforce, don't document.** When a quality rule must be followed, we build it into the system so it's enforced automatically — not written as a guideline that contributors must read and remember.
-
-   There's a tempting alternative: write contribution guidelines that say "please submit working examples," publish them prominently, and hope people comply. This feels productive but doesn't scale. Every new contributor has to read and interpret the rules. Every reviewer has to check whether those rules were followed. The more rules you write, the more human attention each contribution requires. Guidelines that depend on people reading them will eventually be ignored — especially as AI makes it trivially cheap to generate plausible-looking content at volume.
-
-   Instead, we progressively harden quality rules into the system itself:
-
-   - **Level 0 (where we are today):** Quality depends entirely on human reviewers reading every contribution and making judgment calls. This scales linearly with volume.
-   - **Level 1 (structural validation):** Examples must parse as valid Clojure. Malformed code is rejected at submission. An entire class of bad contributions disappears without any human involvement.
-   - **Level 2 (executable verification):** Examples must execute successfully against the var they document. An example for `map` that throws an exception is rejected automatically. Now we've eliminated not just malformed code, but *wrong* code.
-   - **Level 3 (output verification):** Examples must produce the output they claim. If an example says `(map inc [1 2 3])` returns `(2 3 4)`, the system verifies that claim. Incorrect output is impossible to publish.
-   - **Level 4 (semantic signals):** The system surfaces quality signals — freshness, author reputation, community engagement — so that *correct but unhelpful* examples sink and *correct and illuminating* examples rise. This is where human judgment re-enters, but now it operates on a pre-verified corpus.
-
-   At each level, the class of errors that requires human attention shrinks. Reviewers stop spending time on "does this code even work?" and start spending time on "does this example teach well?" — which is the question only humans can answer. The principle is simple: if a machine can check it, a machine should check it. Reserve human attention for the judgments machines can't make.
+2. **Enforce, don't document.** When a quality rule must be followed, we build it into the system so it's enforced automatically — not written as a guideline that contributors must read and remember. The current status quo offers guidelines as style guides but relies on trust with zero verification of truth. This doesn't scale. "Good" is vagely defined but those guidelines are not current nor enforced. No true peer (or computational) verification or "good signal" exists. Every new contributor has to read and interpret the rules. Every reviewer has to check whether those rules were followed. The more rules you write, the more human attention each contribution requires. Guidelines that depend on people reading them will eventually be ignored — especially as AI makes it trivially cheap to generate plausible-looking content at volume.
 3. **REPL as the interface.** Docs should behave like code, not text. The REPL is both a learning tool and a verification mechanism.
 4. **Docs as a graph, not pages.** A var page that exists in isolation is a dead end. Knowledge about a function is not contained on a single page — it's distributed across the ecosystem.
 
@@ -73,15 +61,16 @@ ClojureDocs is a place where engineers can demonstrate the skills that matter mo
 
    We model knowledge as a graph where each var is a node with meaningful connections:
 
-   - **Var → Var:** "See also" relationships. `reduce` connects to `transduce`, `reductions`, `into`. These already exist in ClojureDocs but are hand-curated and sparse. With an explicit data model, they can be enriched by usage analysis: functions that co-occur in real codebases are likely conceptually related.
-   - **Var → Namespace → Library:** A var lives in a namespace, which lives in a library. Navigation should be fluid in both directions. Arriving at `clojure.string/split` should make the rest of `clojure.string` one click away, and related string-handling libraries discoverable.
-   - **Var → People:** Who contributed the best example for this var? Who wrote the definitive blog post about it? Who runs the mob programming session where this concept comes up regularly? The graph makes human expertise visible and reachable. This is the opposite of AI-generated anonymity — it connects knowledge to the people who hold it.
-   - **Var → External Resources:** Blog posts, conference talks, Stack Overflow threads, GitHub usage examples. Each var page becomes a curated entry point into everything the community has produced about that concept.
+- **Var → Var:** "See also" relationships. `reduce` connects to `transduce`, `reductions`, `into`. These already exist in ClojureDocs but are hand-curated and sparse. With an explicit data model, they can be enriched by usage analysis: functions that co-occur in real codebases are likely conceptually related.
+- **Var → Namespace → Library:** A var lives in a namespace, which lives in a library. Navigation should be fluid in both directions. Arriving at `clojure.string/split` should make the rest of `clojure.string` one click away, and related string-handling libraries discoverable.
+- **Var → People:** Who contributed the best example for this var? Who wrote the definitive blog post about it? Who runs the mob programming session where this concept comes up regularly? The graph makes human expertise visible and reachable. This is the opposite of AI-generated anonymity — it connects knowledge to the people who hold it.
+- **Var → External Resources:** Blog posts, conference talks, Stack Overflow threads, GitHub usage examples. Each var page becomes a curated entry point into everything the community has produced about that concept.
 
    The graph model also changes how discovery works. Today, you search for a var by name — you have to already know what you're looking for. In a graph, you can navigate by relationship: "show me all functions related to sequence transformation," "show me what people commonly use alongside `core.async/go`," "show me community resources for learning transducers."
 
    This requires the explicit data model (bet #5). You cannot build a graph on top of implicit, hardcoded relationships scattered through business logic. The data model is the foundation; the graph is what it enables.
-5. **Abstraction-first development.** No feature work without a stable model underneath.
+
+1. **Abstraction-first development.** No feature work without a stable model underneath.
 
 ---
 
@@ -91,7 +80,7 @@ ClojureDocs is a place where engineers can demonstrate the skills that matter mo
 - **Overengineering:** Building more schema than current use cases require.
 - **Moderation friction:** Quality enforcement that creates false positives and discourages real contributors. The line between "structurally rejected" and "frustratingly pedantic" requires ongoing calibration.
 - **Low engagement:** Improvements that don't move contributor or user behavior.
-- **Bulldozing trap:** Accumulating well-written thinking documents and AI-advice files without hardening them into enforcement. The destination is invariants, not prose.
+
 
 ---
 
