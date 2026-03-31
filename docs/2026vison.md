@@ -10,6 +10,8 @@ Examples on ClojureDocs are accurate, executable, and written by real practition
 
 The data model is explicit, documented, and separated from business logic. Adding a new feature — a scoring system, a REPL widget, a new library — does not require understanding the entire codebase. Contributors ship improvements without fear of breaking unrelated functionality. The architecture supports multi-library documentation, not just `clojure.core`. The system is AI-legible: loosely coupled, well-contracted, and independently testable — qualities that make it safe for both human and agentic contributors.
 
+ClojureDocs is a hub between dialects. Clojure, ClojureScript, babashka, jank — the ecosystem is no longer one language on one runtime. Documentation that surfaces where behavior is shared and where it diverges makes the whole ecosystem more navigable. By connecting vars to cross-dialect test suites and marking dialect compatibility, ClojureDocs helps grow the ecosystem by making it easier to move between dialects and adopt new ones.
+
 Every var page has an embedded REPL. Examples are executable — input and output are visible, and users can modify and re-run them in place. This is not just a convenience. In a world where AI tools threaten to eliminate the repetition necessary to build skills, the REPL is where developers put in the reps. Learning Clojure on ClojureDocs is active, not passive learning. The gap between "reading about a function" and "using a function" is eliminated.
 
 Docs are not a dead end. Each var and namespace is a hub connecting to blog posts, talks, GitHub usage, mob programming sessions, and pairing opportunities. Engineers discovering a function or a library also discover the humans and resources around it. ClojureDocs is an entry point into the Clojure community, not a static reference page.
@@ -57,6 +59,10 @@ An engineer who ships a contribution to ClojureDocs — whether it's a verified 
 
 **Why:** A var page with only a docstring and examples is a dead end. Developers learning a function need context that only comes from humans — when to use it, when not to, how it composes. By linking vars to blog posts, talks, GitHub usage, and live sessions like Clojure Camp, each page becomes a hub in a knowledge graph rather than an isolated leaf.
 
+## We will surface cross-dialect compatibility and serve as a hub between Clojure dialects.
+
+**Why:** The Clojure ecosystem now spans multiple dialects — Clojure, ClojureScript, babashka, jank — each with overlapping but not identical standard libraries. Developers moving between dialects need to know what works where. By linking vars to cross-dialect test suites like [jank-lang/clojure-test-suite](https://github.com/jank-lang/clojure-test-suite) and marking dialect compatibility on var pages, ClojureDocs becomes the place where the ecosystem's shared surface area is visible. This makes it easier to adopt new dialects and grows the ecosystem as a whole.
+
 ---
 
 ## Strategic Bets
@@ -71,11 +77,17 @@ An engineer who ships a contribution to ClojureDocs — whether it's a verified 
    - **Var → Var:** See-also relationships, enriched by co-occurrence in real codebases.
    - **Var → Namespace → Library:** Fluid navigation up and down the hierarchy.
    - **Var → People:** Make human expertise visible — who wrote the best example, the definitive blog post, the recurring mob session.
-   - **Var → Resources:** Blog posts, talks, threads, usage examples. Each var page is a curated entry point.
+   - **Var → Source:** Link to source code for every var, not just core. Currently source links exist only for `clojure.core`.
+   - **Var → Usage in the wild:** Real-world usage in open source codebases (e.g. via [grep.app](https://grep.app)) shows how a function is used in context, not just in isolated examples. Both have value.
+   - **Var → Tests:** Link to relevant tests, especially cross-dialect efforts like [jank-lang/clojure-test-suite](https://github.com/jank-lang/clojure-test-suite). Tests are executable specifications — they show edge cases and expected behavior that docstrings and examples often miss.
+   - **Var → Dialects:** Mark which dialects support a given var (Clojure, ClojureScript, babashka, jank). Surface where behavior is shared and where it diverges. This makes ClojureDocs a hub between dialects and helps grow the ecosystem by lowering the cost of moving between them.
+   - **Var → Resources:** Blog posts, talks, threads. Each var page is a curated entry point.
 
    This enables relationship-based discovery ("functions related to sequence transformation") instead of requiring users to already know the name they're searching for.
 
-5. **Abstraction-first development.** No feature work without a stable model underneath. The graph requires the explicit data model; everything else builds on it.
+5. **Cross-dialect hub.** The ecosystem grows when it's easy to move between dialects. ClojureDocs is uniquely positioned to be the connective tissue — the place where shared and divergent behavior across Clojure, ClojureScript, babashka, and jank is visible at a glance.
+
+6. **Abstraction-first development.** No feature work without a stable model underneath. The graph requires the explicit data model; everything else builds on it.
 
 ---
 
@@ -100,6 +112,7 @@ An engineer who ships a contribution to ClojureDocs — whether it's a verified 
 - ↓ Incorrect examples reaching users
 - ↓ Low-quality submissions surviving the pipeline
 - ↑ Libraries documented beyond `clojure.core`
+- ↑ Vars with cross-dialect compatibility information
 
 
 <br>
