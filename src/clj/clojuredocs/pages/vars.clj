@@ -43,9 +43,42 @@
                (assoc sa :doc (:doc looked-up-var))))))
        (remove nil?)))
 
+;; Namespaces in the clojure/clojure repository (excludes external repos)
+(def clojure-repo-namespaces
+  #{"clojure.core"
+    "clojure.core.protocols"
+    "clojure.core.reducers"
+    "clojure.core.server"
+    "clojure.data"
+    "clojure.datafy"
+    "clojure.edn"
+    "clojure.inspector"
+    "clojure.instant"
+    "clojure.java.browse"
+    "clojure.java.io"
+    "clojure.java.javadoc"
+    "clojure.java.process"
+    "clojure.java.shell"
+    "clojure.main"
+    "clojure.math"
+    "clojure.pprint"
+    "clojure.reflect"
+    "clojure.repl"
+    "clojure.repl.deps"
+    "clojure.set"
+    "clojure.stacktrace"
+    "clojure.string"
+    "clojure.template"
+    "clojure.test"
+    "clojure.test.junit"
+    "clojure.test.tap"
+    "clojure.walk"
+    "clojure.xml"
+    "clojure.zip"})
+
 (defn source-url [{:keys [file line ns] :as var}]
-  (when (and (= "clojure.core" ns) file)
-    (str "https://github.com/clojure/clojure/blob/clojure-1.12.4/src/clj/" file "#L" line)))
+  (when (and (contains? clojure-repo-namespaces ns) file)
+    (str (:source-base-url search/clojure-lib) "/src/clj/" file "#L" line)))
 
 (defn lookup-var [ns name]
   (search/lookup (str ns "/" name)))
