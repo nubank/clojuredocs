@@ -184,6 +184,7 @@
                          "@type" "SoftwareSourceCode"
                          "name" (str ns "/" name)
                          "description" (or doc (str "Clojure var in " ns))
+                         "url" canonical-url
                          "programmingLanguage" "Clojure"
                          "codeRepository" "https://github.com/clojure/clojure"})]
           {:session (update-in session [:recent]
