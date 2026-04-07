@@ -9,9 +9,17 @@ Changes are relative to the upstream [zk/clojuredocs](https://github.com/zk/cloj
 
 ## [Unreleased]
 
-All changes since forking from upstream (commit `31d4bd2`). No version
-has been tagged yet — these will be grouped into the first release once
-the versioning scheme and deploy target are confirmed.
+## [2026.04.07]
+
+### Added
+- **Universal source links**: var pages for all namespaces in the `clojure/clojure`
+  repository now show "Source" links to GitHub, not just `clojure.core`
+  ([#28](https://github.com/nubank/clojuredocs/issues/28))
+
+---
+
+*Changes below are inherited from the fork baseline (pre-`2026.04.07`) and
+are not individually versioned.*
 
 ### Fixed
 - Fixed `test-paths` in `project.clj` (`"test/clj"` → `"test"`) — this
