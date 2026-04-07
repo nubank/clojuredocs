@@ -9,6 +9,14 @@ Changes are relative to the upstream [zk/clojuredocs](https://github.com/zk/cloj
 
 ## [Unreleased]
 
+## [2026.04.07a]
+
+### Added
+- **Clojure/Conj 2026 banner**: site-wide announcement banner promoting
+  Clojure/Conj 2026 (Charlotte, NC — Sept 30 – Oct 2) with Matomo click tracking
+  ([#26](https://github.com/nubank/clojuredocs/issues/26),
+   [#33](https://github.com/nubank/clojuredocs/pull/33))
+
 ## [2026.04.07]
 
 ### Added
