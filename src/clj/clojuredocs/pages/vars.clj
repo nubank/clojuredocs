@@ -197,7 +197,8 @@
            (common/$main
              {:body-class "var-page"
               :title (util/html-encode (str name " - " ns " | ClojureDocs - Community-Powered Clojure Documentation and Examples"))
-              :meta {"twitter:card" "summary"
+              :meta {"description" og-description
+                     "twitter:card" "summary"
                      "twitter:title" og-title
                      "twitter:description" og-description}
               :og-meta {"og:title" og-title
@@ -205,6 +206,7 @@
                         "og:url" canonical-url
                         "og:type" "website"
                         "og:site_name" "ClojureDocs"}
+              :canonical-url canonical-url
               :json-ld json-ld
               :page-data {:examples (mapv clean-example examples)
                           :var v
