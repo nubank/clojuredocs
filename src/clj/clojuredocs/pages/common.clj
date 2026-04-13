@@ -145,6 +145,9 @@
                      body-class
                      page-data
                      meta
+                     og-meta
+                     json-ld
+                     canonical-url
                      full-width?] :as opts}]
   [:html5
    [:head
@@ -156,6 +159,13 @@
     (->> meta
          (map (fn [[k v]]
                 [:meta {:name k :content v}])))
+    (->> og-meta
+         (map (fn [[k v]]
+                [:meta {:property k :content v}])))
+    (when json-ld
+      [:script {:type "application/ld+json"} json-ld])
+    (when canonical-url
+      [:link {:rel "canonical" :href canonical-url}])
     [:title (or title "Community-Powered Clojure Documentation and Examples | ClojureDocs")]
     opensearch-link
     font-awesome-link

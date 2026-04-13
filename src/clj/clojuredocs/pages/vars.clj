@@ -5,6 +5,8 @@
             [clojuredocs.search :as search]
             [clojuredocs.pages.common :as common]
             [clojuredocs.data :as data]
+            [clojuredocs.config :as config]
+            [cheshire.core :as json]
             [ring.util.codec :as codec]
             [hiccup.core :as hc]))
 
@@ -16,6 +18,15 @@
                     (take n)
                     (apply str))
                "...")))
+
+(defn truncate-docstring [doc max-len]
+  (if (or (nil? doc) (<= (count doc) max-len))
+    doc
+    (let [truncated (subs doc 0 max-len)
+          last-space (str/last-index-of truncated " ")]
+      (if last-space
+        (str (subs truncated 0 last-space) "\u2026")
+        (str truncated "\u2026")))))
 
 (defn library-for [{:keys [ns]}]
   search/clojure-lib)
@@ -163,7 +174,19 @@
                          (map #(let [author? (util/is-author? user %)]
                                  (-> %
                                      (assoc :can-delete? author?)
-                                     (assoc :can-edit? author?)))))]
+                                     (assoc :can-edit? author?)))))
+              canonical-url (config/url "/" ns "/" (util/cd-encode name))
+              og-title (str name " - " ns)
+              og-description (or (truncate-docstring doc 160)
+                                 (str "Clojure var " ns "/" name))
+              json-ld (json/generate-string
+                        {"@context" "https://schema.org"
+                         "@type" "SoftwareSourceCode"
+                         "name" (str ns "/" name)
+                         "description" (or doc (str "Clojure var " ns "/" name))
+                         "url" canonical-url
+                         "programmingLanguage" "Clojure"
+                         "codeRepository" "https://github.com/clojure/clojure"})]
           {:session (update-in session [:recent]
                       #(->> %
                             (concat [{:text name
@@ -175,6 +198,17 @@
            (common/$main
              {:body-class "var-page"
               :title (util/html-encode (str name " - " ns " | ClojureDocs - Community-Powered Clojure Documentation and Examples"))
+              :meta {"description" og-description
+                     "twitter:card" "summary"
+                     "twitter:title" og-title
+                     "twitter:description" og-description}
+              :og-meta {"og:title" og-title
+                        "og:description" og-description
+                        "og:url" canonical-url
+                        "og:type" "website"
+                        "og:site_name" "ClojureDocs"}
+              :canonical-url canonical-url
+              :json-ld json-ld
               :page-data {:examples (mapv clean-example examples)
                           :var v
                           :notes (vec (map clean-id notes))
