@@ -178,12 +178,12 @@
               canonical-url (config/url "/" ns "/" (util/cd-encode name))
               og-title (str name " - " ns)
               og-description (or (truncate-docstring doc 160)
-                                 (str "Clojure var in " ns))
+                                 (str "Clojure var " ns "/" name))
               json-ld (json/generate-string
                         {"@context" "https://schema.org"
                          "@type" "SoftwareSourceCode"
                          "name" (str ns "/" name)
-                         "description" (or doc (str "Clojure var in " ns))
+                         "description" (or doc (str "Clojure var " ns "/" name))
                          "url" canonical-url
                          "programmingLanguage" "Clojure"
                          "codeRepository" "https://github.com/clojure/clojure"})]
