@@ -25,15 +25,19 @@ Fill this in iteratively. It is not a checklist. Come back and update sections a
 
 ## Glossary
 
-<!-- Precision in naming yields precision in thinking. Define terms on first use. -->
+<!-- Precision in naming yields precision in thinking. Define terms on first use.
+     Cross-reference the project glossary at docs/glossary.md where terms overlap. -->
 
-| Term | Definition |
-|------|-----------|
-| **Dialect** | A runtime implementation that executes Clojure-syntax code. The three dialects in scope for this issue are Clojure/JVM, ClojureScript, and babashka. |
-| **Var** | A named reference to a value in a Clojure namespace (e.g., `clojure.core/map`). On ClojureDocs, each var has a dedicated page. |
-| **Compatibility indicator** | A visual label on a var page showing whether that var is supported in a given dialect. Three states: supported, not supported, unknown. |
-| **EDN** | Extensible Data Notation. Clojure's data format, used here for the static compatibility data file. |
-| <!-- term --> | <!-- definition --> |
+| Term | Definition | Source |
+|------|-----------|--------|
+| **Dialect** | A language implementation that shares Clojure syntax but targets a distinct host platform. The three dialects in scope for this issue are Clojure/JVM, ClojureScript, and babashka. | [2026 Vision](../2026vison.md) ("Cross-dialect hub" strategic bet); informal Clojure community usage. |
+| **Var** | A documented function, macro, special form, or value entry on ClojureDocs, identified by namespace and name (e.g., `clojure.core/map`). Each var has a dedicated page. | [Project glossary](../glossary.md); [`search.clj`](../../src/clj/clojuredocs/search.clj). |
+| **Compatibility indicator** | A badge on a var page that marks whether a given dialect supports that var. Three states: supported, not supported, unknown. | [Feature proposal #4](../feature-proposals-q2-2026.md) (Feature 4: Cross-Dialect Compatibility Indicators). |
+| **EDN** | A data serialization format based on a subset of Clojure literal syntax, used for configuration and data exchange. Used here for the static compatibility data file. | [edn-format/edn](https://github.com/edn-format/edn). |
+| **Namespace** | A named container for vars within a library. On ClojureDocs, a namespace maps to both a Clojure namespace (loaded at JVM startup) and a browsable page at `/:ns`. | [Project glossary](../glossary.md); [`search/static.clj`](../../src/clj/clojuredocs/search/static.clj). |
+| **Static compatibility index** | The data artifact this issue produces: a map from qualified var name to the set of dialects that support it. Loaded at startup, not stored in MongoDB. | This document. |
+| **Var page** | A page on ClojureDocs dedicated to a single var, displaying its docstring, examples, see-alsos, and notes. Located at `/:ns/:name`. | [`pages/vars.clj`](../../src/clj/clojuredocs/pages/vars.clj). |
+| <!-- term --> | <!-- definition --> | <!-- source --> |
 
 ---
 
@@ -320,4 +324,38 @@ For each dialect, answer the four questions to build understanding before planni
 
 | Date | Changes |
 |------|---------|
-| <!-- YYYY-MM-DD --> | Initial planning document created. |
+| <!-- YYYY-MM-DD --> | Initial planning document created. || 2026-04-14 | Glossary review: fixed 4 definitions (Dialect, Var, Compatibility indicator, EDN), added 3 terms (Namespace, Static compatibility index, Var page), added Source column. Added Errata, Learnings, and AI Disclaimer sections. |
+
+---
+
+## Errata
+
+<!-- This section is for errors discovered and subsequently corrected. Each entry states
+     what was wrong, the correction, and why the error likely occurred. Errata are not
+     limitations — limitations qualify scope or confidence and belong inline. -->
+
+1. **Dialect definition said "runtime implementation"** — ClojureScript is a compiler targeting JavaScript, not a runtime implementation. Corrected to "language implementation that shares Clojure syntax but targets a distinct host platform." Error likely occurred because the initial draft generalized from Clojure/JVM and babashka (both of which involve a runtime) without considering ClojureScript's compilation model.
+
+2. **Var definition excluded special forms** — The original definition ("named reference to a value in a Clojure namespace") is the Clojure language definition of var, which excludes special forms like `def`, `if`, and `recur`. But ClojureDocs documents special forms as vars, and they are in scope for dialect compatibility. The project glossary already defines var to include special forms. Corrected to match. Error: the initial draft used the Clojure language definition rather than the project-specific definition.
+
+3. **Compatibility indicator called "label" instead of "badge"** — The feature proposal document (`feature-proposals-q2-2026.md`) consistently uses "badge" terminology. Using "label" introduced a terminological split. Corrected to "badge." Error: synonym substitution without checking existing usage.
+
+4. **EDN definition was an acronym expansion, not a definition** — "Extensible Data Notation. Clojure's data format" expands the acronym but doesn't define what EDN is (a data serialization format). Also, "Clojure's data format" implies exclusivity when Clojure uses multiple formats (Transit, JSON, etc.). Corrected to a substitutable definition. Error: conflating acronym expansion with definition.
+
+---
+
+## Learnings
+
+<!-- This section is for process, tooling, or design insights gained during this work
+     that are reusable beyond this issue. Not dialect-specific findings (those go in
+     Parts 1-2). -->
+
+1. <!-- learning -->
+
+---
+
+> **AI Disclaimer**
+>
+> - **Jordan Miller**: defined the task, specified the research-first approach, chose the Father Watson / Reflective Inquiry framework, required per-dialect maintainer contact tables and manager-review sections, and will fill in research findings and make all decisions.
+> - **Claude (Opus 4.6, via VS Code Copilot)**: drafted the template structure, read the codebase and context documents, and pre-filled sections with information from the code and public sources.
+> - All research sections that Claude filled in should be independently verified. [Trust nothing](https://en.wikipedia.org/wiki/Trust,_but_verify) — AI-generated content may contain false statements.
