@@ -55,8 +55,8 @@ For each dialect, answer the four questions to build understanding before planni
      What data sources exist? How complete and fresh are they? -->
 
 - ClojureScript compiler version: <!-- e.g., 1.11.x -->
-- `cljs.core` maps to `clojure.core` with known omissions (e.g., `pmap`, `locking`, concurrency primitives)
-- `clojure.string` is available in ClojureScript as `clojure.string` (same namespace)
+- `cljs.core` provides implementations of many `clojure.core` vars but omits some. Specific omissions have not been enumerated yet for this project; examples commonly cited include `pmap` and `locking`. <!-- source: not yet verified -->
+- ClojureScript provides a `clojure.string` namespace. Whether it contains all the same vars as Clojure/JVM's `clojure.string` has not been verified.
 - Known data sources:
   - [ ] [ClojureScript cheatsheet](https://cljs.info/cheatsheet/) — last verified: <!-- date or "not yet" -->
   - [ ] ClojureScript compiler source (`cljs.core` namespace) — location: <!-- URL or "not yet located" -->
@@ -116,7 +116,7 @@ For each dialect, answer the four questions to build understanding before planni
      What data sources exist? How complete and fresh are they? -->
 
 - babashka version: <!-- e.g., 1.x.x -->
-- babashka supports a subset of `clojure.core` and `clojure.string` (plus additional namespaces)
+- babashka provides implementations of `clojure.core` and `clojure.string` vars. Whether the set is identical to, a subset of, or extends Clojure/JVM's set has not been verified. <!-- source: not yet verified -->
 - Known data sources:
   - [ ] [babashka documentation](https://book.babashka.org/) — last verified: <!-- date or "not yet" -->
   - [ ] `bb -e '(keys (ns-publics (quote clojure.core)))'` — tested: <!-- date or "not yet" -->
@@ -171,10 +171,10 @@ For each dialect, answer the four questions to build understanding before planni
 <!-- This dialect is the baseline — all vars on ClojureDocs are JVM-supported by definition.
      But document what we know about the data source anyway. -->
 
-- Clojure version tracked by ClojureDocs: <!-- e.g., 1.12.x — check `search.clj` config -->
-- All vars in `clojuredocs.search.static/clojure-namespaces` are Clojure/JVM vars
-- The `:clj` column is always "supported" for every var on ClojureDocs
-- Source of truth: the var metadata loaded at startup via `clojuredocs.search/gather-vars`
+- Clojure version tracked by ClojureDocs: declared as `1.12.4` in `search/clojure-lib` config ([`search.clj` L105](../../src/clj/clojuredocs/search.clj)). Note: vars are loaded from whatever Clojure version the running JVM provides — if deployment runs a different version, the var list and declared version could disagree silently.
+- All vars loaded by ClojureDocs come from JVM namespaces listed in `clojuredocs.search.static/clojure-namespaces`. Note: this list includes namespaces from separate libraries (`core.async`, `core.logic`, `data.csv`, `tools.build`) that are not part of `org.clojure/clojure` itself.
+- By definition, every var currently loaded by ClojureDocs runs on Clojure/JVM, since `gather-vars` calls `ns-publics` on live JVM namespaces. The future `:clj` indicator will always be "supported" for these vars.
+- Source of truth for which vars ClojureDocs displays: `clojuredocs.search/gather-vars`, which calls `ns-publics` on namespaces listed in `search.static/clojure-namespaces` at JVM startup. This may not include all Clojure/JVM vars — only those from listed namespaces.
 
 #### Where are we at? (Status — Activity)
 
@@ -221,10 +221,10 @@ For each dialect, answer the four questions to build understanding before planni
 
 | Data source | Format | Freshness | Machine-readable? | Confidence |
 |-------------|--------|-----------|-------------------|------------|
-| ClojureDocs var list | in-memory at startup | matches Clojure version in config | yes (code) | high |
+| ClojureDocs var list | in-memory at startup | reflects running JVM's Clojure version (declared `1.12.4` in config, not verified at runtime) | yes (code) | high for var existence, medium for version accuracy |
 | ClojureScript cheatsheet | HTML | <!-- ? --> | <!-- ? --> | <!-- ? --> |
 | ClojureScript compiler source | Clojure source | <!-- ? --> | <!-- ? --> | <!-- ? --> |
-| babashka `ns-publics` dump | EDN via `bb -e` | matches installed bb version | yes | <!-- ? --> |
+| babashka `ns-publics` dump | EDN via `bb -e` | reflects whatever bb version is installed locally (version not yet recorded) | yes | not yet assessed |
 | babashka docs | HTML | <!-- ? --> | <!-- ? --> | <!-- ? --> |
 | <!-- other --> | | | | |
 
@@ -298,8 +298,8 @@ For each dialect, answer the four questions to build understanding before planni
 |------------|----------|--------|-------------------|
 | ClojureScript var list | <!-- --> | <!-- --> | <!-- --> |
 | babashka var list | <!-- --> | <!-- --> | <!-- --> |
-| Dutch Clojure Days (mid-May) | community event | upcoming | Shipping before this = feedback opportunity |
-| babashka conf (mid-May) | community event | upcoming | Same as above |
+| Dutch Clojure Days (mid-May) | community event | upcoming | Shipping before this event could provide a feedback opportunity |
+| babashka conf (mid-May) | community event | upcoming | Shipping before this event could provide a feedback opportunity |
 | <!-- other --> | | | |
 
 ---
@@ -308,7 +308,7 @@ For each dialect, answer the four questions to build understanding before planni
 
 - [Issue #30: Cross-Dialect Compatibility Indicators](https://github.com/nubank/clojuredocs/issues/30)
 - [ClojureDocs Two-Year Vision (2026-2028)](../2026vison.md) — "Cross-dialect hub" strategic bet
-- [Data Model Coupling Audit](../resources/datamodelaudit.md) — constraints on schema changes
+- [Data Model Coupling Audit](data-model-coupling-audit.md) — constraints on schema changes
 - Rich Hickey, ["Design in Practice"](https://www.youtube.com/watch?v=c5QF2HjHLSE) (Clojure/conj 2023) — [transcript](https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/DesignInPractice.md)
 - Alex Miller, ["Design in Practice in Practice"](https://www.youtube.com/watch?v=VBnGhQOyTM4) (Clojure/conj 2024)
 - [Clojure Team Bets for 2026](../resources/Clojure_2026_1_Pager.pdf) — ClojureDocs as reference application
@@ -324,7 +324,9 @@ For each dialect, answer the four questions to build understanding before planni
 
 | Date | Changes |
 |------|---------|
-| <!-- YYYY-MM-DD --> | Initial planning document created. || 2026-04-14 | Glossary review: fixed 4 definitions (Dialect, Var, Compatibility indicator, EDN), added 3 terms (Namespace, Static compatibility index, Var page), added Source column. Added Errata, Learnings, and AI Disclaimer sections. |
+| <!-- YYYY-MM-DD --> | Initial planning document created. |
+| 2026-04-14 | Glossary review: fixed 4 definitions (Dialect, Var, Compatibility indicator, EDN), added 3 terms (Namespace, Static compatibility index, Var page), added Source column. Added Errata, Learnings, and AI Disclaimer sections. |
+| 2026-04-14 | Claims audit: fixed 6 unverified claims in ClojureScript, babashka, and Clojure/JVM sections. Fixed data quality table freshness descriptions. Fixed broken Data Model Coupling Audit link. Softened event dependency wording. Added errata 5–9. |
 
 ---
 
@@ -341,6 +343,16 @@ For each dialect, answer the four questions to build understanding before planni
 3. **Compatibility indicator called "label" instead of "badge"** — The feature proposal document (`feature-proposals-q2-2026.md`) consistently uses "badge" terminology. Using "label" introduced a terminological split. Corrected to "badge." Error: synonym substitution without checking existing usage.
 
 4. **EDN definition was an acronym expansion, not a definition** — "Extensible Data Notation. Clojure's data format" expands the acronym but doesn't define what EDN is (a data serialization format). Also, "Clojure's data format" implies exclusivity when Clojure uses multiple formats (Transit, JSON, etc.). Corrected to a substitutable definition. Error: conflating acronym expansion with definition.
+
+5. **ClojureScript `cljs.core` claim asserted unverified facts** — Original: "`cljs.core` maps to `clojure.core` with known omissions (e.g., `pmap`, `locking`, concurrency primitives)." This stated unverified claims as facts, used "maps to" ambiguously, and defined omissions by example only ("concurrency primitives" is undefined). Corrected to mark as unverified. Error: pre-filling research sections with plausible-sounding claims that hadn't been checked.
+
+6. **ClojureScript `clojure.string` claim asserted full equivalence** — Original: "`clojure.string` is available in ClojureScript as `clojure.string` (same namespace)." The word "available" implied all vars are present and behave identically. Corrected to note existence without claiming completeness. Error: same as #5.
+
+7. **babashka claim presupposed research outcome** — Original: "babashka supports a subset of `clojure.core` and `clojure.string` (plus additional namespaces)." This asserted "a subset" and "plus additional namespaces" before any verification. Corrected to note the namespaces exist without claiming the relationship. Error: same as #5.
+
+8. **Clojure/JVM section conflated namespace list with var list** — Original: "All vars in `clojuredocs.search.static/clojure-namespaces` are Clojure/JVM vars." `clojure-namespaces` is a list of namespace symbols, not vars. Also silently included separate Maven artifacts (`core.async`, `core.logic`, etc.) under "Clojure/JVM vars" — technically true but misleading. Corrected to distinguish namespaces from vars and note the multi-artifact composition. Error: imprecise language about the data structure, plus conflating the runtime (JVM) with the specific libraries.
+
+9. **Data Model Coupling Audit reference was a dead link** — Path `../resources/datamodelaudit.md` does not exist. The file is at `data-model-coupling-audit.md` (same directory). Corrected. Error: the prompt specified the path as `docs/resources/datamodelaudit.md`, and the initial draft copied it without verifying.
 
 ---
 
