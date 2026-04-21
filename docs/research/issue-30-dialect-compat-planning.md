@@ -404,6 +404,8 @@ For each dialect, answer the four questions to build understanding before planni
 | <!-- YYYY-MM-DD --> | Initial planning document created. |
 | 2026-04-14 | Glossary review: fixed 4 definitions (Dialect, Var, Compatibility indicator, EDN), added 3 terms (Namespace, Static compatibility index, Var page), added Source column. Added Errata, Learnings, and AI Disclaimer sections. |
 | 2026-04-14 | Claims audit: fixed 6 unverified claims in ClojureScript, babashka, and Clojure/JVM sections. Fixed data quality table freshness descriptions. Fixed broken Data Model Coupling Audit link. Softened event dependency wording. Added errata 5–9. |
+| 2026-04-21 | Part 1: filled all three dialect sections with verified research. CLJS vars extracted programmatically via `cljs.analyzer.api` on compiler 1.12.134 (474/679 present, 205 missing). bb vars via `ns-publics` on bb 1.12.215 (641/679, 57 missing). Added categorized gap tables, maintainer contacts, methodology note on API-docs undercounting, reviewer line. ([`099e94f`](https://github.com/nubank/clojuredocs/commit/099e94f)) |
+| 2026-04-21 | Part 2: cross-cutting analysis. Computed three-way overlap matrix (488/700 vars portable across all dialects, 70%). Updated data quality table with confidence levels and version-pinned sources. Added 4 risks. ([`3828d57`](https://github.com/nubank/clojuredocs/commit/3828d57)) |
 
 ---
 
@@ -445,6 +447,9 @@ For each dialect, answer the four questions to build understanding before planni
 
 > **AI Disclaimer**
 >
-> - **Jordan Miller**: defined the task, specified the research-first approach, chose the Father Watson / Reflective Inquiry framework, required per-dialect maintainer contact tables and manager-review sections, and will fill in research findings and make all decisions.
-> - **Claude (Opus 4.6, via VS Code Copilot)**: drafted the template structure, read the codebase and context documents, and pre-filled sections with information from the code and public sources.
-> - All research sections that Claude filled in should be independently verified. [Trust nothing](https://en.wikipedia.org/wiki/Trust,_but_verify) — AI-generated content may contain false statements.
+> - **Jordan Miller**: defined the task, specified the research-first approach, chose the Father Watson / Reflective Inquiry framework, required per-dialect maintainer contact tables and manager-review sections. Reviewed and approved every finding before it was written into the document. Decided to parse the CLJS compiler source rather than rely on API docs. Provided maintainer contact methods (David Nolen via Discord DM, Michiel Borkent via Clojurians Slack). Specified reviewer list.
+> - **Claude (Opus 4.6, via VS Code Copilot)**:
+>   - *Template (prior session)*: drafted the document structure, read the codebase and context documents, pre-filled sections with information from the code and public sources.
+>   - *Part 1 research*: ran `clojure -M -e` and `bb -e` to extract var lists from JVM and babashka via `ns-publics`. Used `cljs.analyzer.api/analyze-file` with `org.clojure/clojurescript 1.12.134` as a dependency to extract CLJS vars (both `:defs` and `:macros`). Performed `comm` set operations to compute gaps. Categorized missing vars into tables. Identified the API-docs undercounting issue (missing macros) and wrote the methodology note.
+>   - *Part 2 research*: computed three-way overlap using `comm` on the var lists from Part 1. Produced partition tables and combined scope summary. Updated data quality assessments. Identified risks.
+> - All research sections should be independently verified. AI-generated content may contain false statements. The var counts were produced programmatically (not by hand) which reduces but does not eliminate error risk — the extraction commands themselves could have bugs.
