@@ -20,7 +20,7 @@ The structure uses Father Watson's four questions applied to two axes — Unders
 | **Status**    | What do we know?             | Where are we at?         |
 | **Agenda**    | What do we need to know?     | Where are we going?      |
 
-Fill this in iteratively. It is not a checklist. Come back and update sections as understanding grows. Sections that say "unknown" are the most valuable — they tell you where to direct effort next.
+Fill this in iteratively. Come back and update sections as understanding grows. Sections that say "unknown" are the most valuable — they tell you where to direct effort next.
 
 ---
 
@@ -31,12 +31,12 @@ Fill this in iteratively. It is not a checklist. Come back and update sections a
 
 | Term | Definition | Source |
 |------|-----------|--------|
-| **Dialect** | A language implementation that shares Clojure syntax but targets a distinct host platform. The three dialects in scope for this issue are Clojure/JVM, ClojureScript, and babashka. | [2026 Vision](../2026vison.md) ("Cross-dialect hub" strategic bet); informal Clojure community usage. |
+| **Dialect** | A host-targeted implementation of the Clojure language. The three dialects in scope for this issue are Clojure/JVM, ClojureScript, and babashka. | [2026 Vision](../2026vison.md) ("Cross-dialect hub" strategic bet); informal Clojure community usage. |
 | **Var** | A documented function, macro, special form, or value entry on ClojureDocs, identified by namespace and name (e.g., `clojure.core/map`). Each var has a dedicated page. | [Project glossary](../glossary.md); [`search.clj`](../../src/clj/clojuredocs/search.clj). |
 | **Compatibility indicator** | A badge on a var page that marks whether a given dialect supports that var. Three states: supported, not supported, unknown. | [Feature proposal #4](../feature-proposals-q2-2026.md) (Feature 4: Cross-Dialect Compatibility Indicators). |
 | **EDN** | A data serialization format based on a subset of Clojure literal syntax, used for configuration and data exchange. Used here for the static compatibility data file. | [edn-format/edn](https://github.com/edn-format/edn). |
-| **Namespace** | A named container for vars within a library. On ClojureDocs, a namespace maps to both a Clojure namespace (loaded at JVM startup) and a browsable page at `/:ns`. | [Project glossary](../glossary.md); [`search/static.clj`](../../src/clj/clojuredocs/search/static.clj). |
-| **Static compatibility index** | The data artifact this issue produces: a map from qualified var name to the set of dialects that support it. Loaded at startup, not stored in MongoDB. | This document. |
+| **Namespace** | A named container for vars, identified by a dotted symbol (e.g., `clojure.core`). On ClojureDocs, a namespace corresponds to a browsable page at `/:ns`. | [Project glossary](../glossary.md); [`search/static.clj`](../../src/clj/clojuredocs/search/static.clj). |
+| **Static compatibility index** | A map from qualified var name to the set of dialects that support it. Loaded at startup, not stored in MongoDB. | This document. |
 | **Var page** | A page on ClojureDocs dedicated to a single var, displaying its docstring, examples, see-alsos, and notes. Located at `/:ns/:name`. | [`pages/vars.clj`](../../src/clj/clojuredocs/pages/vars.clj). |
 | <!-- term --> | <!-- definition --> | <!-- source --> |
 
@@ -62,7 +62,7 @@ For each dialect, answer the four questions to build understanding before planni
 - `clojure.string` in CLJS: **20 vars** — identical to JVM *except* `re-quote-replacement` is missing. Verified at [cljs.github.io/api/clojure.string](https://cljs.github.io/api/clojure.string) on 2026-04-21.
 - Known data sources:
   - [x] [ClojureScript cheatsheet](https://cljs.info/cheatsheet/) — last verified: 2026-04-21. Useful for quick reference but not machine-readable.
-  - [x] ClojureScript compiler source (`cljs.core` namespace) — [github.com/clojure/clojurescript/src/main/cljs/cljs/core.cljs](https://github.com/clojure/clojurescript/blob/master/src/main/cljs/cljs/core.cljs). Analyzed programmatically via `cljs.analyzer.api` on 2026-04-21.
+  - [x] ClojureScript compiler source (`cljs.core` namespace) — [cljs/core.cljs](https://github.com/clojure/clojurescript/blob/r1.12.134/src/main/cljs/cljs/core.cljs). Analyzed programmatically via `cljs.analyzer.api` on 2026-04-21.
   - [x] ClojureScript API docs — [cljs.github.io/api/cljs.core](https://cljs.github.io/api/cljs.core/). Consulted 2026-04-21. Listing of public defs (functions, protocols, types). Does not include macros — see methodology note below.
 - Authoritative data source: The ClojureScript compiler itself via `cljs.analyzer.api`. Added `org.clojure/clojurescript 1.12.134` as a dependency and ran `(ana-api/analyze-file "cljs/core.cljs")` to extract both `:defs` (functions, protocols, types) and `:macros` from the analyzer state. This is more complete than the API docs alone — it reflects what the compiler actually provides, including macros defined in `.cljc` files.
 
@@ -117,7 +117,7 @@ For each dialect, answer the four questions to build understanding before planni
 | Field | Value |
 |-------|-------|
 | Project | ClojureScript |
-| Repository | https://github.com/clojure/clojurescript |
+| Repository | [clojure/clojurescript](https://github.com/clojure/clojurescript) |
 | Primary maintainer(s) | David Nolen (dnolen) |
 | Contact info | Discord DM |
 | Timezone / Location | EST / New York, NY |
@@ -198,7 +198,7 @@ For each dialect, answer the four questions to build understanding before planni
 | Field | Value |
 |-------|-------|
 | Project | babashka |
-| Repository | https://github.com/babashka/babashka |
+| Repository | [babashka/babashka](https://github.com/babashka/babashka) |
 | Primary maintainer(s) | Michiel Borkent (borkdude) |
 | Contact info | `#babashka` on Clojurians Slack |
 | Timezone / Location | CET / Netherlands |
@@ -217,7 +217,7 @@ For each dialect, answer the four questions to build understanding before planni
 <!-- This dialect is the baseline — all vars on ClojureDocs are JVM-supported by definition.
      But document what we know about the data source anyway. -->
 
-- Clojure version tracked by ClojureDocs: declared as `1.12.4` in `search/clojure-lib` config ([`search.clj` L105](../../src/clj/clojuredocs/search.clj)). Note: vars are loaded from whatever Clojure version the running JVM provides — if deployment runs a different version, the var list and declared version could disagree silently.
+- Clojure version tracked by ClojureDocs: declared as `1.12.4` in `search/clojure-lib` config ([`search.clj`](../../src/clj/clojuredocs/search.clj#L102-L108)). Note: vars are loaded from whatever Clojure version the running JVM provides — if deployment runs a different version, the var list and declared version could disagree silently.
 - All vars loaded by ClojureDocs come from JVM namespaces listed in `clojuredocs.search.static/clojure-namespaces`. Note: this list includes namespaces from separate libraries (`core.async`, `core.logic`, `data.csv`, `tools.build`) that are not part of `org.clojure/clojure` itself.
 - By definition, every var currently loaded by ClojureDocs runs on Clojure/JVM, since `gather-vars` calls `ns-publics` on live JVM namespaces. The future `:clj` indicator will always be "supported" for these vars.
 - Source of truth for which vars ClojureDocs displays: `clojuredocs.search/gather-vars`, which calls `ns-publics` on namespaces listed in `search.static/clojure-namespaces` at JVM startup. This may not include all Clojure/JVM vars — only those from listed namespaces.
@@ -244,7 +244,7 @@ For each dialect, answer the four questions to build understanding before planni
 | Field | Value |
 |-------|-------|
 | Project | Clojure |
-| Repository | https://github.com/clojure/clojure |
+| Repository | [clojure/clojure](https://github.com/clojure/clojure) |
 | Primary maintainer(s) | Alex Miller (puredanger), Rich Hickey |
 | Contact info | `#clojure` on Clojurians Slack |
 | Timezone / Location | EST / various |
@@ -312,8 +312,8 @@ For each dialect, answer the four questions to build understanding before planni
 
 1. **Version drift** — all three dialects release independently. The compatibility data is a snapshot tied to specific versions (Clojure 1.12.4, CLJS 1.12.134, bb 1.12.215). Data needs version pinning in the generated file and periodic regeneration. A var added to bb in a future release would show as "unsupported" until regenerated.
 2. **Behavioral differences** — binary present/absent doesn't capture vars that exist but behave differently across dialects. Out of scope for v1, but the data model should leave room for a future "partial" state.
-3. **Special forms** — ClojureDocs tracks special forms in [`search.static/special-forms`](../../src/clj/clojuredocs/search/static.clj) with a different metadata shape (string `:ns`, symbol `:name`) than regular vars. The generation script and lookup function must handle both.
-4. **Separate Maven artifacts** — `clojure-namespaces` in [`search/static.clj`](../../src/clj/clojuredocs/search/static.clj) includes `core.async`, `core.logic`, `data.csv`, `tools.build`, etc. (38 namespaces total — verified by counting entries in the `clojure-namespaces` vector). These are out of scope for this issue but the lookup function must gracefully return `nil` for vars in those namespaces.
+3. **Special forms** — ClojureDocs tracks special forms in [`search.static/special-forms`](../../src/clj/clojuredocs/search/static.clj#L41-L130) with a different metadata shape (string `:ns`, symbol `:name`) than regular vars. The generation script and lookup function must handle both.
+4. **Separate Maven artifacts** — `clojure-namespaces` in [`search/static.clj`](../../src/clj/clojuredocs/search/static.clj#L3-L39) includes `core.async`, `core.logic`, `data.csv`, `tools.build`, etc. (38 namespaces total — verified by counting entries in the `clojure-namespaces` vector). These are out of scope for this issue but the lookup function must gracefully return `nil` for vars in those namespaces.
 
 ---
 
@@ -347,28 +347,7 @@ For each dialect, answer the four questions to build understanding before planni
 4. <!-- step -->
 5. <!-- step -->
 
-### What I want to review with manager
-
-<!-- Specific questions or decisions to discuss with your manager before proceeding.
-     Alex Miller is OOO — defer this review or find an alternate reviewer. -->
-
-1. <!-- question or decision needing input -->
-2. <!-- -->
-3. <!-- -->
-
 ---
-
-## Part 4: Timeline and Coordination
-
-| Milestone | Target date | Status | Notes |
-|-----------|------------|--------|-------|
-| Research complete (Parts 1-2 filled) | <!-- --> | not started | |
-| Approach reviewed with manager | <!-- --> | not started | Alex OOO — defer or find alternate reviewer |
-| Data file generated | <!-- --> | not started | |
-| Rendering implemented | <!-- --> | not started | |
-| Local verification | <!-- --> | not started | |
-| PR submitted | <!-- --> | not started | |
-| Deployed | <!-- --> | not started | Issue target: April 27 |
 
 ### External dependencies
 
@@ -376,11 +355,12 @@ For each dialect, answer the four questions to build understanding before planni
 
 | Dependency | Who/what | Status | Impact if delayed |
 |------------|----------|--------|-------------------|
-| ClojureScript var list | <!-- --> | <!-- --> | <!-- --> |
-| babashka var list | <!-- --> | <!-- --> | <!-- --> |
-| Dutch Clojure Days (mid-May) | community event | upcoming | Shipping before this event could provide a feedback opportunity |
-| babashka conf (mid-May) | community event | upcoming | Shipping before this event could provide a feedback opportunity |
-| <!-- other --> | | | |
+| ClojureScript var list | CLJS compiler v1.12.134 via `cljs.analyzer.api` | **done** — 1090 vars extracted (2026-04-21) | None — data is captured. Regenerate when CLJS releases a new version. |
+| babashka var list | bb v1.12.215 via `bb -e '(ns-publics ...)'` | **done** — 641 core + 21 string vars extracted (2026-04-21) | None — data is captured. Regenerate when bb releases a new version. |
+| ClojureScript maintainer review | David Nolen (dnolen) — Discord DM | not started | Low — data is programmatically derived from compiler source; review is for courtesy and accuracy, not blocking. |
+| babashka maintainer review | Michiel Borkent (borkdude) — `#babashka` on Clojurians Slack | not started | Low — same rationale. |
+| Dutch Clojure Days (mid-May) | community event | upcoming | Shipping before this event could provide a feedback opportunity. |
+| babashka conf (mid-May) | community event | upcoming | Shipping before this event could provide a feedback opportunity. |
 
 ---
 
@@ -389,9 +369,9 @@ For each dialect, answer the four questions to build understanding before planni
 - [Issue #30: Cross-Dialect Compatibility Indicators](https://github.com/nubank/clojuredocs/issues/30)
 - [ClojureDocs Two-Year Vision (2026-2028)](../2026vison.md) — "Cross-dialect hub" strategic bet
 - [Data Model Coupling Audit](data-model-coupling-audit.md) — constraints on schema changes
-- Rich Hickey, ["Design in Practice"](https://www.youtube.com/watch?v=c5QF2HjHLSE) (Clojure/conj 2023) — [transcript](https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/DesignInPractice.md)
+- Rich Hickey, ["Design in Practice"](https://www.youtube.com/watch?v=c5QF2HjHLSE) (Clojure/conj 2023) — [transcript](https://github.com/matthiasn/talk-transcripts/blob/c879a07b037557f15d98587fbb1e7d7b23251fe4/Hickey_Rich/DesignInPractice.md)
 - Alex Miller, ["Design in Practice in Practice"](https://www.youtube.com/watch?v=VBnGhQOyTM4) (Clojure/conj 2024)
-- [Clojure Team Bets for 2026](../resources/Clojure_2026_1_Pager.pdf) — ClojureDocs as reference application
+- Clojure Team Bets for 2026 (internal) — ClojureDocs as reference application
 - [ClojureScript cheatsheet](https://cljs.info/cheatsheet/)
 - [babashka documentation](https://book.babashka.org/)
 - [jank-lang/clojure-test-suite](https://github.com/jank-lang/clojure-test-suite) — future data source for jank dialect
@@ -442,6 +422,26 @@ For each dialect, answer the four questions to build understanding before planni
 11. **Namespace count was 37, actually 38** — The `clojure-namespaces` vector in `search/static.clj` contains 38 entries, not 37. Corrected and added verification note. Error: off-by-one from manual counting (a common AI failure mode).
 
 12. **bb coverage calculated as 622/700 (89%)** — Used 679−57=622 (core only) with denominator 700 (core + string). Correct calculation: 641 (core) + 21 (string) = 662/700 = 94.6%. Similarly, CLJS was stated as 71% without showing work; correct is 474+20=494/700=70.6%. Corrected both figures and added explicit coverage math. Error: mixing denominators — subtracted missing vars from the wrong total.
+
+13. **Preamble said "not a checklist" but research tasks used checkbox syntax** — The "Where are we at?" sections used `- [x]` / `- [ ]` checklist formatting despite the preamble stating "It is not a checklist." Removed the contradictory sentence from the preamble. Error: the preamble was written before the research sections were filled in, and the checkbox format was a natural fit for tracking completed research steps — but nobody went back to reconcile the two.
+
+14. **Dialect definition didn't match Clojure/JVM** — Original: "A language implementation that shares Clojure syntax but targets a distinct host platform." Clojure/JVM doesn't "share" its own syntax — it defines it. Corrected to "A host-targeted implementation of the Clojure language." Error: the definition framed dialects as deviations from a reference, then included the reference itself.
+
+15. **Namespace definition used undefined term and JVM-centric framing** — Original: "A named container for vars within a library." The term "library" is defined in the project glossary but not in this document's glossary. Also, "loaded at JVM startup" is host-specific in a cross-dialect document. Corrected to use dotted-symbol example and remove host-specific language. Error: carried over JVM-centric framing from the project glossary without adapting for cross-dialect context.
+
+16. **Static compatibility index definition was non-substitutable** — Original began with "The data artifact this issue produces:" — a self-referential clause that can't be substituted for the term. Removed the initial clause, keeping the substitutable definition. Error: preamble-as-definition.
+
+17. **Clojure Team Bets reference was a dead link** — Path `../resources/Clojure_2026_1_Pager.pdf` does not exist in the repository. Replaced with title and "(internal)" marker. Error: the reference was added without verifying the file existed in the repo.
+
+18. **`search.clj` line number off by one** — Document said "L105" for `version "1.12.4"` but the version string is at line 104; L105 is `:source-base-url`. Replaced with a line range link to the full `clojure-lib` def (L102–L108). Error: manual line counting.
+
+19. **Transcript link used branch name instead of permalink** — `talk-transcripts/blob/master/...` moves with HEAD. Pinned to commit `c879a07` (latest commit on that file). Error: copied URL from GitHub's default branch view.
+
+20. **CLJS compiler source link used branch name instead of version tag** — `clojurescript/blob/master/...` instead of the `r1.12.134` tag matching the analyzed version. Corrected. Error: same as #19.
+
+21. **Repository URLs in maintainer tables were raw URLs** — Plain `https://github.com/...` instead of markdown links with descriptive text. Converted to `[org/repo](url)` format. Error: tables were filled quickly without applying link formatting.
+
+22. **`search/static.clj` links lacked line ranges** — References to `special-forms` and `clojure-namespaces` linked to the whole file without anchoring to the specific vectors. Added `#L41-L130` and `#L3-L39` respectively. Error: links were added without line specificity.
 
 ---
 
