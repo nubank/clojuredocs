@@ -63,8 +63,8 @@ For each dialect, answer the four questions to build understanding before planni
 - Known data sources:
   - [x] [ClojureScript cheatsheet](https://cljs.info/cheatsheet/) — last verified: 2026-04-21. Useful for quick reference but not machine-readable.
   - [x] ClojureScript compiler source (`cljs.core` namespace) — [github.com/clojure/clojurescript/src/main/cljs/cljs/core.cljs](https://github.com/clojure/clojurescript/blob/master/src/main/cljs/cljs/core.cljs). Analyzed programmatically via `cljs.analyzer.api` on 2026-04-21.
-  - [x] ClojureScript API docs — [cljs.github.io/api/cljs.core](https://cljs.github.io/api/cljs.core/). Consulted 2026-04-21. Comprehensive listing of all public vars.
-- Authoritative data source: The ClojureScript compiler itself via `cljs.analyzer.api`. Added `org.clojure/clojurescript 1.12.134` as a dependency and ran `(ana-api/analyze-file "cljs/core.cljs")` to extract both `:defs` (functions, protocols, types) and `:macros` from the analyzer state. This is the most accurate source — it reflects what the compiler actually provides, including macros defined in `.cljc` files.
+  - [x] ClojureScript API docs — [cljs.github.io/api/cljs.core](https://cljs.github.io/api/cljs.core/). Consulted 2026-04-21. Listing of public defs (functions, protocols, types). Does not include macros — see methodology note below.
+- Authoritative data source: The ClojureScript compiler itself via `cljs.analyzer.api`. Added `org.clojure/clojurescript 1.12.134` as a dependency and ran `(ana-api/analyze-file "cljs/core.cljs")` to extract both `:defs` (functions, protocols, types) and `:macros` from the analyzer state. This is more complete than the API docs alone — it reflects what the compiler actually provides, including macros defined in `.cljc` files.
 
   > **Methodology note:** An earlier pass consulted only the [ClojureScript API docs](https://cljs.github.io/api/cljs.core/) and found 980 vars in `cljs.core`. This undercounted by ~10% because the API docs page for `cljs.core` lists `:defs` only — functions, protocols, and types defined in `cljs/core.cljs`. It does not include the 191 macros that `cljs.core` imports from its companion file `cljs/core.clj` (a Clojure-hosted file that defines macros like `defn`, `fn`, `let`, `when`, `->`, `cond`, `for`, `doseq`, etc.). The CLJS compiler's analyzer state stores these under the `:macros` key of the namespace, separate from `:defs`. By querying both keys and taking their union, we get the complete picture: 1090 unique vars. The 81-var overlap between `:defs` and `:macros` represents vars that have both a runtime function and a compile-time macro form (e.g., `+`, `*`, `-` have macro versions for inlining). This distinction matters for correctness — consulting only the `.cljs` source or only the API docs page would miss core macros and produce a misleading gap count.
 
@@ -164,13 +164,13 @@ For each dialect, answer the four questions to build understanding before planni
 
   </details>
 - `clojure.string` in bb: **21 vars — identical set to JVM**. Verified by sorted list comparison on 2026-04-21.
-- **Surprise finding:** `pmap`, `locking`, `agent`, `send`, `ref`, `dosync` all resolve in bb. bb supports more concurrency primitives than commonly assumed.
+- **Surprise finding:** `pmap`, `locking`, `agent`, `send`, `ref`, `dosync` all resolve in bb. These vars were initially expected to be absent based on the template's pre-filled claim that bb "supports a subset of `clojure.core`" — in fact bb supports 641 of 679 vars (94%).
 - Known data sources:
   - [ ] [babashka documentation](https://book.babashka.org/) — last verified: 2026-04-21. Does not maintain a var-by-var compatibility list.
   - [x] `bb -e '(keys (ns-publics (quote clojure.core)))'` — tested: 2026-04-21. Returns 641 vars.
   - [x] `bb -e '(keys (ns-publics (quote clojure.string)))'` — tested: 2026-04-21. Returns 21 vars.
   - [ ] babashka source / var registry — [github.com/babashka/babashka](https://github.com/babashka/babashka). Not consulted directly; `ns-publics` used as source of truth.
-- Authoritative data source: `bb -e '(ns-publics ...)'` on the installed bb binary. babashka publishes no separate machine-readable var list — the binary itself is the source of truth.
+- Authoritative data source: `bb -e '(ns-publics ...)'` on the installed bb binary. Claude did not find a separate machine-readable var list in [any of the sources examined](#references) — the binary itself is the source of truth.
 
 #### Where are we at? (Status — Activity)
 
@@ -183,7 +183,7 @@ For each dialect, answer the four questions to build understanding before planni
 #### What do we need to know? (Agenda — Understanding)
 
 - ~~Can we rely on `bb -e '(ns-publics ...)'` as the authoritative source, or does it miss vars?~~ **Answered:** Yes, `ns-publics` is the definitive source. It reflects the running bb binary's capabilities.
-- How frequently does babashka add new var support? Is our data stale within weeks or months? **Partially answered:** bb v1.12.215 aligns closely with Clojure 1.12. New bb releases are frequent (roughly monthly). Data should be regenerated with each major bb release.
+- How frequently does babashka add new var support? Is our data stale within weeks or months? **Partially answered:** bb v1.12.215 aligns closely with Clojure 1.12. New bb releases are frequent (see [releases page](https://github.com/babashka/babashka/releases) for exact cadence — 12 releases from v1.12.207 to v1.12.218 between Aug 2025 and Apr 2026). Data should be regenerated with each major bb release.
 - Are there vars that exist in bb but behave differently in non-obvious ways? **Open.** The 19 bb-only vars are mostly internal. Behavioral differences in shared vars (e.g., `pmap` single-threaded in bb?) are out of scope but worth noting.
 - ~~Does babashka version matter?~~ **Answered:** Yes. Target latest stable (currently 1.12.215). Record version in generated data file.
 - ~~Is there an existing machine-readable list of supported vars we can consume instead of generating?~~ **Answered:** No. `ns-publics` on a running bb is the only source.
@@ -206,7 +206,7 @@ For each dialect, answer the four questions to build understanding before planni
 | Have we contacted them? | Not yet (planned via Clojurians Slack) |
 | Their stance on this feature | Expected supportive |
 | Existing compatibility data they publish | None — bb binary itself is the source of truth via `ns-publics` |
-| Notes | bb releases are frequent (~monthly). Data will need periodic regeneration. |
+| Notes | bb releases are frequent (see [releases page](https://github.com/babashka/babashka/releases) for exact cadence). Data will need periodic regeneration. |
 
 ---
 
@@ -262,9 +262,9 @@ For each dialect, answer the four questions to build understanding before planni
 - Overlap — all three dialects support: **488 vars** (70% of 700). This is the portable core.
 - CLJ-only vars (neither CLJS nor bb): **51 vars** (7%) — mostly proxy infrastructure, struct-maps, and deep internals.
 - Known tricky cases:
-  - `locking` exists in both CLJS and bb but may behave differently. In CLJS it's a macro in the analyzer but may be a no-op (no threads in JS). In bb it resolves but threading semantics are unclear. **Out of scope for v1** — binary present/absent is sufficient.
-  - `pmap` is present in bb but may execute single-threaded (SCI limitation). Present/absent still correct.
-  - 6 vars exist in CLJS but not bb: `->ArrayChunk`, `Inst`, `bases`, `import`, `inst-ms*`, `mix-collection-hash`. All are low-visibility internal/interop vars.
+  - `locking` exists in both CLJS and bb but may behave differently. In CLJS it's a macro in the analyzer but the JavaScript host has no threads, so `locking` cannot provide mutual exclusion — its runtime behavior needs verification. In bb it resolves but threading semantics under SCI are unclear. **Out of scope for v1** — binary present/absent is sufficient.
+  - `pmap` is present in bb but may not parallelize in the same way as JVM `pmap` due to SCI's execution model. Present/absent still correct.
+  - 6 vars exist in CLJS but not bb: `->ArrayChunk`, `Inst`, `bases`, `import`, `inst-ms*`, `mix-collection-hash`. These are internal/interop vars.
 
 #### Three-way partition of `clojure.core` (679 vars)
 
@@ -293,7 +293,9 @@ For each dialect, answer the four questions to build understanding before planni
 | JVM + CLJS only | **6** | <1% |
 | JVM only | **51** | 7% |
 
-**Key insight:** bb's coverage (622/700 = 89%) is almost a strict superset of CLJS's coverage (494/700 = 71%). Only 6 vars exist in CLJS but not bb. This means the data model can be simple: most vars are either "all three" or "JVM + bb."
+**Key insight:** bb's coverage (662/700 = 94.6%) is almost a strict superset of CLJS's coverage (494/700 = 70.6%). Only 6 vars exist in CLJS but not bb. This means the data model can be simple: most vars are either "all three" or "JVM + bb."
+
+> **Coverage math:** bb = 641 (`clojure.core`) + 21 (`clojure.string`) = 662 of 700 vars. CLJS = 474 (`clojure.core`) + 20 (`clojure.string`) = 494 of 700 vars.
 
 ### Data quality assessment
 
@@ -310,8 +312,8 @@ For each dialect, answer the four questions to build understanding before planni
 
 1. **Version drift** — all three dialects release independently. The compatibility data is a snapshot tied to specific versions (Clojure 1.12.4, CLJS 1.12.134, bb 1.12.215). Data needs version pinning in the generated file and periodic regeneration. A var added to bb in a future release would show as "unsupported" until regenerated.
 2. **Behavioral differences** — binary present/absent doesn't capture vars that exist but behave differently across dialects. Out of scope for v1, but the data model should leave room for a future "partial" state.
-3. **Special forms** — ClojureDocs tracks special forms in `search.static/special-forms` with a different metadata shape (string `:ns`, symbol `:name`) than regular vars. The generation script and lookup function must handle both.
-4. **Separate Maven artifacts** — `clojure-namespaces` in `search/static.clj` includes `core.async`, `core.logic`, `data.csv`, `tools.build`, etc. (37 namespaces total). These are out of scope for this issue but the lookup function must gracefully return `nil` for vars in those namespaces.
+3. **Special forms** — ClojureDocs tracks special forms in [`search.static/special-forms`](../../src/clj/clojuredocs/search/static.clj) with a different metadata shape (string `:ns`, symbol `:name`) than regular vars. The generation script and lookup function must handle both.
+4. **Separate Maven artifacts** — `clojure-namespaces` in [`search/static.clj`](../../src/clj/clojuredocs/search/static.clj) includes `core.async`, `core.logic`, `data.csv`, `tools.build`, etc. (38 namespaces total — verified by counting entries in the `clojure-namespaces` vector). These are out of scope for this issue but the lookup function must gracefully return `nil` for vars in those namespaces.
 
 ---
 
@@ -406,6 +408,7 @@ For each dialect, answer the four questions to build understanding before planni
 | 2026-04-14 | Claims audit: fixed 6 unverified claims in ClojureScript, babashka, and Clojure/JVM sections. Fixed data quality table freshness descriptions. Fixed broken Data Model Coupling Audit link. Softened event dependency wording. Added errata 5–9. |
 | 2026-04-21 | Part 1: filled all three dialect sections with verified research. CLJS vars extracted programmatically via `cljs.analyzer.api` on compiler 1.12.134 (474/679 present, 205 missing). bb vars via `ns-publics` on bb 1.12.215 (641/679, 57 missing). Added categorized gap tables, maintainer contacts, methodology note on API-docs undercounting, reviewer line. ([`099e94f`](https://github.com/nubank/clojuredocs/commit/099e94f)) |
 | 2026-04-21 | Part 2: cross-cutting analysis. Computed three-way overlap matrix (488/700 vars portable across all dialects, 70%). Updated data quality table with confidence levels and version-pinned sources. Added 4 risks. ([`3828d57`](https://github.com/nubank/clojuredocs/commit/3828d57)) |
+| 2026-04-21 | Claims audit revisions: fixed bb coverage math (622/700→662/700, 89%→94.6%), fixed CLJS API docs "comprehensive" claim, fixed namespace count (37→38), replaced "~monthly" bb release cadence with verified data (12 releases in ~8.5 months), scoped absence claim for bb machine-readable var list, added source links to `search/static.clj`, refined tricky cases wording, added errata 10–12. |
 
 ---
 
@@ -433,6 +436,12 @@ For each dialect, answer the four questions to build understanding before planni
 
 9. **Data Model Coupling Audit reference was a dead link** — Path `../resources/datamodelaudit.md` does not exist. The file is at `data-model-coupling-audit.md` (same directory). Corrected. Error: the prompt specified the path as `docs/resources/datamodelaudit.md`, and the initial draft copied it without verifying.
 
+10. **CLJS API docs described as "Comprehensive listing of all public vars"** — The API docs page for `cljs.core` lists only `:defs` (functions, protocols, types), not the 191 macros imported from `cljs/core.clj`. Corrected to "Listing of public defs (functions, protocols, types). Does not include macros." Error: the word "comprehensive" was applied without verifying against the methodology note that already documented the undercounting.
+
+11. **Namespace count was 37, actually 38** — The `clojure-namespaces` vector in `search/static.clj` contains 38 entries, not 37. Corrected and added verification note. Error: off-by-one from manual counting (a common AI failure mode).
+
+12. **bb coverage calculated as 622/700 (89%)** — Used 679−57=622 (core only) with denominator 700 (core + string). Correct calculation: 641 (core) + 21 (string) = 662/700 = 94.6%. Similarly, CLJS was stated as 71% without showing work; correct is 474+20=494/700=70.6%. Corrected both figures and added explicit coverage math. Error: mixing denominators — subtracted missing vars from the wrong total.
+
 ---
 
 ## Learnings
@@ -452,4 +461,5 @@ For each dialect, answer the four questions to build understanding before planni
 >   - *Template (prior session)*: drafted the document structure, read the codebase and context documents, pre-filled sections with information from the code and public sources.
 >   - *Part 1 research*: ran `clojure -M -e` and `bb -e` to extract var lists from JVM and babashka via `ns-publics`. Used `cljs.analyzer.api/analyze-file` with `org.clojure/clojurescript 1.12.134` as a dependency to extract CLJS vars (both `:defs` and `:macros`). Performed `comm` set operations to compute gaps. Categorized missing vars into tables. Identified the API-docs undercounting issue (missing macros) and wrote the methodology note.
 >   - *Part 2 research*: computed three-way overlap using `comm` on the var lists from Part 1. Produced partition tables and combined scope summary. Updated data quality assessments. Identified risks.
+>   - *Claims audit*: decomposed document into atomic claims, identified 14 findings (2 high, 7 medium, 5 low severity). User reviewed each finding. Applied 10 approved revisions: fixed arithmetic errors, scoped absence claims, replaced unverified cadence claims with sourced data, added file links, refined wording. Added errata 10–12.
 > - All research sections should be independently verified. AI-generated content may contain false statements. The var counts were produced programmatically (not by hand) which reduces but does not eliminate error risk — the extraction commands themselves could have bugs.
