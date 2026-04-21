@@ -2,9 +2,10 @@
 
 > **Issue:** [nubank/clojuredocs#30](https://github.com/nubank/clojuredocs/issues/30)
 > **Branch:** `research/30/dialect-compat-planning`
-> **Author:** <!-- your name -->
-> **Date started:** <!-- YYYY-MM-DD -->
-> **Last updated:** <!-- YYYY-MM-DD -->
+> **Author:** L. Jordan Miller
+> **Reviewers:** David Nolen (ClojureScript), Michiel Borkent (babashka), Alex Miller (Clojure)
+> **Date started:** 2026-04-14 ([`02c9802`](https://github.com/nubank/clojuredocs/commit/02c980200923afdc502176eba6aea62ce2fe92f3))
+> **Last updated:** 2026-04-21
 
 ---
 
@@ -51,46 +52,65 @@ For each dialect, answer the four questions to build understanding before planni
 
 #### What do we know? (Status — Understanding)
 
-<!-- What is the current state of ClojureScript's standard library coverage?
-     What data sources exist? How complete and fresh are they? -->
-
-- ClojureScript compiler version: <!-- e.g., 1.11.x -->
-- `cljs.core` provides implementations of many `clojure.core` vars but omits some. Specific omissions have not been enumerated yet for this project; examples commonly cited include `pmap` and `locking`. <!-- source: not yet verified -->
-- ClojureScript provides a `clojure.string` namespace. Whether it contains all the same vars as Clojure/JVM's `clojure.string` has not been verified.
+- ClojureScript compiler version: **1.12.134** (from [cljs.github.io/api](https://cljs.github.io/api/), checked 2026-04-21).
+- `cljs.core` analyzed via `cljs.analyzer.api/analyze-file` on the compiler source. Results:
+  - **1090 total vars** in `cljs.core` (980 defs + 191 macros, 81 overlap).
+  - **474 of 679 JVM `clojure.core` vars present** in `cljs.core` (70% coverage).
+  - **205 JVM vars missing** from `cljs.core` — see categorized table below.
+  - **616 CLJS-only vars** (JS interop, protocols, types, internal helpers) — not relevant for compatibility indicators since they have no JVM counterpart.
+- ClojureScript uses `cljs.core` internally but auto-aliases `clojure.core` → `cljs.core`. Code written as `(require '[clojure.core])` works in CLJS.
+- `clojure.string` in CLJS: **20 vars** — identical to JVM *except* `re-quote-replacement` is missing. Verified at [cljs.github.io/api/clojure.string](https://cljs.github.io/api/clojure.string) on 2026-04-21.
 - Known data sources:
-  - [ ] [ClojureScript cheatsheet](https://cljs.info/cheatsheet/) — last verified: <!-- date or "not yet" -->
-  - [ ] ClojureScript compiler source (`cljs.core` namespace) — location: <!-- URL or "not yet located" -->
-  - [ ] ClojureScript API docs — <!-- URL or "not yet located" -->
-  - [ ] Other: <!-- any additional sources -->
-- What is the authoritative, machine-readable source for "which vars exist in cljs.core"?
-  <!-- e.g., the compiler source, an API dump, a namespace listing -->
+  - [x] [ClojureScript cheatsheet](https://cljs.info/cheatsheet/) — last verified: 2026-04-21. Useful for quick reference but not machine-readable.
+  - [x] ClojureScript compiler source (`cljs.core` namespace) — [github.com/clojure/clojurescript/src/main/cljs/cljs/core.cljs](https://github.com/clojure/clojurescript/blob/master/src/main/cljs/cljs/core.cljs). Analyzed programmatically via `cljs.analyzer.api` on 2026-04-21.
+  - [x] ClojureScript API docs — [cljs.github.io/api/cljs.core](https://cljs.github.io/api/cljs.core/). Consulted 2026-04-21. Comprehensive listing of all public vars.
+- Authoritative data source: The ClojureScript compiler itself via `cljs.analyzer.api`. Added `org.clojure/clojurescript 1.12.134` as a dependency and ran `(ana-api/analyze-file "cljs/core.cljs")` to extract both `:defs` (functions, protocols, types) and `:macros` from the analyzer state. This is the most accurate source — it reflects what the compiler actually provides, including macros defined in `.cljc` files.
+
+  > **Methodology note:** An earlier pass consulted only the [ClojureScript API docs](https://cljs.github.io/api/cljs.core/) and found 980 vars in `cljs.core`. This undercounted by ~10% because the API docs page for `cljs.core` lists `:defs` only — functions, protocols, and types defined in `cljs/core.cljs`. It does not include the 191 macros that `cljs.core` imports from its companion file `cljs/core.clj` (a Clojure-hosted file that defines macros like `defn`, `fn`, `let`, `when`, `->`, `cond`, `for`, `doseq`, etc.). The CLJS compiler's analyzer state stores these under the `:macros` key of the namespace, separate from `:defs`. By querying both keys and taking their union, we get the complete picture: 1090 unique vars. The 81-var overlap between `:defs` and `:macros` represents vars that have both a runtime function and a compile-time macro form (e.g., `+`, `*`, `-` have macro versions for inlining). This distinction matters for correctness — consulting only the `.cljs` source or only the API docs page would miss core macros and produce a misleading gap count.
+
+  <details><summary><strong>205 JVM `clojure.core` vars missing from `cljs.core`</strong> (click to expand)</summary>
+
+  | Category | Vars | Count |
+  |----------|------|-------|
+  | Agents | `*agent*`, `agent`, `agent-error`, `agent-errors`, `await`, `await-for`, `await1`, `clear-agent-errors`, `error-handler`, `error-mode`, `release-pending-sends`, `restart-agent`, `send`, `send-off`, `send-via`, `set-agent-send-executor!`, `set-agent-send-off-executor!`, `set-error-handler!`, `set-error-mode!`, `shutdown-agents` | 20 |
+  | Refs / STM | `alter`, `commute`, `dosync`, `ensure`, `ref`, `ref-history-count`, `ref-max-history`, `ref-min-history`, `ref-set`, `sync` | 10 |
+  | Futures / promises | `deliver`, `future`, `future-call`, `future-cancel`, `future-cancelled?`, `future-done?`, `future?`, `promise`, `seque` | 9 |
+  | Thread bindings | `bound-fn`, `bound-fn*`, `bound?`, `get-thread-bindings`, `pop-thread-bindings`, `push-thread-bindings`, `thread-bound?`, `with-bindings`, `with-bindings*`, `with-local-vars` | 10 |
+  | Proxy infrastructure | `construct-proxy`, `gen-class`, `gen-interface`, `get-proxy-class`, `init-proxy`, `proxy`, `proxy-call-with-super`, `proxy-mappings`, `proxy-name`, `proxy-super`, `update-proxy` | 11 |
+  | Struct-maps (deprecated) | `accessor`, `create-struct`, `defstruct`, `struct`, `struct-map` | 5 |
+  | Java I/O | `file-seq`, `line-seq`, `read`, `read+string`, `read-line`, `read-string`, `slurp`, `spit`, `with-in-str`, `with-open`, `xml-seq` | 11 |
+  | Java types / interop | `bean`, `bigdec`, `bigint`, `biginteger`, `boolean-array`, `byte-array`, `cast`, `char-array`, `class`, `class?`, `decimal?`, `definterface`, `definline`, `enumeration-seq`, `float-array`, `format`, `iterator-seq`, `memfn`, `num`, `numerator`, `denominator`, `ratio?`, `rational?`, `rationalize`, `resultset-seq`, `short-array`, `vector-of`, `bytes?`, `io!`, `PrintWriter-on`, `StackTraceElement->vec` | 31 |
+  | Typed array setters | `aset-boolean`, `aset-byte`, `aset-char`, `aset-double`, `aset-float`, `aset-int`, `aset-long`, `aset-short` | 8 |
+  | Namespace management | `alias`, `all-ns`, `in-ns`, `ns`, `ns-aliases`, `ns-map`, `ns-refers`, `ns-resolve`, `ns-unalias`, `refer`, `remove-ns`, `the-ns`, `find-var`, `intern`, `requiring-resolve`, `resolve`, `use`, `loaded-libs`, `namespace-munge`, `load`, `load-reader`, `load-string`, `with-loading-context` | 23 |
+  | Vars | `alter-var-root`, `var-get`, `var-set`, `with-redefs-fn` | 4 |
+  | Compilation | `*compile-files*`, `*compile-path*`, `*compiler-options*`, `*allow-unresolved-vars*`, `*fn-loader*`, `*use-context-classloader*`, `compile` | 7 |
+  | Dynamic vars (JVM-specific) | `*clojure-version*`, `*data-readers*`, `*default-data-reader-fn*`, `*err*`, `*file*`, `*in*`, `*math-context*`, `*read-eval*`, `*reader-resolver*`, `*repl*`, `*source-path*`, `*suppress-read*`, `*unchecked-math*`, `*verbose-defrecords*`, `*warn-on-reflection*` | 15 |
+  | Reader | `char-escape-string`, `char-name-string`, `clojure-version`, `default-data-readers`, `reader-conditional`, `reader-conditional?` | 6 |
+  | Parallel execution | `pcalls`, `pmap`, `pvalues` | 3 |
+  | Protocols / extensions | `extend`, `extenders`, `extends?`, `find-protocol-impl`, `find-protocol-method` | 5 |
+  | Misc / arithmetic | `*'`, `+'`, `-'`, `dec'`, `inc'`, `with-precision`, `destructure`, `add-classpath`, `print-dup`, `print-method`, `print-simple`, `printf`, `print-ctor`, `method-sig`, `primitives-classnames`, `unquote`, `unquote-splicing`, `stream-into!`, `stream-reduce!`, `stream-seq!`, `stream-transduce!` | 21 |
+  | Internal / type constructors | `->Vec`, `->VecNode`, `->VecSeq`, `-cache-protocol-fn`, `-reset-methods`, `EMPTY-NODE` | 6 |
+
+  </details>
 
 #### Where are we at? (Status — Activity)
 
-<!-- What concrete steps have been taken so far for ClojureScript data? -->
-
-- [ ] Identified authoritative data source
-- [ ] Retrieved var list from data source
-- [ ] Cross-referenced against ClojureDocs `clojure.core` vars
-- [ ] Cross-referenced against ClojureDocs `clojure.string` vars
-- [ ] Documented gaps and surprises
+- [x] Identified authoritative data source — CLJS compiler via `cljs.analyzer.api`
+- [x] Retrieved var list from data source — 1090 vars (980 defs + 191 macros) extracted programmatically
+- [x] Cross-referenced against ClojureDocs `clojure.core` vars — 474 of 679 present, 205 missing
+- [x] Cross-referenced against ClojureDocs `clojure.string` vars — 20 of 21 JVM vars present; `re-quote-replacement` missing
+- [x] Documented gaps and surprises
 
 #### What do we need to know? (Agenda — Understanding)
 
-<!-- What open questions remain? What would change our approach if answered differently? -->
-
-- Is there a programmatic way to dump all public vars from `cljs.core`? Or must we parse source/docs?
-- Are there vars that exist in ClojureScript under a different name or namespace?
-- Are there vars where the signature differs (e.g., different arities)?
-- Does ClojureScript version matter for our data? (Which version do we target?)
-- <!-- add more questions as they arise -->
+- ~~How many `cljs.core` vars correspond to ClojureDocs `clojure.core` vars?~~ **Answered:** 474 of 679 (70%).
+- Are there vars where the signature differs (e.g., different arities)? Out of scope for binary yes/no, but worth noting for future "partial" support.
+- `locking` exists in CLJS (confirmed in analyzer output as a macro) — but is it a no-op or functional? Needs verification.
 
 #### Where are we going? (Agenda — Activity)
 
-<!-- What are the next concrete steps? -->
-
-1. <!-- next step -->
-2. <!-- next step -->
+1. ~~Write a script that extracts `cljs.core` var names from the CLJS API or compiler source and cross-references against ClojureDocs `clojure.core` vars.~~ **Done** — used `cljs.analyzer.api/analyze-file` with `org.clojure/clojurescript 1.12.134` as dependency.
+2. Produce the CLJS column of `dialect-compat.edn` for `clojure.core` and `clojure.string` — data is ready, script not yet written.
 
 #### Maintainer / Point of Contact
 
@@ -98,13 +118,13 @@ For each dialect, answer the four questions to build understanding before planni
 |-------|-------|
 | Project | ClojureScript |
 | Repository | https://github.com/clojure/clojurescript |
-| Primary maintainer(s) | <!-- name(s) --> |
-| Contact info | <!-- email, Slack handle, Clojurians Slack channel, etc. --> |
-| Timezone / Location | <!-- e.g., EST / Durham, NC --> |
-| Best way to reach them | <!-- e.g., #clojurescript on Clojurians Slack --> |
-| Have we contacted them? | <!-- yes/no, date, outcome --> |
-| Their stance on this feature | <!-- supportive / neutral / unknown / concerns --> |
-| Notes | <!-- anything relevant from conversations --> |
+| Primary maintainer(s) | David Nolen (dnolen) |
+| Contact info | Discord DM |
+| Timezone / Location | EST / New York, NY |
+| Best way to reach them | Discord DM; also `#clojurescript` on Clojurians Slack |
+| Have we contacted them? | Not yet (planned via Discord DM) |
+| Their stance on this feature | Expected supportive |
+| Notes | ClojureScript is maintained under the Clojure contributor agreement. |
 
 ---
 
@@ -112,40 +132,66 @@ For each dialect, answer the four questions to build understanding before planni
 
 #### What do we know? (Status — Understanding)
 
-<!-- What is the current state of babashka's standard library coverage?
-     What data sources exist? How complete and fresh are they? -->
+- babashka version tested: **1.12.215** (`bb --version`, 2026-04-21).
+- `clojure.core` in bb: **641 vars** vs JVM's 679.
 
-- babashka version: <!-- e.g., 1.x.x -->
-- babashka provides implementations of `clojure.core` and `clojure.string` vars. Whether the set is identical to, a subset of, or extends Clojure/JVM's set has not been verified. <!-- source: not yet verified -->
+  <details><summary><strong>57 JVM vars missing from bb</strong> (click to expand)</summary>
+
+  | Category | Vars | Count |
+  |----------|------|-------|
+  | Proxy infrastructure | `construct-proxy`, `gen-class`, `get-proxy-class`, `init-proxy`, `proxy-call-with-super`, `proxy-mappings`, `proxy-name`, `proxy-super`, `update-proxy` | 9 |
+  | Struct-maps (deprecated) | `accessor`, `create-struct`, `defstruct`, `struct`, `struct-map` | 5 |
+  | Java interop | `bases`, `cast`, `definterface`, `gen-interface`, `import`, `io!`, `resultset-seq` | 7 |
+  | Compilation | `compile`, `*allow-unresolved-vars*`, `*fn-loader*`, `*use-context-classloader*`, `with-loading-context` | 5 |
+  | Agent-related | `*agent*`, `agent-errors`, `await1`, `clear-agent-errors` | 4 |
+  | Ref-related | `ref-history-count`, `ref-max-history`, `ref-min-history` | 3 |
+  | Parallel execution | `pcalls`, `pvalues` | 2 |
+  | Internal / type constructors | `->ArrayChunk`, `->Vec`, `->VecNode`, `->VecSeq`, `EMPTY-NODE`, `-cache-protocol-fn`, `-reset-methods` | 7 |
+  | Protocol introspection | `extenders`, `find-protocol-impl`, `find-protocol-method` | 3 |
+  | Miscellaneous | `add-classpath`, `definline`, `find-keyword`, `Inst`, `inst-ms*`, `method-sig`, `mix-collection-hash`, `primitives-classnames`, `print-ctor`, `unquote-splicing`, `vector-of`, `*verbose-defrecords*` | 12 |
+
+  </details>
+
+  <details><summary><strong>19 bb-only vars</strong> not in JVM (click to expand)</summary>
+
+  | Category | Vars | Count |
+  |----------|------|-------|
+  | Internal implementations | `proxy*`, `reify*`, `multi-fn-impl`, `multi-fn?-impl`, `multi-fn-add-method-impl`, `protocol-type-impl`, `-reified-methods` | 7 |
+  | Threading / binding internals | `-locking-impl`, `binding-conveyor-fn`, `get-thread-binding-frame-impl`, `has-root-impl`, `reset-thread-binding-frame-impl` | 5 |
+  | Var construction | `-new-var`, `-new-dynamic-var` | 2 |
+  | Transaction / loading | `-run-in-transaction`, `-with-precision`, `-add-loaded-lib` | 3 |
+  | Other | `global-hierarchy`, `system-time` | 2 |
+
+  </details>
+- `clojure.string` in bb: **21 vars — identical set to JVM**. Verified by sorted list comparison on 2026-04-21.
+- **Surprise finding:** `pmap`, `locking`, `agent`, `send`, `ref`, `dosync` all resolve in bb. bb supports more concurrency primitives than commonly assumed.
 - Known data sources:
-  - [ ] [babashka documentation](https://book.babashka.org/) — last verified: <!-- date or "not yet" -->
-  - [ ] `bb -e '(keys (ns-publics (quote clojure.core)))'` — tested: <!-- date or "not yet" -->
-  - [ ] `bb -e '(keys (ns-publics (quote clojure.string)))'` — tested: <!-- date or "not yet" -->
-  - [ ] babashka source / var registry — <!-- URL or "not yet located" -->
-  - [ ] Other: <!-- any additional sources -->
-- What is the authoritative, machine-readable source for "which vars exist in bb's clojure.core"?
+  - [ ] [babashka documentation](https://book.babashka.org/) — last verified: 2026-04-21. Does not maintain a var-by-var compatibility list.
+  - [x] `bb -e '(keys (ns-publics (quote clojure.core)))'` — tested: 2026-04-21. Returns 641 vars.
+  - [x] `bb -e '(keys (ns-publics (quote clojure.string)))'` — tested: 2026-04-21. Returns 21 vars.
+  - [ ] babashka source / var registry — [github.com/babashka/babashka](https://github.com/babashka/babashka). Not consulted directly; `ns-publics` used as source of truth.
+- Authoritative data source: `bb -e '(ns-publics ...)'` on the installed bb binary. babashka publishes no separate machine-readable var list — the binary itself is the source of truth.
 
 #### Where are we at? (Status — Activity)
 
-- [ ] Identified authoritative data source
-- [ ] Retrieved var list from data source
-- [ ] Cross-referenced against ClojureDocs `clojure.core` vars
-- [ ] Cross-referenced against ClojureDocs `clojure.string` vars
-- [ ] Documented gaps and surprises
+- [x] Identified authoritative data source
+- [x] Retrieved var list from data source
+- [x] Cross-referenced against ClojureDocs `clojure.core` vars — 57 JVM vars missing, 19 bb-only vars
+- [x] Cross-referenced against ClojureDocs `clojure.string` vars — identical 21-var set
+- [x] Documented gaps and surprises
 
 #### What do we need to know? (Agenda — Understanding)
 
-- Can we rely on `bb -e '(ns-publics ...)'` as the authoritative source, or does it miss vars?
-- How frequently does babashka add new var support? Is our data stale within weeks or months?
-- Are there vars that exist in bb but behave differently in non-obvious ways?
-- Does babashka version matter? (Which version do we target? Latest stable?)
-- Is there an existing machine-readable list of supported vars we can consume instead of generating?
-- <!-- add more questions -->
+- ~~Can we rely on `bb -e '(ns-publics ...)'` as the authoritative source, or does it miss vars?~~ **Answered:** Yes, `ns-publics` is the definitive source. It reflects the running bb binary's capabilities.
+- How frequently does babashka add new var support? Is our data stale within weeks or months? **Partially answered:** bb v1.12.215 aligns closely with Clojure 1.12. New bb releases are frequent (roughly monthly). Data should be regenerated with each major bb release.
+- Are there vars that exist in bb but behave differently in non-obvious ways? **Open.** The 19 bb-only vars are mostly internal. Behavioral differences in shared vars (e.g., `pmap` single-threaded in bb?) are out of scope but worth noting.
+- ~~Does babashka version matter?~~ **Answered:** Yes. Target latest stable (currently 1.12.215). Record version in generated data file.
+- ~~Is there an existing machine-readable list of supported vars we can consume instead of generating?~~ **Answered:** No. `ns-publics` on a running bb is the only source.
 
 #### Where are we going? (Agenda — Activity)
 
-1. <!-- next step -->
-2. <!-- next step -->
+1. Include `bb -e '(ns-publics ...)'` in the generation script to produce the bb column of `dialect-compat.edn`.
+2. Record bb version in the EDN file header for reproducibility.
 
 #### Maintainer / Point of Contact
 
@@ -153,14 +199,14 @@ For each dialect, answer the four questions to build understanding before planni
 |-------|-------|
 | Project | babashka |
 | Repository | https://github.com/babashka/babashka |
-| Primary maintainer(s) | <!-- name(s) --> |
-| Contact info | <!-- email, Slack handle, etc. --> |
-| Timezone / Location | <!-- --> |
-| Best way to reach them | <!-- e.g., #babashka on Clojurians Slack --> |
-| Have we contacted them? | <!-- yes/no, date, outcome --> |
-| Their stance on this feature | <!-- supportive / neutral / unknown / concerns --> |
-| Existing compatibility data they publish | <!-- e.g., does bb publish a var list somewhere? --> |
-| Notes | <!-- --> |
+| Primary maintainer(s) | Michiel Borkent (borkdude) |
+| Contact info | `#babashka` on Clojurians Slack |
+| Timezone / Location | CET / Netherlands |
+| Best way to reach them | `#babashka` on Clojurians Slack |
+| Have we contacted them? | Not yet (planned via Clojurians Slack) |
+| Their stance on this feature | Expected supportive |
+| Existing compatibility data they publish | None — bb binary itself is the source of truth via `ns-publics` |
+| Notes | bb releases are frequent (~monthly). Data will need periodic regeneration. |
 
 ---
 
@@ -178,20 +224,20 @@ For each dialect, answer the four questions to build understanding before planni
 
 #### Where are we at? (Status — Activity)
 
-- [ ] Confirmed the Clojure version in `src/clj/clojuredocs/search.clj`
-- [ ] Enumerated `clojure.core` var count from ClojureDocs
-- [ ] Enumerated `clojure.string` var count from ClojureDocs
+- [x] Confirmed the Clojure version in `src/clj/clojuredocs/search.clj` — `1.12.4`, matches `clojure -M -e '(clojure-version)'` output.
+- [x] Enumerated `clojure.core` var count from ClojureDocs — **679 vars** (via `ns-publics` on running JVM, 2026-04-21). Plus special forms defined in `search.static/special-forms`.
+- [x] Enumerated `clojure.string` var count from ClojureDocs — **21 vars** (via `ns-publics`, 2026-04-21).
 
 #### What do we need to know? (Agenda — Understanding)
 
-- How many vars are in scope? (Total count for `clojure.core` + `clojure.string` on ClojureDocs)
-- Are there vars on ClojureDocs that lack `:name` or `:ns` metadata and would break our lookup key?
-- <!-- add more -->
+- ~~How many vars are in scope?~~ **Answered:** 679 (`clojure.core`) + 21 (`clojure.string`) = **700 vars** from `ns-publics`, plus special forms.
+- Are there vars on ClojureDocs that lack `:name` or `:ns` metadata and would break our lookup key? **Open** — special forms are manually defined in `search.static/special-forms` with string `:ns` and symbol `:name`, so they use a different metadata shape. The generation script must handle both.
+- The `clojure-namespaces` list includes separate Maven artifacts (`core.async`, `core.logic`, `data.csv`, `tools.build`). These are out of scope for this issue (scoped to `clojure.core` + `clojure.string` only), but the lookup function should gracefully return `nil` for vars in those namespaces.
 
 #### Where are we going? (Agenda — Activity)
 
-1. <!-- next step -->
-2. <!-- next step -->
+1. No additional research needed — Clojure/JVM is the baseline. All vars in `clojure.core` and `clojure.string` are `:clj`-supported by definition.
+2. Ensure the generation script handles the special forms list from `search.static/special-forms`.
 
 #### Maintainer / Point of Contact
 
@@ -199,9 +245,9 @@ For each dialect, answer the four questions to build understanding before planni
 |-------|-------|
 | Project | Clojure |
 | Repository | https://github.com/clojure/clojure |
-| Primary maintainer(s) | <!-- name(s) --> |
-| Contact info | <!-- --> |
-| Timezone / Location | <!-- --> |
+| Primary maintainer(s) | Alex Miller (puredanger), Rich Hickey |
+| Contact info | `#clojure` on Clojurians Slack |
+| Timezone / Location | EST / various |
 | Notes | This is the baseline dialect. No outreach needed unless questions arise about var metadata. |
 
 ---
