@@ -258,29 +258,60 @@ For each dialect, answer the four questions to build understanding before planni
 
 <!-- Observations that span dialects. Fill in as research progresses. -->
 
-- Total var count in scope (`clojure.core` + `clojure.string`): <!-- number or "unknown" -->
-- Expected overlap (all three dialects support): <!-- rough % or "unknown" -->
-- Expected CLJ-only vars: <!-- rough count or "unknown" -->
-- Known tricky cases (e.g., vars that exist but behave differently): <!-- list or "none identified yet" -->
+- Total var count in scope (`clojure.core` + `clojure.string`): **700 vars** (679 + 21) from JVM `ns-publics`, plus special forms tracked separately in `search.static/special-forms`.
+- Overlap — all three dialects support: **488 vars** (70% of 700). This is the portable core.
+- CLJ-only vars (neither CLJS nor bb): **51 vars** (7%) — mostly proxy infrastructure, struct-maps, and deep internals.
+- Known tricky cases:
+  - `locking` exists in both CLJS and bb but may behave differently. In CLJS it's a macro in the analyzer but may be a no-op (no threads in JS). In bb it resolves but threading semantics are unclear. **Out of scope for v1** — binary present/absent is sufficient.
+  - `pmap` is present in bb but may execute single-threaded (SCI limitation). Present/absent still correct.
+  - 6 vars exist in CLJS but not bb: `->ArrayChunk`, `Inst`, `bases`, `import`, `inst-ms*`, `mix-collection-hash`. All are low-visibility internal/interop vars.
+
+#### Three-way partition of `clojure.core` (679 vars)
+
+| Partition | Count | % | Examples |
+|-----------|-------|---|----------|
+| All 3 dialects (JVM ∩ CLJS ∩ bb) | **468** | 69% | `map`, `filter`, `reduce`, `atom`, `swap!`, `str` |
+| JVM + bb only | **154** | 23% | `agent`, `send`, `ref`, `dosync`, `future`, `promise`, `slurp`, `spit`, `read-string`, `ns-publics` |
+| JVM + CLJS only | **6** | <1% | `->ArrayChunk`, `Inst`, `bases`, `import`, `inst-ms*`, `mix-collection-hash` |
+| JVM only | **51** | 8% | `gen-class`, `proxy`, `construct-proxy`, `defstruct`, `struct-map`, `compile`, `pcalls`, `pvalues` |
+
+#### Three-way partition of `clojure.string` (21 vars)
+
+| Partition | Count | Var(s) |
+|-----------|-------|--------|
+| All 3 dialects | **20** | All except `re-quote-replacement` |
+| JVM + bb only | **1** | `re-quote-replacement` |
+| JVM + CLJS only | 0 | — |
+| JVM only | 0 | — |
+
+#### Combined scope (700 vars)
+
+| Partition | Count | % |
+|-----------|-------|---|
+| All 3 dialects | **488** | 70% |
+| JVM + bb only | **155** | 22% |
+| JVM + CLJS only | **6** | <1% |
+| JVM only | **51** | 7% |
+
+**Key insight:** bb's coverage (622/700 = 89%) is almost a strict superset of CLJS's coverage (494/700 = 71%). Only 6 vars exist in CLJS but not bb. This means the data model can be simple: most vars are either "all three" or "JVM + bb."
 
 ### Data quality assessment
 
 | Data source | Format | Freshness | Machine-readable? | Confidence |
 |-------------|--------|-----------|-------------------|------------|
-| ClojureDocs var list | in-memory at startup | reflects running JVM's Clojure version (declared `1.12.4` in config, not verified at runtime) | yes (code) | high for var existence, medium for version accuracy |
-| ClojureScript cheatsheet | HTML | <!-- ? --> | <!-- ? --> | <!-- ? --> |
-| ClojureScript compiler source | Clojure source | <!-- ? --> | <!-- ? --> | <!-- ? --> |
-| babashka `ns-publics` dump | EDN via `bb -e` | reflects whatever bb version is installed locally (version not yet recorded) | yes | not yet assessed |
-| babashka docs | HTML | <!-- ? --> | <!-- ? --> | <!-- ? --> |
-| <!-- other --> | | | | |
+| ClojureDocs var list | in-memory at startup via `ns-publics` | Clojure `1.12.4` (declared in `search.clj` config) | yes (code) | **high** |
+| CLJS compiler (`cljs.analyzer.api`) | Clojure analyzer state | `org.clojure/clojurescript 1.12.134` (2026-04-21) | yes (programmatic) | **high** — captures both `:defs` and `:macros` |
+| babashka `ns-publics` | EDN via `bb -e` | bb `1.12.215` (2026-04-21) | yes (programmatic) | **high** |
+| CLJS API docs (cljs.github.io) | HTML | current | no (manual only) | **medium** — misses macros (see methodology note in §1.1) |
+| CLJS cheatsheet (cljs.info) | HTML | current | no | **low** — curated subset, not comprehensive |
+| babashka docs (book.babashka.org) | HTML | current | no | **low** — no var-by-var listing |
 
 ### Risks and open questions
 
-<!-- Promote the most important unknowns here as they emerge. -->
-
-1. <!-- risk or question -->
-2. <!-- risk or question -->
-3. <!-- risk or question -->
+1. **Version drift** — all three dialects release independently. The compatibility data is a snapshot tied to specific versions (Clojure 1.12.4, CLJS 1.12.134, bb 1.12.215). Data needs version pinning in the generated file and periodic regeneration. A var added to bb in a future release would show as "unsupported" until regenerated.
+2. **Behavioral differences** — binary present/absent doesn't capture vars that exist but behave differently across dialects. Out of scope for v1, but the data model should leave room for a future "partial" state.
+3. **Special forms** — ClojureDocs tracks special forms in `search.static/special-forms` with a different metadata shape (string `:ns`, symbol `:name`) than regular vars. The generation script and lookup function must handle both.
+4. **Separate Maven artifacts** — `clojure-namespaces` in `search/static.clj` includes `core.async`, `core.logic`, `data.csv`, `tools.build`, etc. (37 namespaces total). These are out of scope for this issue but the lookup function must gracefully return `nil` for vars in those namespaces.
 
 ---
 
