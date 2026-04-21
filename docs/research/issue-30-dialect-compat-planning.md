@@ -3,7 +3,7 @@
 > **Issue:** [nubank/clojuredocs#30](https://github.com/nubank/clojuredocs/issues/30)
 > **Branch:** `research/30/dialect-compat-planning`
 > **Author:** L. Jordan Miller
-> **Reviewers:** David Nolen (ClojureScript), Michiel Borkent (babashka), Alex Miller (Clojure)
+> **Reviewers:** David Nolen (ClojureScript), Michiel Borkent (babashka)
 > **Date started:** 2026-04-14 ([`02c9802`](https://github.com/nubank/clojuredocs/commit/02c980200923afdc502176eba6aea62ce2fe92f3))
 > **Last updated:** 2026-04-21
 
@@ -347,9 +347,10 @@ For each dialect, answer the four questions to build understanding before planni
 4. <!-- step -->
 5. <!-- step -->
 
-### What I want to review with Alex
+### What I want to review with manager
 
-<!-- Specific questions or decisions to discuss with your manager before proceeding. -->
+<!-- Specific questions or decisions to discuss with your manager before proceeding.
+     Alex Miller is OOO — defer this review or find an alternate reviewer. -->
 
 1. <!-- question or decision needing input -->
 2. <!-- -->
@@ -362,7 +363,7 @@ For each dialect, answer the four questions to build understanding before planni
 | Milestone | Target date | Status | Notes |
 |-----------|------------|--------|-------|
 | Research complete (Parts 1-2 filled) | <!-- --> | not started | |
-| Approach reviewed with Alex | <!-- --> | not started | |
+| Approach reviewed with manager | <!-- --> | not started | Alex OOO — defer or find alternate reviewer |
 | Data file generated | <!-- --> | not started | |
 | Rendering implemented | <!-- --> | not started | |
 | Local verification | <!-- --> | not started | |
