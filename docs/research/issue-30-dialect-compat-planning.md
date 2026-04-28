@@ -395,7 +395,10 @@ Add a static EDN file (`resources/dialect-compat.edn`) that maps each of the 700
 | 2026-04-21 | Part 1: filled all three dialect sections with verified research. CLJS vars extracted programmatically via `cljs.analyzer.api` on compiler 1.12.134 (474/679 present, 205 missing). bb vars via `ns-publics` on bb 1.12.215 (641/679, 57 missing). Added categorized gap tables, maintainer contacts, methodology note on API-docs undercounting, reviewer line. ([`099e94f`](https://github.com/nubank/clojuredocs/commit/099e94f)) |
 | 2026-04-21 | Part 2: cross-cutting analysis. Computed three-way overlap matrix (488/700 vars portable across all dialects, 70%). Updated data quality table with confidence levels and version-pinned sources. Added 4 risks. ([`3828d57`](https://github.com/nubank/clojuredocs/commit/3828d57)) |
 | 2026-04-21 | Claims audit revisions: fixed bb coverage math (622/700→662/700, 89%→94.6%), fixed CLJS API docs "comprehensive" claim, fixed namespace count (37→38), replaced "~monthly" bb release cadence with verified data (12 releases in ~8.5 months), scoped absence claim for bb machine-readable var list, added source links to `search/static.clj`, refined tricky cases wording, added errata 10–12. |
-| 2026-04-28 | Part 3: filled implementation approach, key decisions table (10 decisions), and 5 implementation steps with done signals. Decisions transferred from `docs/decisions.md` (all now Decided status). |
+| 2026-04-24 | Created `docs/decisions.md` with decided entries for Issue #30 (EDN format, qualified-string keys, scripted generation, standalone execution, hardcoded special forms). ([`75deacd`](https://github.com/nubank/clojuredocs/commit/75deacd)) |
+| 2026-04-27 | Added proposed implementation decisions (loading pattern, rendering location, badge visual, unsupported display, unknown state handling). Applied audit corrections to decision entries. ([`fff2ec7`](https://github.com/nubank/clojuredocs/commit/fff2ec7)) |
+| 2026-04-28 | Part 3: filled implementation approach, key decisions table (10 decisions), and 5 implementation steps with done signals. ([`5078c8a`](https://github.com/nubank/clojuredocs/commit/5078c8a), [`73c34bd`](https://github.com/nubank/clojuredocs/commit/73c34bd)) |
+| 2026-04-28 | Implementation: generation script + EDN data ([`f2eac48`](https://github.com/nubank/clojuredocs/commit/f2eac48)), dialect badges in var pages ([`72a9eeb`](https://github.com/nubank/clojuredocs/commit/72a9eeb)), official logos ([`3ae3cf8`](https://github.com/nubank/clojuredocs/commit/3ae3cf8), [`5b7fcc9`](https://github.com/nubank/clojuredocs/commit/5b7fcc9)), RCF verification + decision log entries ([`38bd87f`](https://github.com/nubank/clojuredocs/commit/38bd87f)), jank deferral decision ([`6ab29a2`](https://github.com/nubank/clojuredocs/commit/6ab29a2)). Added 6 learnings. Updated AI disclaimer with implementation acknowledgements and runtime verification results. |
 
 ---
 
@@ -457,16 +460,25 @@ Add a static EDN file (`resources/dialect-compat.edn`) that maps each of the 700
      that are reusable beyond this issue. Not dialect-specific findings (those go in
      Parts 1-2). -->
 
-1. <!-- learning -->
+1. **RCFs as persistent verification** — Rich comment forms serve double duty: verify behavior during development and persist as executable documentation for future contributors. Any new namespace with non-obvious behavior should include one.
+2. **Static EDN over database for infrequently-changing reference data** — The [data model coupling audit](data-model-coupling-audit.md) showed that adding fields to MongoDB would couple this feature to the deployment pipeline. A checked-in EDN file is version-controlled, diffable, and requires no migration. Apply this pattern whenever reference data changes on a release cadence rather than per-request.
+3. **Dimmed vs. omitted communicates different things** — Showing a dimmed icon means "we checked, it's absent." Omitting icons entirely means "we haven't checked." This distinction avoids misleading users about coverage scope. Reusable for any feature with a "not yet measured" state.
+4. **Generation scripts should record input versions** — `dialect-compat.edn` includes `:versions` so anyone can tell exactly what was measured. Without this, stale data looks identical to fresh data.
+5. **Claims audits catch arithmetic errors that prose review misses** — Decomposing into atomic claims caught two arithmetic errors (bb coverage 89%→94.6%, namespace count 37→38). When a document contains computed numbers, audit the math explicitly rather than reading for plausibility.
+6. **`ns-publics` is the universal cross-dialect enumeration primitive** — The same function works in JVM, CLJS (via analyzer), and bb, making it the natural join key for cross-dialect comparison. Future dialect additions (e.g., jank) should use the same primitive if available.
 
 ---
 
 > **AI Disclaimer**
 >
-> - **Jordan Miller**: defined the task, specified the research-first approach, chose the Father Watson / Reflective Inquiry framework, required per-dialect maintainer contact tables and manager-review sections. Reviewed and approved every finding before it was written into the document. Decided to parse the CLJS compiler source rather than rely on API docs. Provided maintainer contact methods (David Nolen via Discord DM, Michiel Borkent via Clojurians Slack). Specified reviewer list.
-> - **Claude (Opus 4.6, via VS Code Copilot)**:
->   - *Template (prior session)*: drafted the document structure, read the codebase and context documents, pre-filled sections with information from the code and public sources.
->   - *Part 1 research*: ran `clojure -M -e` and `bb -e` to extract var lists from JVM and babashka via `ns-publics`. Used `cljs.analyzer.api/analyze-file` with `org.clojure/clojurescript 1.12.134` as a dependency to extract CLJS vars (both `:defs` and `:macros`). Performed `comm` set operations to compute gaps. Categorized missing vars into tables. Identified the API-docs undercounting issue (missing macros) and wrote the methodology note.
->   - *Part 2 research*: computed three-way overlap using `comm` on the var lists from Part 1. Produced partition tables and combined scope summary. Updated data quality assessments. Identified risks.
->   - *Claims audit*: decomposed document into atomic claims, identified 14 findings (2 high, 7 medium, 5 low severity). User reviewed each finding. Applied 10 approved revisions: fixed arithmetic errors, scoped absence claims, replaced unverified cadence claims with sourced data, added file links, refined wording. Added errata 10–12.
-> - All research sections should be independently verified. AI-generated content may contain false statements. The var counts were produced programmatically (not by hand) which reduces but does not eliminate error risk — the extraction commands themselves could have bugs.
+> - **Jordan Miller** directed all decisions: task definition, research approach, methodology choices (CLJS compiler parsing over API docs, RCFs over unit tests), logo sourcing, reviewer list, and claims audit review. Approved every finding before it was written.
+> - **Claude (Opus 4.6, via VS Code Copilot)** drafted this document, ran the var-extraction commands, computed overlap tables, performed the claims audit (14 findings, 10 revisions), wrote the implementation code, and analyzed jank for deferral.
+>
+> **Verified at runtime** (2026-04-28, via Calva nREPL):
+> - Data loading: 715 entries, correct versions (`1.12.4` / `1.12.134` / `v1.12.215`)
+> - `dialects-for` lookups: all-3, JVM-only, JVM+bb, cross-namespace, and nil-for-unknown cases
+> - Badge rendering: correct HTML output and visual display at `localhost:8080`
+> - Test suite: 1 test, 1 assertion, 0 failures
+> - Verification forms preserved in the RCF in `search/compat.clj`
+>
+> AI-generated content may contain false statements. All research sections should be independently verified.
