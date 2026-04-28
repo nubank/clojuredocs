@@ -23,7 +23,7 @@ Decided
 ### Rationale
 - Hardcoding is appropriate because the set of special forms changes extremely rarely (last change was `clojure.core/import*` in Clojure 1.0) and there are only 15 entries.
 - Programmatic detection is not feasible — special forms are not vars and don't appear in `ns-publics` or analyzer `:defs`.
-- The alternative of excluding special forms would leave gaps on some of the most-visited var pages (`if`, `def`, `let`, etc.).
+- The alternative of excluding special forms would leave gaps on some of the most-visited var pages (`if`, `def`, `do`, etc.).
 
 ### Alternatives Considered
 - Exclude special forms from compat data entirely — leaves high-traffic pages without badges.

@@ -5,7 +5,7 @@
 > **Author:** L. Jordan Miller
 > **Reviewers:** David Nolen (ClojureScript), Michiel Borkent (babashka)
 > **Date started:** 2026-04-14 ([`02c9802`](https://github.com/nubank/clojuredocs/commit/02c980200923afdc502176eba6aea62ce2fe92f3))
-> **Last updated:** 2026-04-21
+> **Last updated:** 2026-04-28
 
 ---
 
@@ -323,29 +323,34 @@ For each dialect, answer the four questions to build understanding before planni
 
 ### Proposed approach (high-level)
 
-<!-- 2-4 sentences. What will we build? What pattern does it follow? -->
+Add a static EDN file (`resources/dialect-compat.edn`) that maps each of the 700 in-scope vars to the set of dialects that support it. A standalone generation script produces this file by querying the CLJS compiler analyzer and a running bb binary, with special forms hardcoded. At startup, a new namespace reads the file into a map and exposes a lookup function. The var page renderer calls this function and renders three small dialect logo icons — full opacity for supported, dimmed for unsupported — inside the existing `.var-meta` div.
 
 ### Key decisions
 
 | Decision | Options considered | Chosen | Why |
 |----------|-------------------|--------|-----|
-| Data file format | EDN / JSON / database | <!-- --> | <!-- --> |
-| Data generation | manual / scripted / hybrid | <!-- --> | <!-- --> |
-| Loading pattern | startup atom / on-demand / config | <!-- --> | <!-- --> |
-| Rendering location | `$var-header` / below signature / sidebar | <!-- --> | <!-- --> |
-| Unknown state handling | show "?" / show nothing / omit label | <!-- --> | <!-- --> |
-| <!-- decision --> | <!-- --> | <!-- --> | <!-- --> |
+| Data file format | EDN / JSON / database | **EDN** (`resources/dialect-compat.edn`) | Idiomatic to Clojure; no new deps; readable by all three dialects. JSON lacks keywords/sets. Database ruled out by [data model coupling audit](data-model-coupling-audit.md). |
+| Data file key format | Qualified string / two-level nested map | **Qualified string** (`"clojure.core/map"` → `#{:clj :cljs :bb}`) | Simple, flat, O(1) lookup. Matches how vars are displayed. |
+| Data generation | Manual / scripted / hybrid | **Scripted** (`tools/gen_dialect_compat.clj`) | 700 entries too many to hand-maintain. All three data sources are programmatically accessible. |
+| Script execution | `lein run -m` / `lein-exec` / standalone | **Standalone** (load from `lein repl`) | Simplest; no build tool coupling; portable to future site redesign. Instructions in `tools/README.md`. |
+| Special forms handling | Hardcoded / excluded / detected | **Hardcoded** in gen script | 15 entries, rarely change, not in `ns-publics`. All 15 in JVM+bb; 13 in CLJS (`monitor-enter`/`monitor-exit` excluded). |
+| Loading pattern | Startup def / on-demand slurp / config lib | **Startup def** (`search/compat.clj`) | Follows existing `clojure-lib` pattern in [`search.clj`](../../src/clj/clojuredocs/search.clj#L102-L108). O(1) lookup, no per-request I/O. |
+| Rendering location | `$var-header` / below signature / sidebar | **`$var-header`** inside `.var-meta` div | Dialect support is var identity metadata — belongs next to "Available since" and namespace link. |
+| Badge visual | Text labels / logo icons / colored pills | **Small dialect logo icons** (Clojure, ClojureScript, babashka) | Compact, visually recognizable, community-standard iconography. |
+| Unsupported display | Omit / dim / strikethrough | **Dimmed** (reduced opacity) | Shows all three icons for in-scope vars; communicates "we checked, it's absent" rather than leaving the user guessing. |
+| Unknown state handling | Show "?" / show nothing / show "unknown" | **Show nothing** (omit all badges) | No badges for out-of-scope vars honestly communicates "we haven't checked." |
 
 ### Breakdown into smaller steps
 
-<!-- Numbered list of steps small enough to be a single PR or pairing session.
-     Each step should have a clear "done" signal. -->
+1. **Generate compatibility data** — Write `tools/gen_dialect_compat.clj`. Run it to produce `resources/dialect-compat.edn` with a `:versions` header and 715 entries (700 vars + 15 special forms). **Done signal:** EDN file exists, contains version-pinned data, round-trips through `clojure.edn/read-string`.
 
-1. <!-- step: what, done-signal -->
-2. <!-- step -->
-3. <!-- step -->
-4. <!-- step -->
-5. <!-- step -->
+2. **Add lookup namespace** — Create `src/clj/clojuredocs/search/compat.clj` with a top-level `def` that reads the EDN file and a `(defn dialect-support [ns name])` function. Both regular vars and special forms use string `:ns`; the only difference is `:name` (string for regular vars, symbol for special forms). The lookup key is always `"ns/name"` so the function coerces both to strings. Returns `nil` for out-of-scope vars. **Done signal:** `(dialect-support "clojure.core" "map")` returns `#{:clj :cljs :bb}`; `(dialect-support "clojure.core" "gen-class")` returns `#{:clj}`; `(dialect-support "clojure.core.async" "go")` returns `nil`.
+
+3. **Render badges in var page** — Modify `$var-header` in [`pages/vars.clj`](../../src/clj/clojuredocs/pages/vars.clj) to call `dialect-support` and render three `<img>` elements with appropriate CSS classes and `title`/`aria-label` attributes for accessibility (e.g., `title="Supported in ClojureScript"` vs `title="Not available in ClojureScript"`). **Done signal:** var pages for in-scope vars show three dialect icons; out-of-scope var pages show none.
+
+4. **Add CSS and logo assets** — Add dialect logo images to `resources/public/img/` and `.dialect-badge` styles in [`css.clj`](../../src/clj/clojuredocs/css.clj) (supported = full opacity, unsupported = dimmed). **Done signal:** badges render correctly with visual distinction between supported and unsupported.
+
+5. **Verify and clean up** — Spot-check badge rendering for representative vars: all-three (`map`), JVM+bb (`agent`), JVM+CLJS (`->ArrayChunk`), JVM-only (`gen-class`), special form (`if`), out-of-scope (`clojure.set/union`). Verify `title`/`aria-label` attributes on icons. **Done signal:** all spot-checks pass; no badges on out-of-scope vars.
 
 ---
 
@@ -390,6 +395,7 @@ For each dialect, answer the four questions to build understanding before planni
 | 2026-04-21 | Part 1: filled all three dialect sections with verified research. CLJS vars extracted programmatically via `cljs.analyzer.api` on compiler 1.12.134 (474/679 present, 205 missing). bb vars via `ns-publics` on bb 1.12.215 (641/679, 57 missing). Added categorized gap tables, maintainer contacts, methodology note on API-docs undercounting, reviewer line. ([`099e94f`](https://github.com/nubank/clojuredocs/commit/099e94f)) |
 | 2026-04-21 | Part 2: cross-cutting analysis. Computed three-way overlap matrix (488/700 vars portable across all dialects, 70%). Updated data quality table with confidence levels and version-pinned sources. Added 4 risks. ([`3828d57`](https://github.com/nubank/clojuredocs/commit/3828d57)) |
 | 2026-04-21 | Claims audit revisions: fixed bb coverage math (622/700→662/700, 89%→94.6%), fixed CLJS API docs "comprehensive" claim, fixed namespace count (37→38), replaced "~monthly" bb release cadence with verified data (12 releases in ~8.5 months), scoped absence claim for bb machine-readable var list, added source links to `search/static.clj`, refined tricky cases wording, added errata 10–12. |
+| 2026-04-28 | Part 3: filled implementation approach, key decisions table (10 decisions), and 5 implementation steps with done signals. Decisions transferred from `docs/decisions.md` (all now Decided status). |
 
 ---
 
