@@ -139,7 +139,7 @@
   [:span.badge num])
 
 (def dialect-info
-  {:clj  {:label "Clojure/JVM" :img "/img/clojure-logo.svg"}
+  {:clj  {:label "Clojure/JVM" :img "/img/clojure-logo.png"}
    :cljs {:label "ClojureScript" :img "/img/cljs-logo.svg"}
    :bb   {:label "babashka" :img "/img/babashka-logo.svg"}})
 
