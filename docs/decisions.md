@@ -4,6 +4,40 @@ Document design and architecture decisions. Lightweight alternative to full ADRs
 
 ---
 
+## 2026-04-28 — Verify dialect compat via rich comment blocks, not unit tests
+
+### Status
+Decided
+
+### Context
+- After implementing dialect badges, needed to capture REPL verification results as a repeatable artifact.
+- The project has no real test suite — only a placeholder test (`core_test.clj` with `(is (= 1 1))`).
+- PR #27 explores REPL-verified code review as a demo topic, with a tentative presentation date of June 11, 2026. `cognitect-labs/transcriptor` was flagged as relevant prior art.
+
+### Decision
+- Verify dialect compatibility lookups via inline rich comment blocks in `search/compat.clj`, not unit tests.
+
+### Rationale
+- Rich comment blocks are evaluable at the REPL during development — no test runner needed, immediate feedback.
+- They serve as living documentation: expected results are inline comments next to each form.
+- Adding a unit test to a project with zero real test coverage sets a convention nobody is following yet. RCFs match the project's current maturity.
+- The RCF in `compat.clj` doubles as a concrete artifact for the PR #27 REPL-verified code review demo.
+
+### Alternatives Considered
+- Unit tests in `core_test.clj` — establishes a convention the project doesn't follow; requires a test runner; results are less visible during development.
+- No verification artifact — REPL results are ephemeral; not repeatable by other contributors.
+
+### Impacts and Risks
+- RCFs are not run in CI — regressions won't be caught automatically.
+- Risk: someone changes `dialect-compat.edn` without evaluating the RCF. Mitigation: low probability; the EDN is script-generated, not hand-edited.
+
+### Links
+- [search/compat.clj RCF](src/clj/clojuredocs/search/compat.clj)
+- [PR #27 — REPL-verified code review](https://github.com/nubank/clojuredocs/pull/27)
+- [cognitect-labs/transcriptor](https://github.com/cognitect-labs/transcriptor)
+
+---
+
 ## 2026-04-28 — Hardcode special forms dialect support
 
 ### Status
