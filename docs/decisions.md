@@ -4,6 +4,43 @@ Document design and architecture decisions. Lightweight alternative to full ADRs
 
 ---
 
+## 2026-04-28 — Defer jank dialect until stable var enumeration exists
+
+### Status
+Decided
+
+### Context
+- jank is a native Clojure dialect on LLVM with C++ interop, currently in alpha.
+- Nubank sponsors the jank project.
+- jank has a WIP nREPL server PR (#698) from 2 months ago, suggesting growing introspection capabilities — though the feature may not be complete.
+- The `jank-lang/clojure-test-suite` repo already tests 5 dialects (Clojure, ClojureScript, babashka, ClojureCLR, Basilisp), but jank can't run `clojure.test` yet.
+- The current dialect badge architecture requires a data source function (~10 lines), `cond->` clauses in `build-compat-map` (~4 lines), one `dialect-info` entry, a special forms set, and a logo file.
+
+### Decision
+- Do not add jank as a dialect in v1; revisit when jank supports `ns-publics` or provides a stable var enumeration mechanism.
+
+### Rationale
+- jank is pre-1.0 and its var surface is actively evolving (the project has daily commits).
+- The test suite is a proxy for coverage ("tested") not API surface ("supported"), which is a meaningful distinction for user-facing badges.
+- The architecture is additive — adding jank later requires no breaking changes to data format, rendering, or CSS.
+- Worth a conversation with Jeaye (jank author) about a blessed way to enumerate supported vars before building a scraper.
+
+### Alternatives Considered
+- Scrape `jank-lang/clojure-test-suite` directory listing to infer supported vars — depends on directory naming conventions and file structure, which are not a stable API; conflates "tested" with "supported."
+- Add jank now with frequent regeneration — high maintenance burden for unstable data; could mislead users.
+
+### Impacts and Risks
+- jank users won't see compatibility badges on ClojureDocs.
+- Risk: none. Adding a fourth dialect requires changes to ~4 locations in the codebase, assuming a working var enumeration mechanism exists.
+
+### Links
+- [jank-lang/jank](https://github.com/jank-lang/jank)
+- [jank-lang/clojure-test-suite](https://github.com/jank-lang/clojure-test-suite)
+- [jank nREPL PR #698](https://github.com/jank-lang/jank/pull/698)
+- [2026-04-14 — Three initial dialects](docs/decisions.md)
+
+---
+
 ## 2026-04-28 — Verify dialect compat via rich comment blocks, not unit tests
 
 ### Status
