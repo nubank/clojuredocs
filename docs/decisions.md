@@ -4,10 +4,79 @@ Document design and architecture decisions. Lightweight alternative to full ADRs
 
 ---
 
+## 2026-04-28 — Hardcode special forms dialect support
+
+### Status
+Decided
+
+### Context
+- ClojureDocs tracks 15 special forms in `search/static.clj`: `def`, `if`, `do`, `quote`, `var`, `recur`, `throw`, `try`, `catch`, `finally`, `.`, `set!`, `monitor-enter`, `monitor-exit`, `new`.
+- Special forms are compiler built-ins — they don't appear in `ns-publics` output, so the generation script's programmatic extraction (CLJS analyzer, bb `ns-publics`) won't capture them.
+- Need to decide how to include special forms in the compatibility data.
+
+### Decision
+- Hardcode which special forms each dialect supports in the generation script.
+- All 15 special forms are supported in Clojure/JVM by definition.
+- CLJS supports: `def`, `if`, `do`, `quote`, `var`, `recur`, `throw`, `try`, `catch`, `finally`, `.`, `set!`, `new` (13 of 15). `monitor-enter` and `monitor-exit` are JVM threading primitives with no JS equivalent.
+- bb supports: `def`, `if`, `do`, `quote`, `var`, `recur`, `throw`, `try`, `catch`, `finally`, `.`, `set!`, `monitor-enter`, `monitor-exit`, `new` (all 15). bb runs on the JVM via SCI and supports the full set.
+
+### Rationale
+- Hardcoding is appropriate because the set of special forms changes extremely rarely (last change was `clojure.core/import*` in Clojure 1.0) and there are only 15 entries.
+- Programmatic detection is not feasible — special forms are not vars and don't appear in `ns-publics` or analyzer `:defs`.
+- The alternative of excluding special forms would leave gaps on some of the most-visited var pages (`if`, `def`, `let`, etc.).
+
+### Alternatives Considered
+- Exclude special forms from compat data entirely — leaves high-traffic pages without badges.
+- Detect programmatically — not feasible; special forms aren't in `ns-publics`.
+
+### Impacts and Risks
+- If a future Clojure version adds or removes a special form, the hardcoded list needs manual update.
+- Risk: very low. Special forms are the most stable part of the language.
+
+### Links
+- [search/static.clj special-forms](src/clj/clojuredocs/search/static.clj#L43)
+- [Issue #30](https://github.com/nubank/clojuredocs/issues/30)
+
+---
+
+## 2026-04-28 — Standalone script for dialect data generation
+
+### Status
+Decided
+
+### Context
+- The generation script (`tools/gen_dialect_compat.clj`) needs JVM for the CLJS analyzer and shells out to `bb`.
+- Need to decide how to invoke it: Leiningen task, lein-exec plugin, or standalone manual execution.
+- The current site will be redesigned per the 2026 Vision — infrastructure choices should be portable.
+
+### Decision
+- Keep the script as a standalone Clojure file loaded and invoked manually from a REPL (`lein repl`, then `(load-file "tools/gen_dialect_compat.clj")`).
+- Add a `tools/README.md` with instructions for running the script.
+
+### Rationale
+- Simplest and most composable approach — no build tool plugins, no source path changes.
+- Portable: when the site is redesigned, the script can be moved to the new project without Leiningen coupling.
+- Matches the existing `tools/` convention — `dev_export.clj`, `sanity_check.clj`, and `top_contribs.clj` are all standalone files.
+- The script runs rarely (only when dialect versions change), so ergonomic automation is not yet justified.
+
+### Alternatives Considered
+- `lein run -m tools.gen-dialect-compat` — requires adding `tools/` to Leiningen source paths; couples script to build config.
+- `lein exec tools/gen_dialect_compat.clj` — requires `lein-exec` plugin (not in `project.clj`); adds a dependency for rare use.
+
+### Impacts and Risks
+- Slightly more manual than a one-liner, but documented in `tools/README.md`.
+- Risk: someone forgets how to run it. Mitigation: README with exact commands.
+
+### Links
+- [Issue #30](https://github.com/nubank/clojuredocs/issues/30)
+- [tools/ directory convention](tools/)
+
+---
+
 ## 2026-04-28 — Use EDN for dialect compatibility data file
 
 ### Status
-Proposed
+Decided
 
 ### Context
 - Need a format for the static compatibility index mapping 700 qualified var names to their supported dialects.
@@ -16,6 +85,8 @@ Proposed
 
 ### Decision
 - Use EDN as the data file format for `dialect-compat.edn`.
+- Key format: qualified string (`"clojure.core/map"`) mapping to a set of dialect keywords (`#{:clj :cljs :bb}`).
+- Example: `{"clojure.core/map" #{:clj :cljs :bb}, "clojure.core/gen-class" #{:clj}}`.
 
 ### Rationale
 - Idiomatic to Clojure — readable by all three target dialects (JVM, CLJS, bb).
@@ -40,7 +111,7 @@ Proposed
 ## 2026-04-28 — Script-generate dialect compatibility data
 
 ### Status
-Proposed
+Decided
 
 ### Context
 - The compatibility index covers 700 vars across 3 dialects — too many to maintain by hand.
@@ -71,7 +142,7 @@ Proposed
 ## 2026-04-28 — Load compatibility data at startup via def
 
 ### Status
-Proposed
+Decided
 
 ### Context
 - Need a way for `pages/vars.clj` to look up dialect support for a var at render time.
@@ -100,26 +171,33 @@ Proposed
 ## 2026-04-28 — Render dialect badges in $var-header
 
 ### Status
-Proposed
+Decided
 
 ### Context
 - Need to show which dialects support a var on its page.
 - The `$var-header` function in `pages/vars.clj` already renders var name, namespace link, "Available since", and source link in a `.var-meta` div.
 
 ### Decision
-- Render dialect badges as small inline `<span>` elements inside `.var-meta` in `$var-header`.
+- Render dialect icons as small inline elements inside `.var-meta` in `$var-header`.
+- Use dialect logos (Clojure, ClojureScript, babashka) as small icons, ordered `clj` `cljs` `bb`.
+- For in-scope vars: always show all three icons. Supported dialects are full opacity; unsupported dialects are dimmed. This communicates "we checked, it's absent" rather than leaving the user guessing.
+- For out-of-scope vars (no compat data): show nothing (see "Omit badges for unknown" decision).
 
 ### Rationale
 - Dialect support is var identity metadata — it belongs next to "Available since" and the namespace link, not in a separate section.
-- Minimal visual footprint; badges like `clj` `cljs` `bb` fit naturally as inline pills.
+- Showing all three icons (with dimming) is more informative than omitting unsupported ones — users can see at a glance which dialects were checked and which support the var.
+- Small logos are visually compact and recognizable to the Clojure community.
 
 ### Alternatives Considered
 - Below arglists — too far from the var name; users scanning quickly would miss them.
 - Sidebar — separated from var identity; sidebar is already used for namespace navigation.
+- Omit unsupported icons — less informative; users can't distinguish "not supported" from "not checked."
+- Text labels (`clj`, `cljs`, `bb`) instead of icons — functional but less visually appealing.
 
 ### Impacts and Risks
 - Adds CSS for `.dialect-badge` styles (new Garden rules in `css.clj`).
-- Risk: visual clutter on var pages. Mitigation: badges are small, muted, and only shown for vars in `clojure.core` and `clojure.string` (700 of the vars tracked by ClojureDocs).
+- Need to source or create small dialect logo assets.
+- Risk: visual clutter on var pages. Mitigation: icons are small, and dimmed icons have low visual weight.
 
 ### Links
 - [pages/vars.clj $var-header](src/clj/clojuredocs/pages/vars.clj)
@@ -130,7 +208,7 @@ Proposed
 ## 2026-04-28 — Omit badges for unknown dialect support
 
 ### Status
-Proposed
+Decided
 
 ### Context
 - Vars outside `clojure.core` and `clojure.string` (e.g., `core.async`, `core.logic`) have no dialect compatibility data yet.
