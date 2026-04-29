@@ -9,6 +9,15 @@ Changes are relative to the upstream [zk/clojuredocs](https://github.com/zk/cloj
 
 ## [Unreleased]
 
+## [2026.04.29]
+
+### Added
+- **Cross-dialect compatibility indicators**: var pages now show compatibility
+  badges for ClojureScript and babashka, backed by a static EDN index generated
+  from dialect API metadata
+  ([#30](https://github.com/nubank/clojuredocs/issues/30),
+   [#37](https://github.com/nubank/clojuredocs/pull/37))
+
 ## [2026.04.07a]
 
 ### Added
