@@ -149,13 +149,15 @@
      (for [k [:clj :cljs :bb]
            :let [{:keys [label img]} (dialect-info k)
                  supported? (contains? dialects k)]]
-       [:img.dialect-badge
-        {:src img
-         :alt label
-         :title (if supported?
-                  (str "Available in " label)
-                  (str "Not available in " label))
-         :class (when-not supported? "unsupported")}])]))
+       [:img {:src img
+              :alt label
+              :width 20
+              :height 20
+              :title (if supported?
+                       (str "Available in " label)
+                       (str "Not available in " label))
+              :class (str "dialect-badge"
+                          (when-not supported? " unsupported"))}])]))
 
 (defn $var-header [{:keys [ns name added arglists forms] :as v}]
   [:div.row.var-header
