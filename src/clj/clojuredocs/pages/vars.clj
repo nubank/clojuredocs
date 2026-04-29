@@ -3,6 +3,7 @@
             [clojure.string :as str]
             [somnium.congomongo :as mon]
             [clojuredocs.search :as search]
+            [clojuredocs.search.compat :as compat]
             [clojuredocs.pages.common :as common]
             [clojuredocs.data :as data]
             [clojuredocs.config :as config]
@@ -137,6 +138,25 @@
 (defn $number-badge [num]
   [:span.badge num])
 
+(def dialect-info
+  {:clj  {:label "Clojure/JVM" :img "/img/clojure-logo.png"}
+   :cljs {:label "ClojureScript" :img "/img/cljs-logo.svg"}
+   :bb   {:label "babashka" :img "/img/babashka-logo.svg"}})
+
+(defn $dialect-badges [ns-str name-str]
+  (when-let [dialects (compat/dialects-for ns-str name-str)]
+    [:span.dialect-badges
+     (for [k [:clj :cljs :bb]
+           :let [{:keys [label img]} (dialect-info k)
+                 supported? (contains? dialects k)]]
+       [:img.dialect-badge
+        {:src img
+         :alt label
+         :title (if supported?
+                  (str "Available in " label)
+                  (str "Not available in " label))
+         :class (when-not supported? "unsupported")}])]))
+
 (defn $var-header [{:keys [ns name added arglists forms] :as v}]
   [:div.row.var-header
    [:div.col-sm-8
@@ -150,7 +170,8 @@
        [:span.source-link
         " ("
         [:a {:href su} "source"]
-        ") "])]]
+        ") "])
+     ($dialect-badges ns name)]]
    [:div.col-sm-12
     [:section
      [:ul.arglists
