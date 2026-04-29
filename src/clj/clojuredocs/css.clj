@@ -301,7 +301,19 @@
                   :background-color code-bg}]
     [:ul {:margin-bottom "30px"}]
     [:li {:list-style-type 'disc
-          :margin-left "25px"}]]])
+          :margin-left "25px"}]]
+   [:.dialect-badges
+    {:display 'inline-block
+     :margin-top "5px"}
+    [:.dialect-badge
+     {:width "20px"
+      :height "20px"
+      :margin-right "4px"
+      :vertical-align 'middle
+      :transition "opacity 0.2s ease"}
+     [:&.unsupported
+      {:opacity 0.15
+       :filter "grayscale(100%)"}]]]])
 
 (def quickref
   [[:.toc {:margin-bottom "20px"}
