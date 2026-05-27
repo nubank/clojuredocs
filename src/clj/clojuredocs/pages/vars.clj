@@ -159,6 +159,16 @@
               :class (str "dialect-badge"
                           (when-not supported? " unsupported"))}])]))
 
+(defn $implementation-badge [v]
+  (when (search/impl-var? v)
+    [:span.implementation-badge "Implementation detail"]))
+
+(defn $implementation-notice [v]
+  (when (search/impl-var? v)
+    [:div.implementation-notice
+     "This var is an implementation detail and is not part of the public API. "
+     "It may change or be removed without notice."]))
+
 (defn $var-header [{:keys [ns name added arglists forms] :as v}]
   [:div.row.var-header
    [:div.col-sm-8
@@ -173,7 +183,8 @@
         " ("
         [:a {:href su} "source"]
         ") "])
-     ($dialect-badges ns name)]]
+     ($dialect-badges ns name)
+     ($implementation-badge v)]]
    [:div.col-sm-12
     [:section
      [:ul.arglists
@@ -219,7 +230,9 @@
                             (take 4)))
            :body
            (common/$main
-             {:body-class "var-page"
+             {:body-class (if (search/impl-var? v)
+                            "var-page implementation-var"
+                            "var-page")
               :title (util/html-encode (str name " - " ns " | ClojureDocs - Community-Powered Clojure Documentation and Examples"))
               :meta {"description" og-description
                      "twitter:card" "summary"
@@ -272,6 +285,7 @@
                            (common/$library-nav library ns)]]
                          [:div.col-sm-10
                           ($var-header v)
+                          ($implementation-notice v)
                           [:section
                            [:div.docstring
                             (if doc
