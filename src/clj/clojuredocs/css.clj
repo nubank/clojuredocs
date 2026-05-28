@@ -313,7 +313,27 @@
       :transition "opacity 0.2s ease"}
      [:&.unsupported
       {:opacity 0.15
-       :filter "grayscale(100%)"}]]]])
+       :filter "grayscale(100%)"}]]]
+   [:.implementation-badge
+    {:display 'inline-block
+     :margin-top "5px"
+     :padding "2px 8px"
+     :font-size "11px"
+     :font-weight 'bold
+     :color "#856404"
+     :background-color "#fff3cd"
+     :border "1px solid #ffc107"
+     :border-radius "10px"}]
+   [:.implementation-notice
+    {:margin-bottom "15px"
+     :padding "10px 15px"
+     :font-size "13px"
+     :color "#856404"
+     :background-color "#fff3cd"
+     :border "1px solid #ffeaa0"
+     :border-radius "4px"}]
+   [:&.implementation-var
+    [:.var-name {:opacity 0.7}]]])
 
 (def quickref
   [[:.toc {:margin-bottom "20px"}
