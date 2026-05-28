@@ -33,7 +33,16 @@
      :forms ; -> list of strings
      :deprecated
      :url
-     :no-doc])
+     :no-doc
+     :skip-wiki])
+
+(defn impl-var?
+  "Returns true if a var is an implementation detail — either marked
+   ^:skip-wiki or lacking a docstring (the same heuristic Clojure's
+   official docs use to omit internal vars)."
+  [{:keys [skip-wiki doc special-form]}]
+  (and (not special-form)
+       (or skip-wiki (nil? doc))))
 
 (defn cond-update-in [m keys & rest]
   (if (get-in m keys)
@@ -111,6 +120,7 @@
 (def searchable-vars
   (->> clojure-lib
        :vars
+       (remove impl-var?)
        (map #(assoc % :keywords (tokenize-name (:name %))))))
 
 (def searchable-nss
@@ -136,7 +146,8 @@
     (clucy/add search-index page)))
 
 (def lookup-vars
-  (->> searchable-vars
+  (->> clojure-lib
+       :vars
        (reduce #(assoc %1 (str (:ns %2) "/" (:name %2)) %2) {})))
 
 (defn lookup [ns-name]
