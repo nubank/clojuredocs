@@ -121,7 +121,7 @@
   (->> clojure-lib
        :vars
        (remove impl-var?)
-       (map #(assoc % :keywords (tokenize-name (:name %))))))
+       (map #(assoc % :keywords (str/lower-case (tokenize-name (:name %)))))))
 
 (def searchable-nss
   (->> static/clojure-namespaces
@@ -202,6 +202,7 @@ Still maintains the O(n*m) guarantee.
 (defn format-query [q]
   (some-> q
     str/trim
+    str/lower-case
     drop-leading-stars
     lucene-escape
     (str "*")))
