@@ -1,3 +1,12 @@
+> **Document metadata**
+> - **Created:** 2026-06-01
+> - **Last updated:** 2026-06-05
+> - **Tags:** decisions, architecture, living-document
+> - **AI-assisted:** Yes — Claude drafted entries, human-directed and approved
+> - **Review maturity:** AI-drafted; human-reviewed via PR
+>
+> _AI-assisted document. Decisions reflect the team's choices; rationale text was AI-drafted from human direction._
+
 # Decision Log
 
 Document design and architecture decisions. Lightweight alternative to full ADRs.

@@ -1,6 +1,13 @@
-# ClojureDocs Entity-Attribute Model
+> **Document metadata**
+> - **Created:** 2026-06-01
+> - **Last updated:** 2026-06-05
+> - **Tags:** entity-model, data-model, mongodb, issue-43
+> - **AI-assisted:** Yes — Claude extracted entity shapes from ~15 source files, human-directed and reviewed
+> - **Review maturity:** AI-drafted; human-reviewed via PR
+>
+> _AI-assisted document. Entity shapes were extracted by reading source code, not by querying a running system — runtime behavior may differ._
 
-> **AI Disclaimer**: This model was extracted from the codebase by Claude (Opus 4.6) and reviewed by Jordan Miller. Verify attributes against the source files linked in the CSV.
+# ClojureDocs Entity-Attribute Model
 
 ### Markers
 
@@ -184,3 +191,7 @@ The following collections are called by `add-all-indexes!` but have no active qu
 | User | `api/common.clj` L9-12 | `pages/user.clj` L13 | `pages/gh_auth.clj` L22 |
 | Var | `api/common.clj` L14-16 | `search.clj` L148-150 | — (read-only, derived) |
 | Library | `search.clj` L112-115 | `pages/vars.clj` L34 | — (hardcoded) |
+
+---
+
+> **AI Disclosure**: This model was extracted from the codebase by Claude (Opus 4.6) via GitHub Copilot and reviewed by Jordan Miller. Trust some things — verify attributes against the source files linked in the CSV and the [attribution log](ai/entity-model-attribution.md).
