@@ -4,6 +4,106 @@ Document design and architecture decisions. Lightweight alternative to full ADRs
 
 ---
 
+## 2026-06-01 — Dual-format entity model documentation
+
+### Status
+Decided
+
+### Context
+- Issue #43 requires defining the entity-attribute model for ClojureDocs.
+- The model serves two audiences: humans reading a narrative document and humans doing column-level analysis in a spreadsheet.
+- The data model coupling audit (`docs/research/data-model-coupling-audit.md`) already established that the data model is implicit and scattered.
+
+### Decision
+- Document the entity-attribute model as both a Mermaid ER diagram in Markdown (`docs/entity-attribute-model.md`) and a flat CSV (`docs/entity-attribute-model.csv`).
+
+### Rationale
+- Mermaid ER diagrams render natively in GitHub and show relationships visually.
+- CSV enables filtering, sorting, and gap analysis in any spreadsheet tool.
+- Each format plays to different strengths — the Markdown captures structure and narrative observations, the CSV captures per-attribute detail.
+
+### Alternatives Considered
+- Markdown only — loses the per-attribute detail and sortability that CSV provides.
+- Database DDL / SQL schema — the system uses MongoDB (schemaless); a relational DDL would be misleading about the actual storage model.
+- Single prose document — harder to audit systematically; the data model coupling audit already showed that implicit models resist prose-only documentation.
+
+### Impacts and Risks
+- Two files to keep in sync when the model changes.
+- Risk: drift between formats. Mitigation: the CSV is the source of truth for attribute-level detail; the Markdown is the source of truth for relationships and observations.
+
+### Links
+- [Issue #43](https://github.com/nubank/clojuredocs/issues/43)
+- [docs/entity-attribute-model.md](docs/entity-attribute-model.md)
+- [docs/entity-attribute-model.csv](docs/entity-attribute-model.csv)
+- [Data model coupling audit](docs/research/data-model-coupling-audit.md)
+
+---
+
+## 2026-06-01 — File bugs discovered during model extraction as separate issues
+
+### Status
+Decided
+
+### Context
+- During entity-attribute model extraction for #43, code reading revealed 4 bugs: an indexes function ignoring its parameter (#53), a missing authorship check on note edits (#54), ExampleHistory storing the wrong body (#55), and a key typo in index definitions (#56).
+- These bugs are independent of the entity model work and affect production behavior.
+
+### Decision
+- File each bug as a standalone GitHub issue with Father Watson framing, and cross-reference them in the entity model document via inline ⚠ markers with an issue index table.
+
+### Rationale
+- Standalone issues are independently triageable, assignable, and closeable — embedding them in the entity model document would bury them.
+- Inline ⚠ markers in the entity model preserve the connection between the finding and the evidence without coupling the documents' lifecycles.
+- The Father Watson format matches the repo's issue-writing convention (`docs/ai/issue-writing-guide.md`).
+
+### Alternatives Considered
+- Note bugs inline in the entity model only — they'd be invisible to anyone not reading that specific document, and not triageable via GitHub's issue workflow.
+- File bugs without linking to the entity model — loses the provenance of how the bugs were discovered.
+
+### Impacts and Risks
+- Four new issues (#53–#56) added to the backlog.
+- Risk: marker notation (⚠ #N) is unfamiliar. Mitigation: legend table at the top of the entity model document defines the notation.
+
+### Links
+- [Issue #53](https://github.com/nubank/clojuredocs/issues/53) — `add-indexes-to-coll!` ignores collection parameter
+- [Issue #54](https://github.com/nubank/clojuredocs/issues/54) — `patch-note-handler` missing authorship check
+- [Issue #55](https://github.com/nubank/clojuredocs/issues/55) — ExampleHistory stores new body instead of previous body
+- [Issue #56](https://github.com/nubank/clojuredocs/issues/56) — `:migraion-key` typo
+
+---
+
+## 2026-06-01 — Cross-reference issues between repos via GitHub comments
+
+### Status
+Decided
+
+### Context
+- nubank/clojuredocs is a fork of zk/clojuredocs; both have open issue backlogs with overlapping concerns.
+- Issue #23 explicitly asks to scan the old repo for issues worthy of migration.
+- The 4 new bugs and the entity model findings relate to existing issues in both repos (e.g., nubank#4, nubank#5, zk#226).
+
+### Decision
+- Add GitHub comments on existing issues linking them to related new issues and entity model findings, rather than maintaining a separate cross-reference document.
+
+### Rationale
+- GitHub comments appear in the issue's timeline — anyone triaging an issue sees the connections without consulting a separate document.
+- Comments are durable and searchable via GitHub's interface.
+- A separate cross-reference document would go stale and require manual maintenance.
+
+### Alternatives Considered
+- Maintain a cross-reference table in a markdown file — requires manual updates and is disconnected from the issue workflow.
+- Add GitHub issue labels for cross-referencing — labels are too coarse to express specific relationships between issues.
+
+### Impacts and Risks
+- Comments are permanent; incorrect cross-references cannot be deleted without repo admin access.
+- Risk: comment noise on old issues. Mitigation: comments are concise and only added where the connection is substantive.
+
+### Links
+- [Issue #23](https://github.com/nubank/clojuredocs/issues/23) — scan old repo for issues worthy of migration
+- Comments added to nubank/clojuredocs #4, #5, #43, #54 linking to entity model findings and related issues
+
+---
+
 ## 2026-05-11 — Schedule export JSON regeneration in-process
 
 ### Status
