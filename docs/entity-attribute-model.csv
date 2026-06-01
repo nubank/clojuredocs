@@ -1,0 +1,80 @@
+Entity,Attribute,Type,Required,Current Source,Description,Status,Gap Notes
+Library,library-url,string,yes,JVM heap (hardcoded),GitHub repo URL — serves as identity. Currently only "https://github.com/clojure/clojure",exists,"Currently a hardcoded singleton in search.clj. Must become a first-class persisted entity to support multi-library documentation."
+Library,version,string,yes,JVM heap (hardcoded),"Clojure version string, e.g. ""1.12.4""",exists,
+Library,source-base-url,string,yes,JVM heap (hardcoded),Base URL for source code links,exists,
+Library,gh-tag-url,string,yes,JVM heap (hardcoded),GitHub tag URL for the release,exists,
+Namespace,name,string,yes,JVM heap (derived at startup),Fully qualified namespace name — serves as identity,exists,"Currently derived from a hardcoded vector in search/static.clj. Must become persisted to support multi-library."
+Namespace,doc,string,no,JVM heap (derived at startup),Namespace docstring from ns metadata,exists,
+Namespace,added,string,no,JVM heap (derived at startup),Version when namespace was added,exists,
+Namespace,library-url,string (FK),yes,JVM heap (derived at startup),Which library this namespace belongs to,exists (implicit),"Currently all namespaces implicitly belong to the singleton clojure-lib. The FK is not stored — it's structural."
+Var,ns,string,yes,JVM heap (derived from ns-publics),Namespace the var belongs to. Part of composite identity {ns name library-url},exists,
+Var,name,string,yes,JVM heap (derived from ns-publics),Var name. Part of composite identity,exists,
+Var,library-url,string (FK),yes,JVM heap (derived from ns-publics),Library this var belongs to. Part of composite identity,exists,
+Var,doc,string,no,JVM heap (derived from ns-publics),Docstring,exists,
+Var,arglists,list of strings,no,JVM heap (derived from ns-publics),Argument lists,exists,
+Var,forms,list of strings,no,JVM heap (derived from ns-publics),Special form syntax patterns,exists,
+Var,type,string,yes,JVM heap (derived),Computed: function / macro / special-form / var,exists,
+Var,added,string,no,JVM heap (derived from ns-publics),Version when var was added,exists,
+Var,deprecated,string/boolean,no,JVM heap (derived from ns-publics),Deprecation marker,exists,
+Var,macro,boolean,no,JVM heap (derived from ns-publics),Whether var is a macro,exists,
+Var,dynamic,boolean,no,JVM heap (derived from ns-publics),Whether var is dynamic,exists,
+Var,special-form,boolean,no,JVM heap (derived from ns-publics),Whether var is a special form,exists,
+Var,static,boolean,no,JVM heap (derived from ns-publics),Static flag,exists,
+Var,tag,string,no,JVM heap (derived from ns-publics),Type tag (class name as string),exists,
+Var,file,string,no,JVM heap (derived from ns-publics),Source file path,exists,
+Var,line,int,no,JVM heap (derived from ns-publics),Source line number,exists,
+Var,column,int,no,JVM heap (derived from ns-publics),Source column number,exists,
+Var,url,string,no,JVM heap (derived from ns-publics),URL (for special forms),exists,
+Var,no-doc,boolean,no,JVM heap (derived from ns-publics),Whether var is excluded from docs,exists,
+Var,skip-wiki,boolean,no,JVM heap (derived from ns-publics),Whether var is excluded from wiki,exists,
+Var,href,string,yes,JVM heap (computed),URL path on ClojureDocs. Computed at startup,exists,
+Var,dialects,set of keywords,no,Static EDN file (dialect-compat.edn),"Set of supported dialects, e.g. #{:clj :cljs :bb}",exists,"Currently an attribute loaded from a static file. Candidate for promotion to its own entity (DialectCompat) when it needs to carry version info and test suite links per the vision."
+Example,_id,ObjectId,yes,MongoDB :examples,Primary key,exists,
+Example,body,string,yes,MongoDB :examples,The example code,exists,
+Example,var,embedded {ns name library-url},yes,MongoDB :examples,Which var this example is for. Denormalized copy of var identity,exists,"Embedded sub-document duplicated in every example. No referential integrity — if a var identity changes these go stale."
+Example,author,embedded {login account-source avatar-url},yes,MongoDB :examples,Who created the example. Denormalized copy of User,exists,
+Example,editors,list of embedded Users,no,MongoDB :examples,Users who have edited this example (appended on edit),exists,
+Example,created-at,int (epoch ms),yes,MongoDB :examples,Creation timestamp,exists,
+Example,updated-at,int (epoch ms),yes,MongoDB :examples,Last update timestamp,exists,
+Example,deleted-at,int (epoch ms),no,MongoDB :examples,Soft-delete timestamp. nil means active,exists,
+ExampleHistory,_id,ObjectId,yes,MongoDB :example-histories,Primary key,exists,
+ExampleHistory,example-id,ObjectId (FK),yes,MongoDB :example-histories,Which example this is a history entry for,exists,
+ExampleHistory,body,string,yes,MongoDB :example-histories,⚠ #55 Stores the body submitted in this edit (the NEW body) — not the previous body. See https://github.com/nubank/clojuredocs/issues/55,exists,
+ExampleHistory,editor,embedded User,yes,MongoDB :example-histories,Who made this edit,exists,
+ExampleHistory,created-at,int (epoch ms),yes,MongoDB :example-histories,When the edit happened,exists,
+Note,_id,ObjectId,yes,MongoDB :notes,Primary key,exists,
+Note,body,string,yes,MongoDB :notes,The note content (markdown),exists,
+Note,var,embedded {ns name library-url},yes,MongoDB :notes,Which var this note is for. Denormalized copy,exists,
+Note,author,embedded User,yes,MongoDB :notes,Who created the note,exists,
+Note,created-at,int (epoch ms),yes,MongoDB :notes,Creation timestamp,exists,
+Note,updated-at,int (epoch ms),yes,MongoDB :notes,Last update timestamp,exists,
+SeeAlso,_id,ObjectId,yes,MongoDB :see-alsos,Primary key,exists,
+SeeAlso,from-var,embedded {ns name library-url},yes,MongoDB :see-alsos,Source var. Denormalized copy,exists,
+SeeAlso,to-var,embedded {ns name library-url},yes,MongoDB :see-alsos,Target var. Denormalized copy,exists,
+SeeAlso,author,embedded User,yes,MongoDB :see-alsos,Who created the see-also,exists,
+SeeAlso,created-at,int (epoch ms),yes,MongoDB :see-alsos,Creation timestamp. No updated-at — see-alsos are immutable once created,exists,
+User,login,string,yes,MongoDB :users,GitHub username. Part of composite PK {login account-source},exists,
+User,account-source,string,yes,MongoDB :users,"Auth provider, always ""github"" currently. Part of composite PK",exists,
+User,avatar-url,string,yes,MongoDB :users,GitHub avatar URL,exists,
+LegacyVarRedirect,function-id,int,yes,MongoDB :legacy-var-redirects,Old v1 numeric ID,exists,Vestigial — used only for /v/:id redirects from the old site. Not part of the active data model.
+LegacyVarRedirect,ns,string,yes,MongoDB :legacy-var-redirects,Namespace to redirect to,exists,
+LegacyVarRedirect,name,string,yes,MongoDB :legacy-var-redirects,Var name to redirect to,exists,
+---,---,---,---,---,--- GAPS: Entities/attributes required by vision but not yet in codebase ---,---,---
+Group,,,,,Vision reference: Var → Namespace → Library hierarchy,gap,Library and Namespace need to become first-class persisted entities (not hardcoded/derived) to support multi-library docs.
+DialectCompat (entity),var-key,string (FK),yes,not yet,"Qualified var name, e.g. clojure.core/map",gap,"Promote from Var attribute to its own entity when it needs to carry per-dialect metadata."
+DialectCompat (entity),dialect,keyword,yes,not yet,"Dialect keyword: :clj, :cljs, :bb, :jank",gap,
+DialectCompat (entity),test-suite-url,string,no,not yet,Link to cross-dialect test suite (e.g. jank-lang/clojure-test-suite),gap,Vision: Var → Tests
+DialectCompat (entity),version,string,no,not yet,Version of dialect where support was verified,gap,
+Resource,_id,ObjectId,yes,not yet,Primary key,gap,Vision: Var → Resources (blog posts / talks / threads)
+Resource,var-key,string (FK),yes,not yet,Which var this resource is about,gap,
+Resource,url,string,yes,not yet,Link to the resource,gap,
+Resource,type,enum,yes,not yet,"blog-post / talk / thread / mob-session / pairing",gap,
+Resource,title,string,no,not yet,Display title,gap,
+Resource,author,embedded User or string,no,not yet,Who contributed this resource link,gap,
+Resource,created-at,int (epoch ms),yes,not yet,When it was added,gap,
+QualitySignal,,,,,Vision: content quality signals,gap,"No quality/scoring/reputation model exists. Needed for verification pipeline, author reputation, freshness signals."
+Example,verified,boolean,no,not yet,Whether the example has been verified as executable,gap,Vision: verification pipeline
+Example,verification-result,map,no,not yet,"Output of verification: success/failure, runtime, error",gap,
+User,reputation,int,no,not yet,Computed reputation score based on contributions,gap,Vision: author reputation / quality signals
+Var,source-url,string,no,not yet,Source code link for any library (not just clojure/clojure),gap,"Currently computed only for core namespaces via hardcoded set in pages/vars.clj. Must generalize for multi-library."
+Var,usage-urls,list of strings,no,not yet,"Links to real-world usage (e.g. grep.app results)",gap,Vision: Var → Usage in the wild
