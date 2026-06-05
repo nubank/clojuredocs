@@ -1,11 +1,11 @@
 > **Document metadata**
-> - **Created:** 2026-06-01
+> - **Created:** 2026-04-26
 > - **Last updated:** 2026-06-05
 > - **Tags:** decisions, architecture, living-document
 > - **AI-assisted:** Yes — Claude Opus 4.6 via GitHub Copilot
-> - **Session:** `41bcf361`
+> - **Recent Session:** `41bcf361`
 > - **Tools:** GitHub MCP, workspace file access
-> - **Agents/skills:** [backseat-driver](/.vscode/extensions/betterthantomorrow.calva-backseat-driver-0.0.34/assets/skills/backseat-driver/SKILL.md)
+> - **Agents/skills:** 
 > - **Review maturity:** L2 — human-reviewed via PR
 >
 > _AI-assisted document. Decisions reflect the team's choices; rationale text was AI-drafted from human direction._
@@ -13,6 +13,109 @@
 # Decision Log
 
 Document design and architecture decisions. Lightweight alternative to full ADRs.
+
+---
+
+## 2026-06-05 — Replace Mermaid ER diagrams with EDN schema and Miro visual
+
+### Status
+Decided
+
+### Context
+- Mermaid's `erDiagram` parser treats hyphens as operators and rejects `{}`, `|`, `()`, and unicode characters in attribute descriptions. Clojure uses kebab-case pervasively, making every attribute name a syntax error.
+- Fixing the diagrams required mangling all attribute names to underscores (`library-url` → `library_url`) and stripping descriptive annotations — losing fidelity to the actual domain.
+- The [2026-06-05 decision to correct the diagram in Miro](#2026-06-05--correct-entity-model-diagram-manually-in-miro) already established Miro as the canonical visual.
+- Sierra's ["Developing the Language of the Domain"](https://www.cognitect.com/blog/2017/4/6/developing-the-language-of-the-domain) describes this exact pattern: the domain model is data, visualizations are derived views.
+- The repo already has precedent for EDN as a data format: `dialect-compat.edn`.
+
+### Decision
+- Remove Mermaid ER diagrams from [entity-attribute-model.md](docs/entity-attribute-model.md).
+- Use EDN as the machine-readable source of truth for the entity model, with a `:status` field (`:exists` / `:gap` / `:vestigial`) on each entity and attribute.
+- Use Miro as the canonical visual diagram, with a PDF export in the repo for readers without Miro access.
+- Retain [entity-attribute-model.csv](docs/entity-attribute-model.csv) as the per-attribute detail format until the EDN schema subsumes it.
+
+### Rationale
+- EDN preserves kebab-case attribute names, supports nested structures, sets, and relationships — things CSV and Mermaid cannot express.
+- EDN is loadable at the REPL, queryable, and validatable against the actual codebase via a babashka script.
+- The `:status` field replaces the visual encoding (solid vs. dashed lines) with queryable data, enabling filtered views.
+- This follows the reliability ratchet: LLM produced prose model → human corrected in Miro → EDN makes it data → bb script can enforce it.
+
+### Alternatives Considered
+- Fix Mermaid with underscored names — renders but loses fidelity to the Clojure domain; attribute names no longer match the codebase.
+- PlantUML or D2 — richer syntax but no native GitHub rendering; adds a rendering dependency.
+- Keep Mermaid alongside EDN — redundant; Mermaid is a lossy translation of information the EDN and Miro already capture faithfully.
+
+### Impacts and Risks
+- PDF is not diffable in git. Mitigation: PDF exports are versioned by dated filename (e.g., `entity-model-2026-06-05.pdf`) and old versions are kept, creating a visual version history through accumulation. The EDN and CSV remain the diffable sources.
+- EDN schema does not yet exist — this decision commits to creating it. Mitigation: the CSV covers the gap until the EDN is written.
+
+---
+
+## 2026-06-05 — Unify ER diagrams with legend and magnitude annotations
+
+### Status
+Decided
+
+### Context
+- Sandra reviewed PR #57 and discovered Claude produced two separate ER diagrams instead of the single unified diagram specified in the 2026-06-01 decision entry.
+- The entity-model.md header says "Solid lines = exists today. Dashed lines = required by vision" but the diagrams don't deliver this — they are two disconnected `erDiagram` blocks.
+- No formal legend or key exists for reading the diagram.
+- No order-of-magnitude grounding: the diagram doesn't communicate that there is 1 Library (hardcoded singleton), ~30 Namespaces, ~700 Vars, and thousands of Examples.
+- Sierra's ["Developing the Language of the Domain"](https://www.cognitect.com/blog/2017/4/6/developing-the-language-of-the-domain) (Cognitect, 2017) reinforces that models need facets and ground truth to be useful — a diagram without a legend or sense of scale fails to communicate the domain.
+
+### Decision
+- Correct the entity model to be a single unified diagram with a formal legend distinguishing current-state entities from vision-gap entities, and annotate entities with approximate cardinality.
+
+### Rationale
+- A single diagram with differentiated line styles shows gaps in context rather than in isolation, making the distance between current state and vision visible at a glance.
+- A legend makes the diagram self-documenting — readers shouldn't need to find prose elsewhere to interpret it.
+- Order-of-magnitude counts (1 / ~30 / ~700 / thousands) shape design intuition about which entities dominate and where denormalization costs compound.
+
+### Alternatives Considered
+- Leave as two separate diagrams — loses the visual comparison between what exists and what's missing; readers must mentally merge them.
+- Regenerate with AI — would reproduce the same class of error (instruction deviation) without the human engaging with the domain structure.
+
+### Impacts and Risks
+- Mermaid `erDiagram` has limited native support for dashed vs. solid relationship lines. The canonical corrected diagram will live in Miro rather than in Mermaid source.
+- Risk: Miro diagram drifts from the Markdown file. Mitigation: Markdown file references the Miro board; legend in Markdown documents the intended visual language even if Mermaid can't fully render it.
+
+### Links
+- [PR #57](https://github.com/nubank/clojuredocs/pull/57)
+- [docs/entity-attribute-model.md](docs/entity-attribute-model.md)
+- [Sierra, "Developing the Language of the Domain"](https://www.cognitect.com/blog/2017/4/6/developing-the-language-of-the-domain)
+
+---
+
+## 2026-06-05 — Correct entity model diagram manually in Miro
+
+### Status
+Decided
+
+### Context
+- The AI-generated ER diagram in PR #57 deviated from the stated design (two diagrams instead of one, no legend, no magnitude).
+- Miro is the team's standard diagramming tool. Mermaid ER diagrams have rendering limitations (no dashed lines, no annotations) that constrain what can be expressed in-repo.
+- Jordan's pedagogical framework is constructivism: learning happens through the act of constructing and correcting mental models, not through passively receiving correct output.
+- Sandra recommended correcting the diagram by hand as the most effective way to internalize the domain model.
+
+### Decision
+- Import the existing diagram into Miro and manually correct it rather than having AI regenerate it, to ensure active engagement with the domain structure.
+
+### Rationale
+- Manual correction forces the author to evaluate each entity and relationship against the codebase, building the mental model that AI-generated output bypasses.
+- Miro supports the visual language (dashed lines, color coding, annotations) that Mermaid's `erDiagram` syntax cannot express.
+- The corrected Miro diagram becomes a presentation artifact for the Clojure Guild session (~June 19), where the correction process itself is the subject.
+
+### Alternatives Considered
+- Have Claude regenerate with corrected instructions — faster but eliminates the learning opportunity; likely to introduce new deviations from intent.
+- Correct in Mermaid syntax only — limited by Mermaid's `erDiagram` capabilities; can't render the intended visual language.
+
+### Impacts and Risks
+- The canonical diagram lives in Miro, not in the repo. The Markdown file retains a Mermaid approximation for GitHub rendering.
+- Risk: Miro board is not version-controlled. Mitigation: the Markdown Mermaid diagram and CSV remain the in-repo source of truth for attributes and relationships; Miro is the visual authority.
+
+### Links
+- [PR #57](https://github.com/nubank/clojuredocs/pull/57)
+- [docs/entity-attribute-model.md](docs/entity-attribute-model.md)
 
 ---
 
