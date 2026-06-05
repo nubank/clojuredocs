@@ -2,8 +2,11 @@
 > - **Created:** 2026-06-01
 > - **Last updated:** 2026-06-05
 > - **Tags:** decisions, architecture, living-document
-> - **AI-assisted:** Yes — Claude drafted entries, human-directed and approved
-> - **Review maturity:** AI-drafted; human-reviewed via PR
+> - **AI-assisted:** Yes — Claude Opus 4.6 via GitHub Copilot
+> - **Session:** `41bcf361`
+> - **Tools:** GitHub MCP, workspace file access
+> - **Agents/skills:** [backseat-driver](/.vscode/extensions/betterthantomorrow.calva-backseat-driver-0.0.34/assets/skills/backseat-driver/SKILL.md)
+> - **Review maturity:** L2 — human-reviewed via PR
 >
 > _AI-assisted document. Decisions reflect the team's choices; rationale text was AI-drafted from human direction._
 
