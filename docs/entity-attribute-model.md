@@ -2,8 +2,11 @@
 > - **Created:** 2026-06-01
 > - **Last updated:** 2026-06-05
 > - **Tags:** entity-model, data-model, mongodb, issue-43
-> - **AI-assisted:** Yes — Claude extracted entity shapes from ~15 source files, human-directed and reviewed
-> - **Review maturity:** AI-drafted; human-reviewed via PR
+> - **AI-assisted:** Yes — Claude Opus 4.6 via GitHub Copilot
+> - **Session:** `41bcf361`
+> - **Tools:** GitHub MCP, workspace file access
+> - **Agents/skills:** [backseat-driver](/.vscode/extensions/betterthantomorrow.calva-backseat-driver-0.0.34/assets/skills/backseat-driver/SKILL.md), [editing-clojure-files](/.vscode/extensions/betterthantomorrow.calva-backseat-driver-0.0.34/assets/skills/editing-clojure-files/SKILL.md)
+> - **Review maturity:** L2 — human-reviewed via PR
 >
 > _AI-assisted document. Entity shapes were extracted by reading source code, not by querying a running system — runtime behavior may differ._
 
@@ -194,4 +197,4 @@ The following collections are called by `add-all-indexes!` but have no active qu
 
 ---
 
-> **AI Disclosure**: This model was extracted from the codebase by Claude (Opus 4.6) via GitHub Copilot and reviewed by Jordan Miller. Trust some things — verify attributes against the source files linked in the CSV and the [attribution log](ai/entity-model-attribution.md).
+> **AI Disclosure**: This model was extracted from the codebase by Claude (Opus 4.6) via GitHub Copilot and reviewed by Jordan Miller. Entity shapes were read from source code — verify attributes against the source files linked in the Source References table above.

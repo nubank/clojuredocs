@@ -2,8 +2,11 @@
 > - **Created:** 2026-06-01
 > - **Last updated:** 2026-06-05
 > - **Tags:** diagrams, dataflow, architecture
-> - **AI-assisted:** Yes — Claude generated Mermaid diagrams from code reading
-> - **Review maturity:** AI-drafted; human-reviewed via PR
+> - **AI-assisted:** Yes — Claude Opus 4.6 via GitHub Copilot
+> - **Session:** `41bcf361`
+> - **Tools:** GitHub MCP, workspace file access
+> - **Agents/skills:** [backseat-driver](/.vscode/extensions/betterthantomorrow.calva-backseat-driver-0.0.34/assets/skills/backseat-driver/SKILL.md)
+> - **Review maturity:** L1 — human-directed, not yet verified against running system
 >
 > _AI-assisted document. Flows were traced by reading source code — verify against a running instance for runtime accuracy._
 

@@ -41,8 +41,11 @@ Every prose document under `docs/` must carry an inline metadata block at the to
 > - **Created:** YYYY-MM-DD
 > - **Last updated:** YYYY-MM-DD
 > - **Tags:** comma, separated, tags
-> - **AI-assisted:** Yes/No — brief description of AI role
-> - **Review maturity:** e.g. "AI-drafted; human-reviewed via PR"
+> - **AI-assisted:** Yes — model + interface (e.g. "Claude Opus 4.6 via GitHub Copilot")
+> - **Session:** `session-id` (from debug log or Copilot session)
+> - **Tools:** MCP servers and capabilities available (e.g. "GitHub MCP, workspace files")
+> - **Agents/skills:** links to agent or skill definitions applied
+> - **Review maturity:** L0–L4 level + short description
 >
 > _AI-assisted document. [Scope-specific disclaimer about what to verify.]_
 ```
@@ -171,3 +174,4 @@ Be helpful, specific, and low-noise. Comment only when a change is likely to cau
 - Use GitHub permalinks (with commit hash) for code references — not branch names.
 - First mentions of domain terms should link to the [glossary](docs/glossary.md).
 - Diagrams use Mermaid fenced code blocks (rendered natively on GitHub).
+- Mermaid diagrams have a corresponding miro board 
