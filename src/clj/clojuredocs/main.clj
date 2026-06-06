@@ -51,7 +51,7 @@
 
 (defn add-indexes-to-coll! [coll ks]
   (doseq [k ks]
-    (mon/add-index! :examples [k])))
+    (mon/add-index! coll [k])))
 
 (defn add-all-indexes! []
   (add-indexes-to-coll!
