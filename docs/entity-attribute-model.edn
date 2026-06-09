@@ -1,0 +1,367 @@
+;; ClojureDocs Entity-Attribute Model — EDN Schema
+;;
+;; Source of truth for the data model. Replaces entity-attribute-model.csv.
+;; Generated from REPL-verified findings in dev/sidecar_repl.clj
+;; See docs/rfcs/entity-model-rfc.md for design rationale.
+;;
+;; Status semantics:
+;;   :exists   — REPL-verified, data is there
+;;   :nil      — key exists but value is systematically nil
+;;   :vestigial — key exists but carries no meaningful information
+;;   :planned  — has a GitHub issue tracking it
+;;   :gap      — described in vision doc, no code or data yet
+;;
+;; Coverage: nil when :required? is true, otherwise n/total
+
+{:schema-version "1.0.0"
+ :generated      "2026-06-09"
+ :issue           "https://github.com/nubank/clojuredocs/issues/43"
+
+ :sub-schemas
+ {:embedded-var
+  {:ns          {:type :string  :required? true :description "Namespace name"}
+   :name        {:type :string  :required? true :description "Var name"}
+   :library-url {:type :string  :required? true :description "Library GitHub URL"}}
+
+  :embedded-user
+  {:login          {:type :string :required? true :description "Username (GitHub or legacy)"}
+   :account-source {:type :string :required? true :description "Auth provider: \"github\" or \"clojuredocs\""}
+   :avatar-url     {:type :string :required? true :description "Avatar image URL"}}}
+
+ :entities
+ {:library
+  {:source "jvm-heap"
+   :cardinality 1
+   :description "Singleton — the Clojure standard library. Hardcoded in search.clj."
+   :attrs
+   {:library-url    {:type :string :required? true
+                     :description "GitHub repo URL"
+                     :status {:state :exists :verified "2026-06-09"
+                              :evidence "sidecar_repl.clj — (dissoc search/clojure-lib :vars :namespaces)"}}
+    :version        {:type :string :required? true
+                     :description "Clojure version string, e.g. \"1.12.4\""
+                     :status {:state :exists :verified "2026-06-09"
+                              :evidence "sidecar_repl.clj — (dissoc search/clojure-lib :vars :namespaces)"}}
+    :source-base-url {:type :string :required? true
+                      :description "GitHub blob URL prefix for source links"
+                      :status {:state :exists :verified "2026-06-09"
+                               :evidence "sidecar_repl.clj — (dissoc search/clojure-lib :vars :namespaces)"}}
+    :gh-tag-url     {:type :string :required? true
+                     :description "GitHub tag URL for the release"
+                     :status {:state :exists :verified "2026-06-09"
+                              :evidence "sidecar_repl.clj — (dissoc search/clojure-lib :vars :namespaces)"}}
+    :namespaces     {:type :vector :required? true
+                     :description "Vector of namespace maps (38 entries)"
+                     :status {:state :exists :verified "2026-06-09"
+                              :evidence "sidecar_repl.clj — (count (:namespaces search/clojure-lib))"}}
+    :vars           {:type :vector :required? true
+                     :description "Vector of var maps (1,572 entries)"
+                     :status {:state :exists :verified "2026-06-09"
+                              :evidence "sidecar_repl.clj — (count (:vars search/clojure-lib))"}}}}
+
+  :namespace
+  {:source "jvm-heap"
+   :cardinality 38
+   :description "Clojure namespaces indexed by ClojureDocs. Gathered from JVM metadata at startup."
+   :attrs
+   {:name  {:type :string :required? true
+            :description "Fully qualified namespace name"
+            :status {:state :exists :verified "2026-06-09"
+                     :evidence "sidecar_repl.clj — (keys (first (:namespaces search/clojure-lib)))"}}
+    :doc   {:type :string :required? false :coverage "32/38"
+            :description "Namespace docstring. Nil for 6 namespaces (core.logic.*, core.protocols, instant, tools.build.api)."
+            :status {:state :exists :verified "2026-06-09"
+                     :evidence "entity_model_test.clj — namespace-universal-keys"}}
+    :added {:type :string :required? false :coverage "2/38"
+            :description "Version when namespace was added. Only clojure.pprint and clojure.reflect."
+            :status {:state :exists :verified "2026-06-09"
+                     :evidence "sidecar_repl.clj — namespace key coverage"}}}}
+
+  :var
+  {:source "jvm-heap"
+   :cardinality 1572
+   :description "Public vars across all indexed namespaces. Gathered from JVM metadata, filtered by search/var-keys."
+   :attrs
+   {:ns           {:type :string  :required? true :coverage nil
+                   :description "Namespace name (stringified)"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :name         {:type :string  :required? true :coverage nil
+                   :description "Var name (stringified)"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :type         {:type :string  :required? true :coverage nil
+                   :description "One of: \"function\", \"macro\", \"var\", \"special-form\""
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :arglists     {:type :list    :required? true :coverage nil
+                   :description "List of argument list strings"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :library-url  {:type :string  :required? true :coverage nil
+                   :description "Library GitHub URL (denormalized from Library)"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :href         {:type :string  :required? true :coverage nil
+                   :description "URL path for this var's page, e.g. \"/clojure.core/map\""
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :file         {:type :string  :required? false :coverage "1482/1572"
+                   :description "Source file path relative to project root"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :column       {:type :integer :required? false :coverage "1482/1572"
+                   :description "Source column number"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :line         {:type :integer :required? false :coverage "1482/1572"
+                   :description "Source line number"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :doc          {:type :string  :required? false :coverage "1293/1572"
+                   :description "Docstring"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :added        {:type :string  :required? false :coverage "907/1572"
+                   :description "Version when this var was added"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :static       {:type :boolean :required? false :coverage "319/1572"
+                   :description "Static compilation hint (legacy)"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :macro        {:type :boolean :required? false :coverage "190/1572"
+                   :description "True if this var is a macro"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :tag          {:type :string  :required? false :coverage "122/1572"
+                   :description "Return type hint (stringified from class)"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :dynamic      {:type :boolean :required? false :coverage "56/1572"
+                   :description "True if this var is dynamic (e.g. *out*)"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :skip-wiki    {:type :boolean :required? false :coverage "31/1572"
+                   :description "True if var should be hidden from documentation"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :deprecated   {:type :string  :required? false :coverage "18/1572"
+                   :description "Deprecation version string"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :special-form {:type :boolean :required? false :coverage "4/1572"
+                   :description "True for let, fn, letfn, loop"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :forms        {:type :list    :required? false :coverage "4/1572"
+                   :description "Usage form strings for special forms"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan"}}
+    :url          {:type :string  :required? false :coverage "1/1572"
+                   :description "Present only on letfn with nil value. Vestigial annotation from Clojure source."
+                   :status {:state :vestigial :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — letfn :url investigation"}}}}
+
+  :example
+  {:source "mongodb"
+   :collection :examples
+   :cardinality 2671
+   :description "User-contributed code examples for vars. Soft-deleted via :deleted-at."
+   :attrs
+   {:_id        {:type :object-id :required? true
+                 :description "MongoDB ObjectId"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — examples key universe scan"}}
+    :var        {:type :ref :schema :embedded-var :required? true
+                 :description "Which var this example is for"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — examples key universe scan"}}
+    :body       {:type :string :required? true
+                 :description "The example source code"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — examples key universe scan"}}
+    :author     {:type :ref :schema :embedded-user :required? true
+                 :description "User who created the example"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — examples key universe scan"}}
+    :created-at {:type :integer :required? true
+                 :description "Unix epoch millis when created"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — examples key universe scan"}}
+    :updated-at {:type :integer :required? true
+                 :description "Unix epoch millis when last updated"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — examples key universe scan"}}
+    :editors    {:type :vector :schema :embedded-user :required? false :coverage "1708/2671"
+                 :description "Users who have edited this example (may contain duplicates — see issue #65)"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — examples key universe scan"}}
+    :deleted-at {:type :integer :required? false :coverage "54/2671"
+                 :description "Unix epoch millis when soft-deleted. nil for active examples."
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — examples key universe scan"}}}}
+
+  :example-history
+  {:source "mongodb"
+   :collection :example-histories
+   :cardinality 3358
+   :description "Append-only audit trail of example edits. One record per edit."
+   :attrs
+   {:_id        {:type :object-id :required? true
+                 :description "MongoDB ObjectId"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — example-histories key universe scan"}}
+    :example-id {:type :object-id :required? true
+                 :description "ObjectId of the example this history entry belongs to"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — example-histories key universe scan"}}
+    :body       {:type :string :required? true
+                 :description "The NEW body after edit (not the old body — see issue for bug)"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — example-histories key universe scan"}}
+    :editor     {:type :ref :schema :embedded-user :required? true
+                 :description "User who made this edit"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — example-histories key universe scan"}}
+    :created-at {:type :integer :required? true
+                 :description "Unix epoch millis when this edit occurred"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — example-histories key universe scan"}}}}
+
+  :note
+  {:source "mongodb"
+   :collection :notes
+   :cardinality 497
+   :description "User-contributed notes on vars. Hard-deleted (no :deleted-at)."
+   :attrs
+   {:_id        {:type :object-id :required? true
+                 :description "MongoDB ObjectId"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — notes key universe scan"}}
+    :var        {:type :ref :schema :embedded-var :required? true
+                 :description "Which var this note is for"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — notes key universe scan"}}
+    :body       {:type :string :required? true
+                 :description "Note text (markdown)"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — notes key universe scan"}}
+    :author     {:type :ref :schema :embedded-user :required? true
+                 :description "User who created the note"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — notes key universe scan"}}
+    :created-at {:type :integer :required? true
+                 :description "Unix epoch millis when created"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — notes key universe scan"}}
+    :updated-at {:type :integer :required? true
+                 :description "Unix epoch millis when last updated"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — notes key universe scan"}}}}
+
+  :see-also
+  {:source "mongodb"
+   :collection :see-alsos
+   :cardinality 2494
+   :description "Directed edges between vars. No body, no editing — just a link."
+   :attrs
+   {:_id        {:type :object-id :required? true
+                 :description "MongoDB ObjectId"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — see-alsos key universe scan"}}
+    :from-var   {:type :ref :schema :embedded-var :required? true
+                 :description "Source var of the see-also relationship"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — see-alsos key universe scan"}}
+    :to-var     {:type :ref :schema :embedded-var :required? true
+                 :description "Target var of the see-also relationship"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — see-alsos key universe scan"}}
+    :author     {:type :ref :schema :embedded-user :required? true
+                 :description "User who created this see-also"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — see-alsos key universe scan"}}
+    :created-at {:type :integer :required? true
+                 :description "Unix epoch millis when created"
+                 :status {:state :exists :verified "2026-06-09"
+                          :evidence "sidecar_repl.clj — see-alsos key universe scan"}}}}
+
+  :user
+  {:source "mongodb"
+   :collection :users
+   :cardinality 4902
+   :description "Registered users. 3,650 GitHub + 1,252 legacy ClojureDocs accounts."
+   :attrs
+   {:_id            {:type :object-id :required? true
+                     :description "MongoDB ObjectId"
+                     :status {:state :exists :verified "2026-06-09"
+                              :evidence "sidecar_repl.clj — users key universe scan"}}
+    :login          {:type :string :required? true
+                     :description "Username"
+                     :status {:state :exists :verified "2026-06-09"
+                              :evidence "sidecar_repl.clj — users key universe scan"}}
+    :account-source {:type :string :required? true
+                     :description "Auth provider: \"github\" or \"clojuredocs\""
+                     :status {:state :exists :verified "2026-06-09"
+                              :evidence "sidecar_repl.clj — users key universe scan"}}
+    :avatar-url     {:type :string :required? true
+                     :description "Avatar image URL"
+                     :status {:state :exists :verified "2026-06-09"
+                              :evidence "sidecar_repl.clj — users key universe scan"}}}}
+
+  :legacy-var-redirect
+  {:source "mongodb"
+   :collection :legacy-var-redirects
+   :cardinality 1654
+   :description "Redirects from old ClojureDocs URL scheme to current. No writes observed."
+   :attrs
+   {:_id          {:type :object-id :required? true
+                   :description "MongoDB ObjectId"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — legacy-var-redirects key universe scan"}}
+    :function-id  {:type :integer :required? true
+                   :description "Legacy numeric function ID"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — legacy-var-redirects key universe scan"}}
+    :ns           {:type :string :required? true
+                   :description "Namespace name"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — legacy-var-redirects key universe scan"}}
+    :name         {:type :string :required? true
+                   :description "Var name"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — legacy-var-redirects key universe scan"}}
+    :library-url  {:type :string :required? true
+                   :description "Library GitHub URL"
+                   :status {:state :exists :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — legacy-var-redirects key universe scan"}}}}
+
+  :dialect-compat
+  {:source "edn-file"
+   :cardinality "~1400 var-dialect pairs"
+   :description "Dialect compatibility data. Loaded from resources/dialect-compat.edn at startup."
+   :attrs
+   {:var-key     {:type :string :required? true
+                  :description "Qualified var name, e.g. \"clojure.core/map\""
+                  :status {:state :exists :verified "2026-06-09"
+                           :evidence "sidecar_repl.clj — (compat/dialects-for \"clojure.core\" \"map\")"}}
+    :dialects    {:type :set :required? true
+                  :description "Set of dialect keywords, e.g. #{:bb :clj :cljs}"
+                  :status {:state :exists :verified "2026-06-09"
+                           :evidence "sidecar_repl.clj — (compat/dialects-for \"clojure.core\" \"map\")"}}
+    :version     {:type :string :required? false
+                  :description "Clojure version when compatibility was last verified"
+                  :status {:state :gap
+                           :vision "2026vison.md"
+                           :context "Verification pipeline"}}
+    :test-suite-url {:type :string :required? false
+                     :description "URL to test suite that verified compatibility"
+                     :status {:state :gap
+                              :vision "2026vison.md"
+                              :context "Verification pipeline"}}
+    :verified-at {:type :instant :required? false
+                  :description "When compatibility was last verified"
+                  :status {:state :gap
+                           :vision "2026vison.md"
+                           :context "Verification pipeline"}}}}}}
