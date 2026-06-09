@@ -12,6 +12,12 @@
 ;;   legacy-var-redirect) are snapshot-derived from sidecar_repl.clj and are
 ;;   NOT yet test-guarded — their cardinalities/coverage will drift (issue #66).
 ;;
+;; Completeness: a :status of :exists means that attribute was verified PRESENT,
+;;   not that the entity's attribute list is complete. No systematic search for
+;;   gaps was performed — entities or attributes that exist but are not listed
+;;   here would not have been caught. This records what was verified, not a
+;;   guarantee that nothing is missing.
+;;
 ;; Status semantics:
 ;;   :exists   — REPL-verified, data is there
 ;;   :nil      — key exists but value is systematically nil
