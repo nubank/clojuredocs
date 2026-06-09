@@ -9,6 +9,8 @@
 > - **Review maturity:** L4 — human-endorsed by Jordan Miller (2026-06-09); the JVM-heap entities (Library, Namespace, Var) and DialectCompat are REPL-verified and guarded by [`entity_model_test.clj`](../test/clojuredocs/entity_model_test.clj). Exception: MongoDB cardinalities/coverage remain L2 (snapshot-derived, not test-guarded — see [#66](https://github.com/nubank/clojuredocs/issues/66)).
 >
 > _AI-assisted document. JVM-heap entities (Library, Namespace, Var) and DialectCompat are REPL-verified and enforced by tests; MongoDB cardinalities are derived from a one-time snapshot and are not yet test-guarded ([#66](https://github.com/nubank/clojuredocs/issues/66)). AI-generated content may contain errors — see [errata.md](errata.md)._
+>
+> _**Scope of "verified" / L4:** this status means the claims **present** in the model were checked against the running system (REPL + tests). It is **not** a completeness audit — no systematic search for missing entities, attributes, or behaviors was performed, so gaps that exist but were never looked for would not have been caught. What is marked verified is what was checked, not a guarantee that nothing is missing._
 
 # ClojureDocs Entity-Attribute Model
 
