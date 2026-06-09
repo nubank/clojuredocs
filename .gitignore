@@ -35,6 +35,9 @@ TAGS
 
 # Ignore all tooling and linting files and directories
 .calva/
+.clj-kondo/
+.lsp/
+.vscode/
 .portal
 .portal/*
 /clj-kondo
