@@ -1,9 +1,9 @@
 > **Document metadata**
 > - **Created:** 2026-04-26
-> - **Last updated:** 2026-06-05
+> - **Last updated:** 2026-06-09
 > - **Tags:** decisions, architecture, living-document
-> - **AI-assisted:** Yes — Claude Opus 4.6 via GitHub Copilot
-> - **Recent Session:** `41bcf361`
+> - **AI-assisted:** Yes — Claude Opus 4.6 via GitHub Copilot (original); Claude Opus 4.8 via Claude Code (2026-06-09 entries)
+> - **Recent Session:** `c6580eec` (2026-06-09); `41bcf361`
 > - **Tools:** GitHub MCP, workspace file access
 > - **Agents/skills:** 
 > - **Review maturity:** L2 — human-reviewed via PR
@@ -13,6 +13,111 @@
 # Decision Log
 
 Document design and architecture decisions. Lightweight alternative to full ADRs.
+
+---
+
+## 2026-06-09 — Enforce the entity model with a test namespace
+
+### Status
+Decided
+
+### Context
+- The entity model's value is the reliability ratchet (LLM → REPL → Library → **Enforcement**). Until now its claims lived in prose + EDN, REPL-verified once but unguarded against drift.
+- The [2026-04-28 RCF decision](#2026-04-28--verify-dialect-compat-via-rich-comment-blocks-not-unit-tests) chose rich comment blocks over unit tests because "adding a unit test to a project with zero real test coverage sets a convention nobody is following yet."
+- That tradeoff shifted: the model produces dozens of exact, REPL-verified facts (var count 1,572; per-key coverage; the special-form/type behavior; embedded-doc uniformity) worth locking against regression and Clojure-version drift.
+
+### Decision
+- Add [`test/clojuredocs/entity_model_test.clj`](../test/clojuredocs/entity_model_test.clj) (25 tests, ~12.5k assertions). It loads the EDN and checks the JVM-heap entities (Library, Namespace, Var) and DialectCompat against the running system on every run. MongoDB entities are intentionally excluded — they need a DB connection and are snapshot-derived (tracked in [#66](https://github.com/nubank/clojuredocs/issues/66)).
+
+### Rationale
+- Hardens REPL findings into enforcement — the final ratchet step. A regression or a Clojure bump now fails a test instead of silently rotting the doc.
+- Deliberately establishes the test convention for the entity-model domain, superseding the "nobody follows it" rationale of the 2026-04-28 RCF decision. The dialect-compat RCF still exists; this suite also covers dialect-compat lookups.
+- Draws an explicit, honest verification boundary: in-process entities are test-guarded; database-resident cardinalities stay snapshot-derived (L2) until #66 adds a DB-backed tier.
+
+### Alternatives Considered
+- Keep REPL/RCF verification only — ephemeral, drifts silently; was the prior convention but doesn't scale to the model's many exact claims.
+- Test the MongoDB entities too — needs a DB connection and seed fixtures in the harness; deferred to #66 rather than blocking this work.
+- Looser assertions (e.g. `subset?` on the type set) — masked a real error (the phantom `:type "special-form"`); the suite uses exact assertions instead (errata #8).
+
+### Impacts and Risks
+- Counts are pinned to Clojure 1.12.4; a bump fails many tests at once. Intended (the ratchet), but there is no single "version changed" signal yet — tracked in [#68](https://github.com/nubank/clojuredocs/issues/68).
+- MongoDB claims remain unguarded ([#66](https://github.com/nubank/clojuredocs/issues/66)), noted in the model metadata and the RFC.
+
+### Links
+- [test/clojuredocs/entity_model_test.clj](../test/clojuredocs/entity_model_test.clj)
+- [entity-attribute-model.edn](entity-attribute-model.edn)
+- [2026-04-28 — Verify dialect compat via rich comment blocks](#2026-04-28--verify-dialect-compat-via-rich-comment-blocks-not-unit-tests)
+- [#66](https://github.com/nubank/clojuredocs/issues/66), [#68](https://github.com/nubank/clojuredocs/issues/68)
+
+---
+
+## 2026-06-09 — Add `:absent` status state for code-supported, data-absent keys
+
+### Status
+Decided
+
+### Context
+- Verifying the EDN against the running system surfaced `:no-doc`: it is listed in `search/var-keys` (so the gather pipeline would retain it), but no var in Clojure 1.12.4 carries it (0/1,572, REPL-verified).
+- The existing status vocabulary (`:exists` / `:nil` / `:vestigial` / `:planned` / `:gap`) had no state for "the code path keeps this key, but the current dataset never populates it."
+- The schema claims to enumerate the full key universe, and `var-key-universe-matches-schema` enforces `actual ⊆ schema`. Omitting `:no-doc` left the schema silently incomplete relative to `var-keys`.
+
+### Decision
+- Add a sixth status state, `:absent` — "key is retained by code (e.g. listed in `search/var-keys`) but no record in the current dataset carries it." Document `:no-doc` as `:absent`, coverage `0/1572`.
+
+### Rationale
+- Reconciles the schema with the code's declared key set (`var-keys`), not just observed data — a future Clojure var carrying `:no-doc` would be caught by the existing test rather than silently breaking it.
+- Keeps `:exists` honest: only data actually observed earns `:exists`.
+- Additive — the test's `valid-states` gains one entry; no existing attribute changes meaning.
+
+### Alternatives Considered
+- Reuse `:nil` — inaccurate; the key is not present at all, not present-with-nil.
+- Reuse `:gap` — inaccurate; `:gap` means no code exists, but the code path does retain the key.
+- Reuse `:vestigial` — inaccurate; that implies the key is present but meaningless.
+- Omit `:no-doc` — leaves the "full key universe" claim false and the test passing only by luck of current data.
+
+### Impacts and Risks
+- One new state to keep in the header semantics list and the test's `valid-states`.
+- Risk: low — narrowly defined, currently used by exactly one attribute.
+
+### Links
+- [entity-attribute-model.edn](entity-attribute-model.edn) — `:var :no-doc`
+- [errata #9](errata.md)
+- [src/clj/clojuredocs/search.clj](../src/clj/clojuredocs/search.clj) — `var-keys`
+
+---
+
+## 2026-06-09 — Supersede the entity-model CSV with the EDN
+
+### Status
+Decided
+
+### Context
+- The [2026-06-05 EDN decision](#2026-06-05--replace-mermaid-er-diagrams-with-edn-schema-and-miro-visual) set the condition: retain [entity-attribute-model.csv](entity-attribute-model.csv) "until the EDN schema subsumes it." The EDN is now the REPL-verified, test-guarded source of truth, so that condition is met.
+- The CSV was never updated after the EDN corrections — it still carries uncorrected errata #2 (Namespace.library-url), #7 (LegacyVarRedirect missing `_id`/`library-url`), #8 (Var.type "special-form"), #9 (Var.no-doc "exists"), plus a wrong `User.account-source` ("always github" — legacy `clojuredocs` users exist).
+- But the CSV's GAP section is the only structured record of several envisioned entities (`Resource`, `QualitySignal`, `Group`, `Var.source-url`, `User.reputation`, …) that were never migrated into the EDN.
+
+### Decision
+- Mark the CSV superseded with a banner header pointing at the EDN, and stop maintaining it. Retire (delete) it during the [#43](https://github.com/nubank/clojuredocs/issues/43) vision pass, once its GAP/envisioned rows are migrated into the EDN as `:gap` entries.
+
+### Rationale
+- A reader opening the CSV directly must not be misled into treating stale, error-bearing rows as current — the banner makes the status unmissable.
+- Deleting now would drop the only structured record of the envisioned future-state; keeping it until the vision pass preserves that scaffolding.
+- Resolves the "not yet corrected in CSV" status on errata #2 and #7 by retirement rather than by maintaining a second source — avoiding the drift the 2026-06-05 decision warned about.
+
+### Alternatives Considered
+- Correct the CSV to match the EDN — re-creates the two-source drift the EDN was meant to end; wasted effort on a file being retired.
+- Delete it now — loses the envisioned entities (only in git history) before they are migrated.
+- Leave it unmarked — readers mistake stale rows for current state.
+
+### Impacts and Risks
+- The banner is a non-data first row; harmless because nothing loads the CSV programmatically (docs-only artifact, verified).
+- Risk: the vision pass forgets to migrate the GAP rows before deleting. Mitigation: this entry and the banner both name the GAP rows as the migration payload.
+
+### Links
+- [entity-attribute-model.csv](entity-attribute-model.csv)
+- [entity-attribute-model.edn](entity-attribute-model.edn)
+- [errata.md](errata.md) — #2 and #7
+- [2026-06-05 — Replace Mermaid ER diagrams with EDN schema and Miro visual](#2026-06-05--replace-mermaid-er-diagrams-with-edn-schema-and-miro-visual)
 
 ---
 
