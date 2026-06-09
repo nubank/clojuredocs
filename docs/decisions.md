@@ -32,10 +32,11 @@ Decided
 ### Rationale
 - Alex can review the EDN directly, so a visual is not on the critical path.
 - The EDN is REPL-verified and test-guarded — it is the trustworthy substrate a diagram would be derived from anyway (data first, views second; the same principle behind the 2026-06-05 EDN decision).
+- Sierra's ["Developing the Language of the Domain"](https://www.cognitect.com/blog/2017/4/6/developing-the-language-of-the-domain) makes the same case: the domain model is data, and visualizations are *derived views*. That ordering puts the data first and treats a diagram as something generated from it, not a prerequisite — exactly the data-first stance Alex's review confirmed.
 - Avoids overstating a Miro artifact that does not exist.
 
 ### Alternatives Considered
-- Produce the Miro diagram first — front-loads a visual the reviewer doesn't need yet, and which would have to track the still-settling data.
+- Produce the Miro diagram first — front-loads a visual the reviewer doesn't need yet, and which would have to track the still-settling data. Also inverts Sierra's data → derived-view ordering.
 - Keep claiming Miro as canonical — misrepresents the actual state (no diagram/PDF exists).
 
 ### Impacts and Risks
@@ -44,6 +45,7 @@ Decided
 
 ### Links
 - [entity-attribute-model.edn](entity-attribute-model.edn)
+- [Sierra, "Developing the Language of the Domain" (Cognitect, 2017)](https://www.cognitect.com/blog/2017/4/6/developing-the-language-of-the-domain)
 - [2026-06-05 — Replace Mermaid ER diagrams with EDN schema and Miro visual](#2026-06-05--replace-mermaid-er-diagrams-with-edn-schema-and-miro-visual)
 - [errata #11](errata.md)
 
