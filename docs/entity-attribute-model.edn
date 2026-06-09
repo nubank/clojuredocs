@@ -12,11 +12,12 @@
 ;;   legacy-var-redirect) are snapshot-derived from sidecar_repl.clj and are
 ;;   NOT yet test-guarded — their cardinalities/coverage will drift (issue #66).
 ;;
-;; Completeness: a :status of :exists means that attribute was verified PRESENT,
-;;   not that the entity's attribute list is complete. No systematic search for
-;;   gaps was performed — entities or attributes that exist but are not listed
-;;   here would not have been caught. This records what was verified, not a
-;;   guarantee that nothing is missing.
+;; Scope: this schema currently holds only the verified present-state — entities
+;;   and attributes with :status :exists, checked against the running system.
+;;   The envisioned future-state (what the 2026 vision will require us to build,
+;;   carrying :status :gap or :planned) has NOT been enumerated yet, beyond a few
+;;   :gap attrs on :dialect-compat. Mapping that future-state from the vision is
+;;   the pending second half of issue #43.
 ;;
 ;; Status semantics:
 ;;   :exists   — REPL-verified, data is there
