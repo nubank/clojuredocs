@@ -8,6 +8,7 @@ Key points:
 - **Review maturity**: Use L0–L4 levels to indicate how much human review has occurred
 - **Unverified claims**: Mark with `[unverified]` inline
 - **PRs**: Use conventional-commit prefixes (`feat:`, `fix:`, `docs:`, etc.)
+- **Code reviews**: Follow Clojure-specific review guidance in CLAUDE.md — flag behavior changes without tests, lazy seqs escaping resource scopes, silent nil swallowing; skip style preferences
 - **Code references**: Use GitHub permalinks with commit hashes, not branch names
 - **Git**: Push to `upstream` (nubank/clojuredocs), not `zk`
 
