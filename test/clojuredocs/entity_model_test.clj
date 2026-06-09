@@ -8,7 +8,8 @@
             [clojure.set :as set]
             [clojuredocs.search :as search]
             [clojuredocs.search.static :as static]
-            [clojuredocs.search.compat :as compat]))
+            [clojuredocs.search.compat :as compat]
+            [clojuredocs.api.common :as common]))
 
 ;; --- Schema loading ---
 
@@ -21,7 +22,7 @@
 
 (deftest schema-parses-and-has-required-keys
   (is (map? schema))
-  (is (= "1.0.0" (:schema-version schema)))
+  (is (= "1.1.0" (:schema-version schema)))
   (is (map? (:sub-schemas schema)))
   (is (map? (:entities schema))))
 
@@ -46,7 +47,7 @@
 
 (deftest schema-status-states-are-valid
   (testing "every :status :state is one of the defined enum values"
-    (let [valid-states #{:exists :nil :vestigial :planned :gap}]
+    (let [valid-states #{:exists :nil :vestigial :absent :planned :gap}]
       (doseq [[entity-key entity] (:entities schema)
               [attr-key attr] (:attrs entity)]
         (is (contains? valid-states (get-in attr [:status :state]))
@@ -190,25 +191,34 @@
       (is (nil? (:url (first with-url)))))))
 
 (deftest var-type-values
-  (testing "var :type is one of the expected values"
-    (let [valid-types #{"function" "macro" "var" "special-form"}
-          actual-types (->> (:vars search/clojure-lib)
+  (testing "var :type set is exactly the observed values — no phantom types"
+    ;; Strict equality (not subset?) so the schema cannot claim a type that never
+    ;; occurs. "special-form" is intentionally absent: the 15 static special forms
+    ;; lose their :type in transform-var-meta and surface as "var" (issue #67).
+    ;; See the :var/:type entry in entity-attribute-model.edn.
+    (let [actual-types (->> (:vars search/clojure-lib)
                             (map :type)
                             set)]
-      (is (set/subset? actual-types valid-types)
-          (str "unexpected var types: " (set/difference actual-types valid-types))))))
+      (is (= #{"function" "macro" "var"} actual-types)
+          (str "var :type set drifted from documented values: " actual-types)))))
 
 ;; --- Embedded sub-schema consistency ---
 
-(deftest embedded-var-shape-is-uniform
-  (testing "EmbeddedVar sub-schema matches common.clj Var schema"
-    (let [schema-keys (set (keys (get-in schema [:sub-schemas :embedded-var])))]
-      (is (= #{:ns :name :library-url} schema-keys)))))
+(deftest embedded-var-shape-matches-common
+  (testing "EmbeddedVar sub-schema keys match the live api/common.clj Var schema"
+    ;; Compare against the actual schema in clojuredocs.api.common, not a hardcoded
+    ;; literal, so a change to Var there forces an update here (reliability ratchet).
+    (is (= (set (keys common/Var))
+           (set (keys (get-in schema [:sub-schemas :embedded-var]))))
+        (str "embedded-var drifted from api/common.clj Var: "
+             (set (keys common/Var))))))
 
-(deftest embedded-user-shape-is-uniform
-  (testing "EmbeddedUser sub-schema matches common.clj User schema"
-    (let [schema-keys (set (keys (get-in schema [:sub-schemas :embedded-user])))]
-      (is (= #{:login :account-source :avatar-url} schema-keys)))))
+(deftest embedded-user-shape-matches-common
+  (testing "EmbeddedUser sub-schema keys match the live api/common.clj User schema"
+    (is (= (set (keys common/User))
+           (set (keys (get-in schema [:sub-schemas :embedded-user]))))
+        (str "embedded-user drifted from api/common.clj User: "
+             (set (keys common/User))))))
 
 ;; --- Dialect compat entity ---
 

@@ -4,16 +4,26 @@
 ;; Generated from REPL-verified findings in dev/sidecar_repl.clj
 ;; See docs/rfcs/entity-model-rfc.md for design rationale.
 ;;
+;; Verification split:
+;;   JVM-heap entities (library, namespace, var) and the edn-file entity
+;;   (dialect-compat) are checked against the running system by
+;;   test/clojuredocs/entity_model_test.clj on every run.
+;;   MongoDB entities (example, example-history, note, see-also, user,
+;;   legacy-var-redirect) are snapshot-derived from sidecar_repl.clj and are
+;;   NOT yet test-guarded — their cardinalities/coverage will drift (issue #66).
+;;
 ;; Status semantics:
 ;;   :exists   — REPL-verified, data is there
 ;;   :nil      — key exists but value is systematically nil
 ;;   :vestigial — key exists but carries no meaningful information
+;;   :absent   — key is retained by code (e.g. listed in search/var-keys) but no
+;;               record in the current dataset carries it
 ;;   :planned  — has a GitHub issue tracking it
 ;;   :gap      — described in vision doc, no code or data yet
 ;;
 ;; Coverage: nil when :required? is true, otherwise n/total
 
-{:schema-version "1.0.0"
+{:schema-version "1.1.0"
  :generated      "2026-06-09"
  :issue           "https://github.com/nubank/clojuredocs/issues/43"
 
@@ -91,9 +101,9 @@
                    :status {:state :exists :verified "2026-06-09"
                             :evidence "sidecar_repl.clj — var key universe scan"}}
     :type         {:type :string  :required? true :coverage nil
-                   :description "One of: \"function\", \"macro\", \"var\", \"special-form\""
+                   :description "Observed values on search/clojure-lib: \"function\" (1225), \"macro\" (190), \"var\" (157). type-of has a \"special-form\" branch and import.clj/UI accept that value, but no var here produces it — the 15 static special forms lose their :type in transform-var-meta (select-keys var-keys drops :type) and surface as \"var\". See issue #67."
                    :status {:state :exists :verified "2026-06-09"
-                            :evidence "sidecar_repl.clj — var key universe scan"}}
+                            :evidence "entity_model_test.clj — var-type-values (type set = #{\"function\" \"macro\" \"var\"})"}}
     :arglists     {:type :list    :required? true :coverage nil
                    :description "List of argument list strings"
                    :status {:state :exists :verified "2026-06-09"
@@ -146,6 +156,10 @@
                    :description "True if var should be hidden from documentation"
                    :status {:state :exists :verified "2026-06-09"
                             :evidence "sidecar_repl.clj — var key universe scan"}}
+    :no-doc       {:type :boolean :required? false :coverage "0/1572"
+                   :description "Documentation-visibility flag. Listed in search/var-keys, so the gather pipeline retains it when present, but no var in Clojure 1.12.4 carries it. (On namespaces, :no-doc is meaningful — gather-namespaces removes flagged namespaces.)"
+                   :status {:state :absent :verified "2026-06-09"
+                            :evidence "entity_model_test.clj — var key universe scan (no var carries :no-doc)"}}
     :deprecated   {:type :string  :required? false :coverage "18/1572"
                    :description "Deprecation version string"
                    :status {:state :exists :verified "2026-06-09"
@@ -339,7 +353,7 @@
 
   :dialect-compat
   {:source "edn-file"
-   :cardinality "~1400 var-dialect pairs"
+   :cardinality "715 vars / 1880 var-dialect pairs"
    :description "Dialect compatibility data. Loaded from resources/dialect-compat.edn at startup."
    :attrs
    {:var-key     {:type :string :required? true
