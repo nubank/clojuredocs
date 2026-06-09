@@ -36,13 +36,13 @@ Each erratum follows this structure:
    - **Claimed**: [entity-attribute-model.csv](entity-attribute-model.csv) listed `:source-url` (string) and `:usage-urls` (list) as existing Var attributes with source "JVM heap (derived from ns-publics)."
    - **Discovered**: REPL evaluation in [sidecar_repl.clj](../dev/sidecar_repl.clj). `(:source-url (search/lookup "clojure.core/map"))` returned `nil`. `(:usage-urls (search/lookup "clojure.core/map"))` returned `nil`. Neither key appears in `search/var-keys` or anywhere in the gather pipeline.
    - **Corrected**: Not yet corrected in CSV — will be removed or marked as gap when EDN schema is built.
-   - **Why**: The AI likely inferred these attributes from what a documentation site *should* have rather than what the code actually produces. `:source-url` is a plausible computed field (and `source-base-url` exists on Library), so the AI hallucinated it onto Var. `:usage-urls` appears nowhere in the codebase — pure fabrication.
+   - **Why**: The AI likely inferred these attributes from what a documentation site *should* have rather than what the code actually produces. `:source-url` is a plausible computed field (and `source-base-url` exists on Library), which may have made this fabrication seem reasonable. `:usage-urls` appears nowhere in the codebase — pure fabrication.
    - **Prevent**: Eval every attribute against the running system before marking it `:exists`. The sidecar REPL pattern makes this a 5-second check per attribute. Alternatively, a transcriptor test that asserts `(every? #(contains? var-from-repl %) claimed-keys)` would catch this mechanically.
 
 2. **CSV listed 4 Namespace attributes; only 2 exist**
 
    - **Claimed**: Namespace entity has 4 attributes: `:name`, `:doc`, `:added`, `:library-url`. CSV listed `:added` (source: "JVM heap (derived at startup)") and `:library-url` (source: "JVM heap (derived at startup)") as existing.
-   - **Discovered**: REPL evaluation. `(keys (first (:namespaces search/clojure-lib)))` returned `(:doc :name)` — only 2 keys. `gather-namespace` in `search.clj` selects `:doc :no-doc :added` from ns metadata then adds `:name`, but `:no-doc` and `:added` are nil on most namespaces and absent from the resulting map (Clojure's `select-keys` retains nil-valued keys, but `find-ns` metadata may not contain these keys at all). `:library-url` is not added by `gather-namespace` — it's only on Var.
+   - **Discovered**: REPL evaluation. `(keys (first (:namespaces search/clojure-lib)))` returned `(:doc :name)` — only 2 keys. `gather-namespace` in `search.clj` selects `:doc :no-doc :added` from ns metadata then adds `:name`, but `:no-doc` and `:added` are nil on most namespaces and absent from the resulting map (`select-keys` with a missing key omits that key from the result — there is no error or nil placeholder). `:library-url` is not added by `gather-namespace` — it's only on Var.
    - **Corrected**: Not yet corrected — will be addressed in EDN schema.
    - **Why**: The AI read `gather-namespace` source and saw `(select-keys (meta (find-ns ns-sym)) [:doc :no-doc :added])` — correctly noting those keys are *selected for*, but incorrectly concluding they *exist* on the output. For `:library-url`, the AI likely copied it from Var's attribute list (where `gather-vars` adds it) to Namespace by analogy. The CSV marks it "exists (implicit)" which is a hedge that masks fabrication.
    - **Prevent**: Distinguish "code selects for this key" from "this key appears on output." REPL eval of `(keys ...)` on actual data is the only reliable check. The hedge "exists (implicit)" should be treated as a smell — if you need to qualify existence, verify it.
@@ -79,15 +79,23 @@ Each erratum follows this structure:
    - **Why**: The first diagram covered "existing" entities and the second covered "gap" entities. The AI split them because Mermaid's `erDiagram` has no built-in way to visually distinguish entity status (solid vs. dashed lines). Rather than finding a single-diagram solution, the AI created two diagrams — doubling the maintenance surface and confusing the reader.
    - **Prevent**: When a tool can't express a distinction you need, that's a signal to question the tool choice — not to work around it by duplicating artifacts. This ultimately led to the decision to drop Mermaid entirely.
 
+7. **CSV omitted `:library-url` from LegacyVarRedirect while fabricating it on Namespace**
+
+   - **Claimed**: CSV listed LegacyVarRedirect with 3 attributes: `function-id`, `ns`, `name`. No `:library-url` attribute.
+   - **Discovered**: REPL evaluation of `(keys (first (mon/fetch :legacy-var-redirects)))` returned `(:_id :function-id :library-url :ns :name)` — 5 keys, not 3. Full-collection key frequency scan confirmed `:library-url` appears on all 1,654 documents.
+   - **Corrected**: Will be included in EDN schema.
+   - **Why**: Mirror image of erratum #2. The AI fabricated `:library-url` on Namespace (where it doesn't exist) by analogy from Var, while omitting it from LegacyVarRedirect (where it does exist). The AI listed only 3 of 5 keys — whether this was because LegacyVarRedirect was treated as a simple redirect table is speculation. The result: attributes that a documentation system would plausibly have were added where absent and omitted where present.
+   - **Prevent**: The key-universe scan (`(mapcat keys) frequencies`) catches both fabrications and omissions in one pass. Run it on every MongoDB collection, not just the ones you expect to be interesting.
+
 ---
 
 ## Patterns
 
 Recurring failure modes observed across these errata:
 
-1. **Plausible fabrication** (#1, #3): The AI generates attributes that a system *should* have based on domain knowledge, rather than attributes it *does* have based on code. The more reasonable the fabrication, the harder it is to catch without REPL verification.
+1. **Plausible fabrication** (#1, #3, #7): The AI generates attributes that are plausible for the domain but not present in the system, rather than attributes it *does* have based on code. The more reasonable the fabrication, the harder it is to catch without REPL verification. Erratum #7 shows this works in both directions — fabricating presence *and* fabricating absence.
 
-2. **Code-reading ≠ data-reading** (#2): Reading source code that *selects for* a key is not the same as observing that key on actual runtime data. `select-keys` with a missing key produces an empty entry, not an error — making this invisible to static analysis.
+2. **Code-reading ≠ data-reading** (#2): Reading source code that *selects for* a key is not the same as observing that key on actual runtime data. `select-keys` with a missing key omits it from the result silently — making this invisible to static analysis.
 
 3. **Format limitations masked as content problems** (#4, #6): When the chosen format (CSV, Mermaid) can't express a needed distinction, the AI works around it by adding noise rather than questioning the format choice. The fix is always to choose a format that makes the distinction structural.
 
@@ -98,3 +106,4 @@ Recurring failure modes observed across these errata:
 | Date | Changes |
 |------|---------|
 | 2026-06-09 | Initial errata document with 6 entries from entity model work. Verified against REPL output and source code. |
+| 2026-06-09 | Added erratum #7 (LegacyVarRedirect `:library-url` omission). Updated pattern #1 to include bidirectional fabrication. |
