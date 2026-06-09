@@ -1,6 +1,6 @@
 # Copilot Instructions
 
-All project conventions — including AI metadata, review maturity levels, PR format, and docs conventions — are defined in [CLAUDE.md](../CLAUDE.md) at the repo root. Follow those conventions for all code and documentation work.
+Project conventions are defined in [CLAUDE.md](../CLAUDE.md) at the repo root. The key points below are the complete set of conventions you must follow. Refer to CLAUDE.md for full details when its content is available in context.
 
 Key points:
 
@@ -12,4 +12,4 @@ Key points:
 - **Code references**: Use GitHub permalinks with commit hashes, not branch names
 - **Git**: Push to `upstream` (nubank/clojuredocs), not `zk`
 
-The site has known issues and data inconsistencies (see `docs/issues/`). The architecture is legacy — a major redesign is underway per `docs/2026vison.md`.
+The site has known issues and data inconsistencies (see `docs/issues/`). The architecture is legacy — a major redesign is underway per `docs/2026vison.md`. When modifying existing code, preserve current patterns for consistency unless the change is explicitly part of the redesign. Do not proactively refactor legacy code toward the new architecture unless asked.

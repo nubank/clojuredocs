@@ -15,7 +15,7 @@ Draft GitHub issues for [nubank/clojuredocs](https://github.com/nubank/clojuredo
 
 ## Procedure
 
-1. **Classify.** Determine the issue type (bug, enhancement, feature). Ask one clarifying question only if the type or user-facing impact is genuinely ambiguous.
+1. **Classify.** Determine the issue type (bug, enhancement, feature). If the input is not an issue at all (e.g., a general question, support request, or discussion topic), tell the user it does not map to a GitHub issue and suggest an alternative (e.g., Slack channel, GitHub Discussion). Ask one clarifying question only if the type or user-facing impact is genuinely ambiguous.
 2. **Verify.** If the user mentions a URL or file path, fetch or read it to confirm the claim before drafting.
 3. **Pick the template.** Use the matching [issue template](../../ISSUE_TEMPLATE/) (bug, enhancement, or feature). Load [docs/github-templates/issue-writing-guide.md](../../../docs/github-templates/issue-writing-guide.md) for section guidance and examples.
 4. **Draft.** Write the issue following the template structure: Problem, Demonstration/Steps to Reproduce, Context, and References. Omit sections that don't apply.
