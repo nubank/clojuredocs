@@ -27,7 +27,7 @@
 
 ## Entity Model Diagram
 
-The canonical visual diagram lives in Miro (the team's diagramming tool), with a PDF export checked into this repo for reference. See [the decision log](decisions.md) for rationale.
+A visual diagram in Miro is the **eventual** representation, not the current focus. Reviewing with Alex — who confirmed he can review the data directly — the first step is sound data, not a diagram. There is **no** Miro diagram or PDF export in the repo yet; the data below is the deliverable under review. See [the decision log](decisions.md) for rationale.
 
 The machine-readable source of truth for entities and attributes is [`entity-attribute-model.edn`](entity-attribute-model.edn), which superseded the earlier [`entity-attribute-model.csv`](entity-attribute-model.csv). The EDN carries a per-attribute `:status` and is enforced by [`entity_model_test.clj`](../test/clojuredocs/entity_model_test.clj), which checks the JVM-heap entities (Library, Namespace, Var) and DialectCompat against the running system on every test run. Errors found and corrected while building and verifying the schema are recorded in [errata.md](errata.md).
 
@@ -80,3 +80,4 @@ The following collections are called by `add-all-indexes!` but have no active qu
 | 2026-06-05 | Replaced Mermaid ER diagrams with Miro + EDN strategy; pointed source-of-truth at the forthcoming EDN. |
 | 2026-06-09 | Promoted the EDN to source of truth (now REPL-verified and guarded by `entity_model_test.clj`). Corrected the stale "read from source, not the running system" framing. Bumped to L3 (JVM-heap entities; Mongo cardinalities remain L2 pending [#66](https://github.com/nubank/clojuredocs/issues/66)). Logged errata #8–#10 and filed [#66](https://github.com/nubank/clojuredocs/issues/66)–[#70](https://github.com/nubank/clojuredocs/issues/70) during verification. |
 | 2026-06-09 | Endorsed to L4 by Jordan Miller for the JVM-heap entities (REPL-verified + test-guarded). MongoDB cardinalities explicitly held at L2 pending [#66](https://github.com/nubank/clojuredocs/issues/66). |
+| 2026-06-09 | Corrected the claim that the canonical visual lives in Miro and that a PDF is checked into the repo (none exists). Per review with Alex, the EDN/data is the first deliverable and review artifact; the Miro visual is the eventual goal (errata #11). |

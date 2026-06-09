@@ -16,6 +16,39 @@ Document design and architecture decisions. Lightweight alternative to full ADRs
 
 ---
 
+## 2026-06-09 — Data first: defer the Miro visual
+
+### Status
+Decided
+
+### Context
+- The [2026-06-05 entries](#2026-06-05--replace-mermaid-er-diagrams-with-edn-schema-and-miro-visual) named Miro the "canonical visual" for the entity model, with a PDF export to be checked into the repo.
+- In practice no Miro diagram or PDF was ever produced or committed (`git ls-files` shows no PDF), yet the docs described it as the current canonical representation.
+- Reviewing with Alex: he can review the data (the EDN) directly — a diagram is not a prerequisite for review.
+
+### Decision
+- Prioritize sound, verified data (the EDN) as the first deliverable and the review artifact. Treat the Miro visual as the eventual/ideal representation, deferred until the data is solid — not a blocker for review.
+
+### Rationale
+- Alex can review the EDN directly, so a visual is not on the critical path.
+- The EDN is REPL-verified and test-guarded — it is the trustworthy substrate a diagram would be derived from anyway (data first, views second; the same principle behind the 2026-06-05 EDN decision).
+- Avoids overstating a Miro artifact that does not exist.
+
+### Alternatives Considered
+- Produce the Miro diagram first — front-loads a visual the reviewer doesn't need yet, and which would have to track the still-settling data.
+- Keep claiming Miro as canonical — misrepresents the actual state (no diagram/PDF exists).
+
+### Impacts and Risks
+- Supersedes the "Miro as the canonical visual" priority from the 2026-06-05 entries. The EDN-as-source-of-truth decision stands.
+- Risk: the visual is deferred indefinitely. Mitigation: it remains the stated eventual goal; the EDN can generate derived views when wanted.
+
+### Links
+- [entity-attribute-model.edn](entity-attribute-model.edn)
+- [2026-06-05 — Replace Mermaid ER diagrams with EDN schema and Miro visual](#2026-06-05--replace-mermaid-er-diagrams-with-edn-schema-and-miro-visual)
+- [errata #11](errata.md)
+
+---
+
 ## 2026-06-09 — Enforce the entity model with a test namespace
 
 ### Status
