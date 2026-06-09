@@ -111,6 +111,14 @@ Each erratum follows this structure:
     - **Why**: Plausible fabrication of a magnitude (#1) — a round "~1400" reads as reasonable for "a bit over a thousand entries" and was never checked. It was the only cardinality in the model with a `~` and no test.
     - **Prevent**: Pin every cardinality to a REPL-verified integer and guard it with a test; treat `~`-prefixed approximate counts as unverified smells.
 
+11. **Claimed a Miro PDF export was checked into the repo; none exists**
+
+    - **Claimed**: [entity-attribute-model.md](entity-attribute-model.md) stated "The canonical visual diagram lives in Miro … with a PDF export checked into this repo," and the [2026-06-05 decision](decisions.md) described versioned PDF exports kept in the repo.
+    - **Discovered**: `git ls-files | grep -i '\.pdf$'` returns no entity-model PDF — none was ever committed. Reviewing with Alex also clarified the visual is not the current deliverable: he can review the EDN data directly.
+    - **Corrected**: Reframed the model doc and PR #57 to say the EDN/data is the first deliverable and review artifact, and the Miro visual is an eventual goal (not yet produced). Recorded the direction in a [decision entry](decisions.md).
+    - **Why**: The doc described the intended end-state (Miro canonical + PDF in repo) as if already done — aspirational state written as current fact, the same class as errata #1 and #2.
+    - **Prevent**: Before claiming an artifact is "checked into the repo," verify it exists (`git ls-files`). Keep "the plan" and "the current state" distinct in prose.
+
 ---
 
 ## Patterns
@@ -133,3 +141,4 @@ Recurring failure modes observed across these errata:
 | 2026-06-09 | Added erratum #7 (LegacyVarRedirect `:library-url` omission). Updated pattern #1 to include bidirectional fabrication. |
 | 2026-06-09 | Added errata #8–#10 (Var `:type` phantom `"special-form"`, `:no-doc` omission, DialectCompat cardinality) from REPL verification of the EDN schema while reviewing the tests. Filed [#66](https://github.com/nubank/clojuredocs/issues/66)–[#70](https://github.com/nubank/clojuredocs/issues/70). Updated patterns #1 and #2. |
 | 2026-06-09 | Superseded the entity-model CSV with the EDN (banner header; retirement deferred to the #43 vision pass). Updated the "Corrected" status on errata #2 and #7 accordingly — they are resolved by the EDN plus CSV retirement, not by editing the CSV. See the [decision entry](decisions.md). |
+| 2026-06-09 | Added erratum #11 (claimed a Miro PDF was checked into the repo; none exists). Corrected the model doc and PR #57 to put data first, with the Miro visual as an eventual goal — per review with Alex. |
