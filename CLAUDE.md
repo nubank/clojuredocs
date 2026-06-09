@@ -134,6 +134,40 @@ Don't:
 
 See the [PR template](.github/pull_request_template.md) for the standard body skeleton.
 
+## Code review guidance
+
+Adapted from Nubank's canonical Clojure review conventions.
+
+### Review posture
+
+Be helpful, specific, and low-noise. Comment only when a change is likely to cause incorrect behavior, broken tests, confusing API behavior, security/data integrity problems, or resource/lifecycle bugs. Avoid comments about personal style or speculative refactors.
+
+### Clojure-specific
+
+- Side effects are explicit and not mixed into pure logic
+- Data shape expectations are clear at boundaries
+- Nil handling matches intended behavior
+- Lazy sequences don't escape into places where resources may be closed
+- Exception handling preserves useful context
+- Stateful code (atoms, refs, agents) has clear ownership and safe update semantics
+- Namespace changes don't leave unused requires or circular dependencies
+
+### What to flag
+
+- Behavior changes without test coverage
+- Functions that now accept/return a different shape without call-site updates
+- Hidden coupling between namespaces
+- Lazy seqs from I/O consumed after the source is closed
+- Error handling that turns diagnosable failures into silent nils
+- Concurrency logic that can duplicate work or lose updates
+
+### What not to flag
+
+- Formatting and whitespace
+- Alternative naming unless actively misleading
+- "Could be extracted" unless duplication is causing confusion
+- Replacing one valid idiom with another
+
 ## Docs conventions
 
 - Use relative links between docs in the same repo.
