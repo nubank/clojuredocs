@@ -24,7 +24,7 @@ While researching, create and extend an annotated bibliography in a separate fil
 ## Code analysis
 
 - When researching a codebase, don't just catalog structure and history. Include a **critical code review** that evaluates the code against domain-appropriate quality criteria.
-- Don't rely only on what source documents *say about* the code. Read the code itself and form independent judgments. Source documents often describe intent; the code reveals reality.
+- Don't rely only on what source documents *say about* the code. Read the code itself and form independent judgments. Source documents describe intent; the code may differ. Read both and note discrepancies.
 
 ## Problem ranking
 

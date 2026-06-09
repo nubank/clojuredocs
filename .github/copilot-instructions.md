@@ -12,4 +12,4 @@ Key points:
 - **Code references**: Use GitHub permalinks with commit hashes, not branch names
 - **Git**: Push to `upstream` (nubank/clojuredocs), not `zk`
 
-The site has known issues and data inconsistencies (see `docs/issues/`). The architecture is legacy — a major redesign is underway per `docs/2026vison.md`. When modifying existing code, preserve current patterns for consistency unless the change is explicitly part of the redesign. Do not proactively refactor legacy code toward the new architecture unless asked.
+The site has known issues and data inconsistencies (see `docs/issues/`). The architecture predates the redesign described in `docs/2026vison.md`. When modifying existing code, preserve current patterns for consistency unless the change is explicitly part of the redesign. Do not proactively refactor legacy code toward the new architecture unless asked.

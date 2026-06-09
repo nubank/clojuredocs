@@ -9,7 +9,7 @@
 
 ClojureDocs is a community-powered documentation site for Clojure. It's currently a Ring/Compojure web app backed by MongoDB, with server-side rendering via Hiccup and a ClojureScript (Reagent) client.
 
-> **Note:** The site has known issues and data inconsistencies (see [docs/issues/](docs/issues/)). The architecture is legacy — a major redesign is underway to align with the [2026 vision statement](docs/2026vison.md).
+> **Note:** The site has known issues and data inconsistencies (see [docs/issues/](docs/issues/)). The architecture predates the [2026 vision statement](docs/2026vison.md) and will be replaced as part of that redesign.
 
 | Directory | Contents |
 |---|---|
@@ -52,7 +52,7 @@ Every prose document under `docs/` must carry an inline metadata block at the to
 
 ### Review maturity levels
 
-Inspired by C2PA's progressive trust model (Well-Formed → Valid → Trusted) and the Linux kernel's `Reviewed-by` / `Tested-by` conventions. Each level subsumes the ones below it.
+Review maturity levels use a progressive trust model, similar in spirit to C2PA's content credentials and the Linux kernel's review trailers. Each level subsumes the ones below it.
 
 | Level | Label | Meaning |
 |---|---|---|
@@ -101,7 +101,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 Reviewed-by: Jordan Miller <jordan.miller@nubank.com.br>
 ```
 
-`Co-Authored-By` identifies the AI. `Reviewed-by` identifies the human who reviewed the diff before commit. This follows the Linux kernel convention for review attribution in git history.
+`Co-Authored-By` identifies the AI, following the GitHub convention for multi-author commits. `Reviewed-by` identifies the human who reviewed the diff before commit, following the Linux kernel convention for review attribution.
 
 ### Rules
 
@@ -136,7 +136,7 @@ See the [PR template](.github/pull_request_template.md) for the standard body sk
 
 ## Code review guidance
 
-Adapted from Nubank's canonical Clojure review conventions.
+Based on Clojure code review conventions used at Nubank.
 
 ### Review posture
 
