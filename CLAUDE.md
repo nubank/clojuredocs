@@ -113,14 +113,26 @@ Reviewed-by: Jordan Miller <jordan.miller@nubank.com.br>
 
 ### Titles
 
-Use conventional-commit prefixes: `feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`.
+Use conventional-commit prefixes: `feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`. Keep titles under ~70 characters; details go in the body.
 
 ### Body
 
-Keep it direct:
+Four sections, in this order:
+
 1. **Context.** What triggered the change. Link the issue if there is one.
-2. **Problem.** What is broken, missing, or insufficient.
-3. **Solution.** What the change does.
+2. **Problem.** What is broken, missing, or insufficient today.
+3. **Solution.** What the change does. Highlight rationale only for non-obvious decisions.
+4. **Father Watson Questions.** In a collapsible `<details>` block. What do we know, what do we need to know, where are we, where are we going. Use when the change involves open questions or diagnostic framing.
+
+Tone: direct and assertive. Short and specific.
+
+Don't:
+
+- Use marketing language ("comprehensive", "robust", "production-ready").
+- Restate the diff line by line — the reviewer can read it.
+- Pad a simple change with paragraphs. If you need walls of text to describe one decision, the decision isn't clear yet.
+
+See the [PR template](.github/pull_request_template.md) for the standard body skeleton.
 
 ## Docs conventions
 

@@ -8,7 +8,7 @@ This guide describes the format conventions used in this repo's issue tracker. I
 
 Copy the **Prompt** section below into any AI assistant (ChatGPT, Claude, Copilot, etc.) as a system prompt or paste it at the start of a conversation. Then give it a rough description of a bug or feature idea — a Slack thread, a conversation summary, a one-liner — and it will produce an issue formatted for this repo.
 
-If you use VS Code with GitHub Copilot, this guide is also available as a [skill](.github/skills/issue-writer/SKILL.md) that can be invoked with `/issue-writer` or loaded automatically when the agent detects a relevant context.
+If you use VS Code with GitHub Copilot, this guide is also available as a [skill](../../.github/skills/issue-writer/SKILL.md) that can be invoked with `/issue-writer` or loaded automatically when the agent detects a relevant context.
 
 <details>
 <summary><strong>Prompt</strong> (click to expand)</summary>
@@ -26,7 +26,7 @@ Rules:
 - No "Acceptance Criteria", "Risks & Mitigations", or "Implementation Steps" sections.
 - Omit sections that don't apply. Don't pad.
 
-Format:
+Format: Use the matching GitHub issue template (.github/ISSUE_TEMPLATE/).
 
 # <Title — short, descriptive>
 
@@ -38,21 +38,8 @@ Format:
 ## Demonstration (or "Steps to Reproduce" for bugs)
 Numbered steps with URLs, var names, console output as relevant.
 
-## Father Watson Questions
-
-**What do we know?**
-- Bullet established facts, code paths, prior discussion.
-
-**What do we need to know?**
-- Bullet open questions that would unblock a decision.
-
-**Where are we?**
-- Current state of the relevant code or feature.
-
-**Where are we going?**
-- Desired outcomes in user-facing terms, not implementation details.
-
-## Assumptions (optional, only if load-bearing)
+## Context
+Established facts, code paths, prior discussion, related issues.
 
 ## References
 - Related issues (#N), repo file paths, external docs, clojuredocs.org pages.
@@ -73,7 +60,9 @@ Numbered steps with URLs, var names, console output as relevant.
 
 ## Issue template
 
-Use this skeleton, omitting sections that don't apply:
+Use the matching [GitHub issue template](../../.github/ISSUE_TEMPLATE/) for the issue type (bug, enhancement, or feature). The templates live in `.github/ISSUE_TEMPLATE/` and GitHub will offer them when creating a new issue.
+
+The general skeleton, omitting sections that don't apply:
 
 ```markdown
 # <Issue title — short, descriptive, no clickbait>
@@ -94,28 +83,10 @@ as the section name. Include URLs, exact var names, console output, screenshots 
 2. <step>
 3. <observed result>
 
-## Father Watson Questions
+## Context
 
-**What do we know?**
-<Bullet the established facts. Behavior observed, code paths involved, prior discussion,
+<Established facts. Behavior observed, code paths involved, prior discussion,
 related issues. Cite specific files or links where you can.>
-
-**What do we need to know?**
-<Bullet the open questions. What information would unblock a decision? What hasn't been
-investigated yet? What would a maintainer reasonably need to ask before triaging this?>
-
-**Where are we?**
-<The current state of the relevant code or feature. What exists today, what's already
-in place, what the user-facing behavior is right now.>
-
-**Where are we going?**
-<The desired end state, framed as outcomes rather than implementation. What would success
-look like for the user? What invariants should hold afterward?>
-
-## Assumptions (optional)
-
-<Only include if there are non-obvious assumptions baked into the framing of the issue.
-Skip this section entirely if there's nothing to flag.>
 
 ## References
 
@@ -123,6 +94,8 @@ Skip this section entirely if there's nothing to flag.>
 - <link to relevant file path in the repo>
 - <link to external docs, cheatsheets, or specs>
 ```
+
+> **Note:** Father Watson diagnostic questions (What do we know? What do we need to know? Where are we? Where are we going?) have moved to the [PR description template](../../.github/pull_request_template.md). Issues diagnose; PRs frame the solution.
 
 ## Section guidance
 
@@ -150,18 +123,11 @@ For **features and enhancements**: concrete examples of the current gap. E.g. "V
 
 ### Father Watson Questions
 
-These four questions replace the "Proposed Solution / Implementation Steps / Acceptance Criteria" pattern. They keep the issue in the **diagnostic phase** rather than jumping to design.
+> Father Watson diagnostic questions have moved to the [PR description template](../../.github/pull_request_template.md). Issues use a simpler **Context** section instead.
 
-- **What do we know?** — Established facts. Evidence, code references, prior conversation.
-- **What do we need to know?** — Open questions. Investigations not yet done. Decisions deferred to maintainers.
-- **Where are we?** — Current state. The baseline. Different from "what do we know" — this is the snapshot, not the inventory of facts.
-- **Where are we going?** — Desired outcomes, in user-facing terms. Not "add a function called X" but "users can tell at a glance whether a var works in their dialect."
+### Context
 
-Use bullet points under each question. Keep each bullet to a single idea. If a question doesn't apply, write a single sentence explaining why rather than padding.
-
-### Assumptions
-
-Only include if there's a load-bearing assumption that, if false, would change the framing of the issue. E.g. "Assumes the runtime-var-access constraint from #5 still holds." Skip otherwise — empty Assumptions sections are noise.
+Established facts relevant to the issue: behavior observed, code paths involved, prior discussion, related issues. Cite specific files or links where you can. This replaces the four Father Watson questions — keep it factual and concise.
 
 ### References
 
