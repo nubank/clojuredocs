@@ -20,6 +20,8 @@ The [2026 vision](2026vison.md) requires an explicit, extensible data model. Dat
 
 Document all existing entities and attributes verified via REPL. Include gap/planned entities from the vision with richer status metadata that traces each to its source (verification timestamp, vision doc line, or GitHub issue).
 
+> **Status of this scope.** The present-state inventory (§1) is complete and REPL-verified. The vision-derived gap/planned (envisioned) entities are **not yet enumerated** — that pass over the [2026 vision](2026vison.md) is the pending second half of [#43](https://github.com/nubank/clojuredocs/issues/43). What exists in the EDN today is the verified present-state plus a few `:gap` attributes on `:dialect-compat`.
+
 ---
 
 ## 1. REPL-Verified Entity Inventory

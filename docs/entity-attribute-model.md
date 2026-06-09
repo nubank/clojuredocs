@@ -10,7 +10,7 @@
 >
 > _AI-assisted document. JVM-heap entities (Library, Namespace, Var) and DialectCompat are REPL-verified and enforced by tests; MongoDB cardinalities are derived from a one-time snapshot and are not yet test-guarded ([#66](https://github.com/nubank/clojuredocs/issues/66)). AI-generated content may contain errors — see [errata.md](errata.md)._
 >
-> _**Scope of "verified" / L4:** this status means the claims **present** in the model were checked against the running system (REPL + tests). It is **not** a completeness audit — no systematic search for missing entities, attributes, or behaviors was performed, so gaps that exist but were never looked for would not have been caught. What is marked verified is what was checked, not a guarantee that nothing is missing._
+> _**Scope — present-state only, so far.** Issue [#43](https://github.com/nubank/clojuredocs/issues/43) is to map the full data model: both what exists today **and** what the [2026 vision](2026vison.md) will require us to build. This model currently holds only the **verified present-state** — entities and attributes checked against the running system (`:status :exists`). The **envisioned future-state** — combing the vision to enumerate the entities/attributes that still need to be created (which carry `:status :gap` / `:planned`) — has not been done yet; the lone exception is `:dialect-compat`, which already carries a few `:gap` attributes. So "verified"/L4 reflects the present-state half; it is not a claim that the model is complete against the vision._
 
 # ClojureDocs Entity-Attribute Model
 
