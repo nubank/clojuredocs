@@ -6,7 +6,7 @@
 > - **Session:** `41bcf361` (original); `c6580eec` (2026-06-09 update)
 > - **Tools:** GitHub MCP, workspace file access; Clojure MCP (live nREPL eval) for the 2026-06-09 verification
 > - **Agents/skills:** [backseat-driver](/.vscode/extensions/betterthantomorrow.calva-backseat-driver-0.0.34/assets/skills/backseat-driver/SKILL.md), [editing-clojure-files](/.vscode/extensions/betterthantomorrow.calva-backseat-driver-0.0.34/assets/skills/editing-clojure-files/SKILL.md)
-> - **Review maturity:** L3 — human-verified against the running system via REPL and guarded by [`entity_model_test.clj`](../test/clojuredocs/entity_model_test.clj). Exception: MongoDB cardinalities/coverage remain L2 (snapshot-derived, not test-guarded — see [#66](https://github.com/nubank/clojuredocs/issues/66)).
+> - **Review maturity:** L4 — human-endorsed by Jordan Miller (2026-06-09); the JVM-heap entities (Library, Namespace, Var) and DialectCompat are REPL-verified and guarded by [`entity_model_test.clj`](../test/clojuredocs/entity_model_test.clj). Exception: MongoDB cardinalities/coverage remain L2 (snapshot-derived, not test-guarded — see [#66](https://github.com/nubank/clojuredocs/issues/66)).
 >
 > _AI-assisted document. JVM-heap entities (Library, Namespace, Var) and DialectCompat are REPL-verified and enforced by tests; MongoDB cardinalities are derived from a one-time snapshot and are not yet test-guarded ([#66](https://github.com/nubank/clojuredocs/issues/66)). AI-generated content may contain errors — see [errata.md](errata.md)._
 
@@ -77,3 +77,4 @@ The following collections are called by `add-all-indexes!` but have no active qu
 | 2026-06-01 | Initial entity-attribute model extracted from source code (PR #57). Review maturity L2. |
 | 2026-06-05 | Replaced Mermaid ER diagrams with Miro + EDN strategy; pointed source-of-truth at the forthcoming EDN. |
 | 2026-06-09 | Promoted the EDN to source of truth (now REPL-verified and guarded by `entity_model_test.clj`). Corrected the stale "read from source, not the running system" framing. Bumped to L3 (JVM-heap entities; Mongo cardinalities remain L2 pending [#66](https://github.com/nubank/clojuredocs/issues/66)). Logged errata #8–#10 and filed [#66](https://github.com/nubank/clojuredocs/issues/66)–[#70](https://github.com/nubank/clojuredocs/issues/70) during verification. |
+| 2026-06-09 | Endorsed to L4 by Jordan Miller for the JVM-heap entities (REPL-verified + test-guarded). MongoDB cardinalities explicitly held at L2 pending [#66](https://github.com/nubank/clojuredocs/issues/66). |

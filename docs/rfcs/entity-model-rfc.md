@@ -6,7 +6,7 @@
 > - **Tools:** Calva REPL, MongoDB (seed data), workspace files
 > - **Review maturity:** L3 — human-verified via REPL evaluation
 >
-> _All data in this RFC was verified against the running system via REPL. See [sidecar_repl.clj](../dev/sidecar_repl.clj) for the executable evidence._
+> _All data in this RFC was verified against the running system via REPL on 2026-06-09. See [sidecar_repl.clj](../dev/sidecar_repl.clj) for the executable evidence. Caveat: the MongoDB collection counts and coverage figures are a point-in-time snapshot and are **not** test-guarded — they will drift (see §1 and [#66](https://github.com/nubank/clojuredocs/issues/66)). The JVM-heap entities are re-verified on every test run by [entity_model_test.clj](../test/clojuredocs/entity_model_test.clj)._
 
 # RFC: Entity-Attribute Model EDN Schema
 
@@ -37,6 +37,8 @@ Document all existing entities and attributes verified via REPL. Include gap/pla
 | Library (singleton) | 1 | JVM heap |
 | Namespaces | 38 | JVM heap |
 | Vars | 1,572 | JVM heap |
+
+> **Caveat — the MongoDB figures are a snapshot, not a guarded invariant.** The six MongoDB collection counts above, and the per-key coverage figures throughout this section, were captured by a one-time [`dev/sidecar_repl.clj`](../dev/sidecar_repl.clj) run against the database on 2026-06-09. Unlike the JVM-heap entities (Library, Namespace, Var) and DialectCompat — which [`entity_model_test.clj`](../test/clojuredocs/entity_model_test.clj) re-verifies against the running system on every test run — these MongoDB numbers are **not** test-guarded and will drift as the database changes. Tracked in [#66](https://github.com/nubank/clojuredocs/issues/66).
 
 ### Key Universe (MongoDB — All Collections)
 
@@ -305,3 +307,4 @@ Each entity is a map of keyword → attribute metadata. Each attribute carries t
 |------|---------|
 | 2026-06-09 | Initial RFC from REPL-verified discovery on `feat/43/entity-attribute-model` branch. |
 | 2026-06-09 | Claims audit fixes: clarified error count scope, corrected Datomic/vision wording, fixed `:dialects` description, added EmbeddedUser count footnote, softened Datomic modeling assumptions, clarified `clojure.core` var population scope, dropped loose identity analogy. |
+| 2026-06-09 | Added caveat that the MongoDB collection counts/coverage are a one-time snapshot and not test-guarded (see [#66](https://github.com/nubank/clojuredocs/issues/66)), to match the verification split now enforced by `entity_model_test.clj`. |
