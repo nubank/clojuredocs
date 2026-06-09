@@ -9,7 +9,7 @@
 
 ClojureDocs is a community-powered documentation site for Clojure. It's currently a Ring/Compojure web app backed by MongoDB, with server-side rendering via Hiccup and a ClojureScript (Reagent) client.
 
-> **Note:** The site has known issues and data inconsistencies (see [docs/issues/](docs/issues/)). The architecture is legacy — a major redesign is underway to align with the [2026 vision statement](docs/2026vison.md).
+> **Note:** The site has known issues and data inconsistencies (see [.github/ISSUE_TEMPLATE/](.github/ISSUE_TEMPLATE/)). The architecture predates the [2026 vision statement](docs/2026vison.md) and will be replaced as part of that redesign.
 
 | Directory | Contents |
 |---|---|
@@ -52,7 +52,7 @@ Every prose document under `docs/` must carry an inline metadata block at the to
 
 ### Review maturity levels
 
-Inspired by C2PA's progressive trust model (Well-Formed → Valid → Trusted) and the Linux kernel's `Reviewed-by` / `Tested-by` conventions. Each level subsumes the ones below it.
+Review maturity levels use a progressive trust model, similar in spirit to [C2PA](https://c2pa.org/)'s content credentials and the Linux kernel's review trailers. Each level subsumes the ones below it.
 
 | Level | Label | Meaning |
 |---|---|---|
@@ -101,7 +101,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 Reviewed-by: Jordan Miller <jordan.miller@nubank.com.br>
 ```
 
-`Co-Authored-By` identifies the AI. `Reviewed-by` identifies the human who reviewed the diff before commit. This follows the Linux kernel convention for review attribution in git history.
+`Co-Authored-By` identifies the AI, following the GitHub convention for multi-author commits. `Reviewed-by` identifies the human who reviewed the diff before commit, following the Linux kernel convention for review attribution.
 
 ### Rules
 
@@ -133,6 +133,40 @@ Don't:
 - Pad a simple change with paragraphs. If you need walls of text to describe one decision, the decision isn't clear yet.
 
 See the [PR template](.github/pull_request_template.md) for the standard body skeleton.
+
+## Code review guidance
+
+Based on Clojure code review conventions used at Nubank.
+
+### Review posture
+
+Be helpful, specific, and low-noise. Comment only when a change is likely to cause incorrect behavior, broken tests, confusing API behavior, security/data integrity problems, or resource/lifecycle bugs. Avoid comments about personal style or speculative refactors.
+
+### Clojure-specific
+
+- Side effects are explicit and not mixed into pure logic
+- Data shape expectations are clear at boundaries
+- Nil handling matches intended behavior
+- Lazy sequences don't escape into places where resources may be closed
+- Exception handling preserves useful context
+- Stateful code (atoms, refs, agents) has clear ownership and safe update semantics
+- Namespace changes don't leave unused requires or circular dependencies
+
+### What to flag
+
+- Behavior changes without test coverage
+- Functions that now accept/return a different shape without call-site updates
+- Hidden coupling between namespaces
+- Lazy seqs from I/O consumed after the source is closed
+- Error handling that turns diagnosable failures into silent nils
+- Concurrency logic that can duplicate work or lose updates
+
+### What not to flag
+
+- Formatting and whitespace
+- Alternative naming unless actively misleading
+- "Could be extracted" unless duplication is causing confusion
+- Replacing one valid idiom with another
 
 ## Docs conventions
 
