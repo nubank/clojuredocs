@@ -9,7 +9,7 @@
 
 ClojureDocs is a community-powered documentation site for Clojure. It's currently a Ring/Compojure web app backed by MongoDB, with server-side rendering via Hiccup and a ClojureScript (Reagent) client.
 
-> **Note:** The site has known issues and data inconsistencies (see [docs/issues/](docs/issues/)). The architecture predates the [2026 vision statement](docs/2026vison.md) and will be replaced as part of that redesign.
+> **Note:** The site has known issues and data inconsistencies (see [.github/ISSUE_TEMPLATE/](.github/ISSUE_TEMPLATE/)). The architecture predates the [2026 vision statement](docs/2026vison.md) and will be replaced as part of that redesign.
 
 | Directory | Contents |
 |---|---|
@@ -52,7 +52,7 @@ Every prose document under `docs/` must carry an inline metadata block at the to
 
 ### Review maturity levels
 
-Review maturity levels use a progressive trust model, similar in spirit to C2PA's content credentials and the Linux kernel's review trailers. Each level subsumes the ones below it.
+Review maturity levels use a progressive trust model, similar in spirit to [C2PA](https://c2pa.org/)'s content credentials and the Linux kernel's review trailers. Each level subsumes the ones below it.
 
 | Level | Label | Meaning |
 |---|---|---|
