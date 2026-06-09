@@ -16,6 +16,35 @@ Document design and architecture decisions. Lightweight alternative to full ADRs
 
 ---
 
+## 2026-06-09 — Sidecar REPL scratchpad for entity model verification
+
+### Status
+Decided
+
+### Context
+- Verifying the entity-attribute model requires evaluating forms against the running system — inspecting actual keys on vars, namespace shapes, and collection contents.
+- Rich comment forms inside source files mix investigation code with production code, adding noise to diffs and expanding the AI context window unnecessarily.
+- The project already has a `tools/` directory for one-off scripts, but those are meant to be run as standalone programs, not evaluated interactively.
+
+### Decision
+- Create [`dev/sidecar_repl.clj`](dev/sidecar_repl.clj) as a REPL scratchpad for interactive investigation. All exploratory `comment` forms go here, not in source files.
+
+### Rationale
+- Keeps production source files clean — no exploratory code in diffs or PRs.
+- Reduces AI context window cost — AI tools reading source files don't ingest investigation noise.
+- The `comment` block pattern makes forms individually evaluable at the REPL without side effects on load.
+- Scratchpad is committed so investigation history is visible and reproducible.
+
+### Alternatives Considered
+- Rich comment forms in source files — conventional in Clojure, but mixes investigation with production code and inflates diffs.
+- Ephemeral REPL history only — loses the investigation record; not reproducible by reviewers.
+- Separate `.repl` files (transcriptor-style) — appropriate for verification tests but too structured for exploratory investigation.
+
+### Impacts and Risks
+- `dev/` directory needs to be on the classpath for the namespace to resolve. Mitigation: it's a `comment`-block scratchpad — eval individual forms, don't load the file.
+
+---
+
 ## 2026-06-05 — Replace Mermaid ER diagrams with EDN schema and Miro visual
 
 ### Status
