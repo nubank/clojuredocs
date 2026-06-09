@@ -1,6 +1,6 @@
 # Copilot Instructions
 
-Project conventions are defined in [CLAUDE.md](../CLAUDE.md) at the repo root. The key points below are the complete set of conventions you must follow. Refer to CLAUDE.md for full details when its content is available in context.
+Project conventions are defined in [CLAUDE.md](../CLAUDE.md) at the repo root. The key points below summarize the required conventions; when CLAUDE.md is available in context, treat it as the source of truth for the full set.
 
 Key points:
 
