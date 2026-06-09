@@ -1,14 +1,14 @@
 > **Document metadata**
 > - **Created:** 2026-06-01
-> - **Last updated:** 2026-06-05
+> - **Last updated:** 2026-06-09
 > - **Tags:** entity-model, data-model, mongodb, issue-43
-> - **AI-assisted:** Yes — Claude Opus 4.6 via GitHub Copilot
-> - **Session:** `41bcf361`
-> - **Tools:** GitHub MCP, workspace file access
+> - **AI-assisted:** Yes — Claude Opus 4.6 via GitHub Copilot (original); Claude Opus 4.8 via Claude Code (2026-06-09 verification + EDN promotion)
+> - **Session:** `41bcf361` (original); `c6580eec` (2026-06-09 update)
+> - **Tools:** GitHub MCP, workspace file access; Clojure MCP (live nREPL eval) for the 2026-06-09 verification
 > - **Agents/skills:** [backseat-driver](/.vscode/extensions/betterthantomorrow.calva-backseat-driver-0.0.34/assets/skills/backseat-driver/SKILL.md), [editing-clojure-files](/.vscode/extensions/betterthantomorrow.calva-backseat-driver-0.0.34/assets/skills/editing-clojure-files/SKILL.md)
-> - **Review maturity:** L2 — human-reviewed via PR
+> - **Review maturity:** L3 — human-verified against the running system via REPL and guarded by [`entity_model_test.clj`](../test/clojuredocs/entity_model_test.clj). Exception: MongoDB cardinalities/coverage remain L2 (snapshot-derived, not test-guarded — see [#66](https://github.com/nubank/clojuredocs/issues/66)).
 >
-> _AI-assisted document. Entity shapes were extracted by reading source code, not by querying a running system — runtime behavior may differ._
+> _AI-assisted document. JVM-heap entities (Library, Namespace, Var) and DialectCompat are REPL-verified and enforced by tests; MongoDB cardinalities are derived from a one-time snapshot and are not yet test-guarded ([#66](https://github.com/nubank/clojuredocs/issues/66)). AI-generated content may contain errors — see [errata.md](errata.md)._
 
 # ClojureDocs Entity-Attribute Model
 
@@ -27,7 +27,7 @@
 
 The canonical visual diagram lives in Miro (the team's diagramming tool), with a PDF export checked into this repo for reference. See [the decision log](decisions.md) for rationale.
 
-The machine-readable source of truth for entities and attributes is [`entity-attribute-model.csv`](entity-attribute-model.csv). A future EDN schema will replace the CSV as the primary source, enabling programmatic validation and derived views.
+The machine-readable source of truth for entities and attributes is [`entity-attribute-model.edn`](entity-attribute-model.edn), which superseded the earlier [`entity-attribute-model.csv`](entity-attribute-model.csv). The EDN carries a per-attribute `:status` and is enforced by [`entity_model_test.clj`](../test/clojuredocs/entity_model_test.clj), which checks the JVM-heap entities (Library, Namespace, Var) and DialectCompat against the running system on every test run. Errors found and corrected while building and verifying the schema are recorded in [errata.md](errata.md).
 
 ## Key Observations
 
@@ -68,4 +68,12 @@ The following collections are called by `add-all-indexes!` but have no active qu
 
 ---
 
-> **AI Disclosure**: This model was extracted from the codebase by Claude (Opus 4.6) via GitHub Copilot and reviewed by Jordan Miller. Entity shapes were read from source code — verify attributes against the source files linked in the Source References table above.
+> **AI Disclosure**: This model was first extracted from the codebase by Claude (Opus 4.6) via GitHub Copilot, then verified against the running system by Claude (Opus 4.8) via Claude Code and reviewed by Jordan Miller. JVM-heap entity shapes (Library, Namespace, Var) and DialectCompat are confirmed by REPL evaluation and guarded by [`entity_model_test.clj`](../test/clojuredocs/entity_model_test.clj). MongoDB cardinalities are snapshot-derived ([#66](https://github.com/nubank/clojuredocs/issues/66)). AI-generated content may contain errors — see [errata.md](errata.md) for ones found and corrected.
+
+## Version History
+
+| Date | Changes |
+|------|---------|
+| 2026-06-01 | Initial entity-attribute model extracted from source code (PR #57). Review maturity L2. |
+| 2026-06-05 | Replaced Mermaid ER diagrams with Miro + EDN strategy; pointed source-of-truth at the forthcoming EDN. |
+| 2026-06-09 | Promoted the EDN to source of truth (now REPL-verified and guarded by `entity_model_test.clj`). Corrected the stale "read from source, not the running system" framing. Bumped to L3 (JVM-heap entities; Mongo cardinalities remain L2 pending [#66](https://github.com/nubank/clojuredocs/issues/66)). Logged errata #8–#10 and filed [#66](https://github.com/nubank/clojuredocs/issues/66)–[#70](https://github.com/nubank/clojuredocs/issues/70) during verification. |

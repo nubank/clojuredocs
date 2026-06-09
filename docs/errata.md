@@ -87,15 +87,39 @@ Each erratum follows this structure:
    - **Why**: Mirror image of erratum #2. The AI fabricated `:library-url` on Namespace (where it doesn't exist) by analogy from Var, while omitting it from LegacyVarRedirect (where it does exist). The AI listed only 3 of 5 keys — whether this was because LegacyVarRedirect was treated as a simple redirect table is speculation. The result: attributes that a documentation system would plausibly have were added where absent and omitted where present.
    - **Prevent**: The key-universe scan (`(mapcat keys) frequencies`) catches both fabrications and omissions in one pass. Run it on every MongoDB collection, not just the ones you expect to be interesting.
 
+8. **EDN listed `"special-form"` as a Var `:type` value, but no var produces it**
+
+   - **Claimed**: [entity-attribute-model.edn](entity-attribute-model.edn) `:var :type` read `One of: "function", "macro", "var", "special-form"`.
+   - **Discovered**: REPL — `(->> search/clojure-lib :vars (map :type) frequencies)` returned `{"function" 1225, "macro" 190, "var" 157}`; no `"special-form"`. Root cause in `search.clj`: `transform-var-meta`'s `(select-keys var-keys)` drops `:type` (it is not in `var-keys`), so the 15 `static/special-forms` are re-typed by `type-of` to `"var"`; the 4 vars carrying the `:special-form` metadata key (`fn`/`let`/`letfn`/`loop`) are macros, so `type-of` returns `"macro"` before reaching its `special-form` branch.
+   - **Corrected**: EDN description updated to the observed set with the explanation; `var-type-values` changed from `subset?` to exact-set equality so a phantom type cannot pass again. Filed [#67](https://github.com/nubank/clojuredocs/issues/67) for the dead `type-of` branch / stripped static `:type`.
+   - **Why**: Same class as #2 — the AI listed the values `type-of` *can* return (reading the `cond`), plus values the downstream UI/import code *accept*, rather than observing the actual type set on data. A `subset?` test masked the over-claim.
+   - **Prevent**: Assert the *exact* value set against the running system, never a superset. `subset?`-style checks pass silently when the schema over-claims.
+
+9. **EDN `:var` omitted `:no-doc`, which `var-keys` retains**
+
+   - **Claimed**: The `:var` entity enumerated the full key universe (and `var-key-universe-matches-schema` asserts `actual ⊆ schema`), but had no `:no-doc` attribute.
+   - **Discovered**: `search.clj` lists `:no-doc` in `var-keys`, so the gather pipeline retains it when present — yet the EDN had no entry. REPL confirmed 0/1572 current vars carry it, so the test passed *despite* the omission; the gap was latent (a future Clojure var with `:no-doc` would break the test and prove the schema incomplete).
+   - **Corrected**: Added `:no-doc` to `:var` with a new `:absent` status state ("retained by code but absent from current data"), coverage `0/1572`; added `:absent` to the test's `valid-states`.
+   - **Why**: The model was built from the *observed* key universe of current data; a key the code retains but no current var carries is invisible to a data-only scan. `var-keys` (the code's declared intent) was not reconciled against observed data.
+   - **Prevent**: Reconcile the schema against `search/var-keys` (the code's declared key set), not only against observed data. A test asserting `schema-var-keys ⊇ (var-keys ∪ pipeline-keys)` would catch it mechanically.
+
+10. **EDN gave DialectCompat cardinality as "~1400 var-dialect pairs" — wrong on both units**
+
+    - **Claimed**: `:dialect-compat :cardinality "~1400 var-dialect pairs"`.
+    - **Discovered**: REPL — `(count (:vars compat/dialect-compat))` returned 715; `(reduce + (map count (vals (:vars compat/dialect-compat))))` returned 1880. The figure matched neither vars (715) nor pairs (1880). No test guarded the count, so it went unnoticed.
+    - **Corrected**: Cardinality updated to `"715 vars / 1880 var-dialect pairs"` (REPL-verified). Filed [#69](https://github.com/nubank/clojuredocs/issues/69) to add a count test.
+    - **Why**: Plausible fabrication of a magnitude (#1) — a round "~1400" reads as reasonable for "a bit over a thousand entries" and was never checked. It was the only cardinality in the model with a `~` and no test.
+    - **Prevent**: Pin every cardinality to a REPL-verified integer and guard it with a test; treat `~`-prefixed approximate counts as unverified smells.
+
 ---
 
 ## Patterns
 
 Recurring failure modes observed across these errata:
 
-1. **Plausible fabrication** (#1, #3, #7): The AI generates attributes that are plausible for the domain but not present in the system, rather than attributes it *does* have based on code. The more reasonable the fabrication, the harder it is to catch without REPL verification. Erratum #7 shows this works in both directions — fabricating presence *and* fabricating absence.
+1. **Plausible fabrication** (#1, #3, #7, #10): The AI generates attributes that are plausible for the domain but not present in the system, rather than attributes it *does* have based on code. The more reasonable the fabrication, the harder it is to catch without REPL verification. Erratum #7 shows this works in both directions — fabricating presence *and* fabricating absence. Erratum #10 shows it applies to magnitudes too: a round "~1400" reads as reasonable and was never checked.
 
-2. **Code-reading ≠ data-reading** (#2): Reading source code that *selects for* a key is not the same as observing that key on actual runtime data. `select-keys` with a missing key omits it from the result silently — making this invisible to static analysis.
+2. **Code-reading ≠ data-reading** (#2, #8, #9): Reading source code that *selects for* a key is not the same as observing that key on actual runtime data. `select-keys` with a missing key omits it from the result silently — making this invisible to static analysis. Erratum #8 is the inverse: a value `type-of` *can* return, and the UI/import code *accept*, is never produced for the live data; #9 is a key `var-keys` retains but no current var carries.
 
 3. **Format limitations masked as content problems** (#4, #6): When the chosen format (CSV, Mermaid) can't express a needed distinction, the AI works around it by adding noise rather than questioning the format choice. The fix is always to choose a format that makes the distinction structural.
 
@@ -107,3 +131,4 @@ Recurring failure modes observed across these errata:
 |------|---------|
 | 2026-06-09 | Initial errata document with 6 entries from entity model work. Verified against REPL output and source code. |
 | 2026-06-09 | Added erratum #7 (LegacyVarRedirect `:library-url` omission). Updated pattern #1 to include bidirectional fabrication. |
+| 2026-06-09 | Added errata #8–#10 (Var `:type` phantom `"special-form"`, `:no-doc` omission, DialectCompat cardinality) from REPL verification of the EDN schema while reviewing the tests. Filed [#66](https://github.com/nubank/clojuredocs/issues/66)–[#70](https://github.com/nubank/clojuredocs/issues/70). Updated patterns #1 and #2. |
