@@ -43,7 +43,7 @@ Each erratum follows this structure:
 
    - **Claimed**: Namespace entity has 4 attributes: `:name`, `:doc`, `:added`, `:library-url`. CSV listed `:added` (source: "JVM heap (derived at startup)") and `:library-url` (source: "JVM heap (derived at startup)") as existing.
    - **Discovered**: REPL evaluation. `(keys (first (:namespaces search/clojure-lib)))` returned `(:doc :name)` — only 2 keys. `gather-namespace` in `search.clj` selects `:doc :no-doc :added` from ns metadata then adds `:name`, but `:no-doc` and `:added` are nil on most namespaces and absent from the resulting map (`select-keys` with a missing key omits that key from the result — there is no error or nil placeholder). `:library-url` is not added by `gather-namespace` — it's only on Var.
-   - **Corrected**: Not yet corrected — will be addressed in EDN schema.
+   - **Corrected**: The EDN omits `:library-url` from Namespace (its attrs are `:name`, `:doc`, `:added`). The stale CSV still shows it, but the CSV is now [superseded by the EDN](decisions.md) (banner header) and slated for retirement, so it will not be individually corrected.
    - **Why**: The AI read `gather-namespace` source and saw `(select-keys (meta (find-ns ns-sym)) [:doc :no-doc :added])` — correctly noting those keys are *selected for*, but incorrectly concluding they *exist* on the output. For `:library-url`, the AI likely copied it from Var's attribute list (where `gather-vars` adds it) to Namespace by analogy. The CSV marks it "exists (implicit)" which is a hedge that masks fabrication.
    - **Prevent**: Distinguish "code selects for this key" from "this key appears on output." REPL eval of `(keys ...)` on actual data is the only reliable check. The hedge "exists (implicit)" should be treated as a smell — if you need to qualify existence, verify it.
 
@@ -83,7 +83,7 @@ Each erratum follows this structure:
 
    - **Claimed**: CSV listed LegacyVarRedirect with 3 attributes: `function-id`, `ns`, `name`. No `:library-url` attribute.
    - **Discovered**: REPL evaluation of `(keys (first (mon/fetch :legacy-var-redirects)))` returned `(:_id :function-id :library-url :ns :name)` — 5 keys, not 3. Full-collection key frequency scan confirmed `:library-url` appears on all 1,654 documents.
-   - **Corrected**: Will be included in EDN schema.
+   - **Corrected**: The EDN's `:legacy-var-redirect` includes both `:_id` and `:library-url`. The CSV still omits them, but the CSV is now [superseded by the EDN](decisions.md) and slated for retirement, so it will not be individually corrected.
    - **Why**: Mirror image of erratum #2. The AI fabricated `:library-url` on Namespace (where it doesn't exist) by analogy from Var, while omitting it from LegacyVarRedirect (where it does exist). The AI listed only 3 of 5 keys — whether this was because LegacyVarRedirect was treated as a simple redirect table is speculation. The result: attributes that a documentation system would plausibly have were added where absent and omitted where present.
    - **Prevent**: The key-universe scan (`(mapcat keys) frequencies`) catches both fabrications and omissions in one pass. Run it on every MongoDB collection, not just the ones you expect to be interesting.
 
@@ -132,3 +132,4 @@ Recurring failure modes observed across these errata:
 | 2026-06-09 | Initial errata document with 6 entries from entity model work. Verified against REPL output and source code. |
 | 2026-06-09 | Added erratum #7 (LegacyVarRedirect `:library-url` omission). Updated pattern #1 to include bidirectional fabrication. |
 | 2026-06-09 | Added errata #8–#10 (Var `:type` phantom `"special-form"`, `:no-doc` omission, DialectCompat cardinality) from REPL verification of the EDN schema while reviewing the tests. Filed [#66](https://github.com/nubank/clojuredocs/issues/66)–[#70](https://github.com/nubank/clojuredocs/issues/70). Updated patterns #1 and #2. |
+| 2026-06-09 | Superseded the entity-model CSV with the EDN (banner header; retirement deferred to the #43 vision pass). Updated the "Corrected" status on errata #2 and #7 accordingly — they are resolved by the EDN plus CSV retirement, not by editing the CSV. See the [decision entry](decisions.md). |
