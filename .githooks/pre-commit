@@ -1,0 +1,14 @@
+#!/bin/sh
+# Pre-commit: validate OKF + RDF document metadata before the commit lands.
+# Enable once per clone:  bin/install-hooks   (or: git config core.hooksPath .githooks)
+# Bypass in a pinch:       git commit --no-verify
+#
+# Runs the same validator as CI and `lein test` (single source of truth).
+
+if ! command -v bb >/dev/null 2>&1; then
+  echo "pre-commit: babashka (bb) not found on PATH — skipping doc-metadata check." >&2
+  echo "            install bb or run with --no-verify to bypass." >&2
+  exit 0
+fi
+
+exec bb tools/validate_metadata.clj

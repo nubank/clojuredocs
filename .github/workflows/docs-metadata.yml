@@ -1,0 +1,33 @@
+name: docs-metadata
+
+# Authoritative remote gate for the OKF + RDF document-metadata convention.
+# Runs the same validator as the local pre-commit hook and `lein test`.
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'tools/validate_metadata.clj'
+      - 'docs/metadata-schema.edn'
+      - 'docs/context.jsonld'
+      - 'CLAUDE.md'
+      - '.github/workflows/docs-metadata.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'docs/**'
+      - 'tools/validate_metadata.clj'
+      - 'docs/metadata-schema.edn'
+      - 'docs/context.jsonld'
+
+jobs:
+  validate-docs-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install babashka
+        uses: DeLaGuardo/setup-clojure@12.5
+        with:
+          bb: latest
+      - name: Validate doc metadata
+        run: bb tools/validate_metadata.clj
