@@ -1,14 +1,19 @@
-> **Document metadata**
-> - **Created:** 2026-06-09
-> - **Last updated:** 2026-06-09
-> - **Tags:** rfc, entity-model, edn-schema, issue-43, datomic-migration
-> - **AI-assisted:** Yes — Claude Opus 4.6 via GitHub Copilot
-> - **Tools:** Calva REPL, MongoDB (seed data), workspace files
-> - **Review maturity:** L3 — human-verified via REPL evaluation
->
-> _All data in this RFC was verified against the running system via REPL on 2026-06-09. See [sidecar_repl.clj](../dev/sidecar_repl.clj) for the executable evidence. Caveat: the MongoDB collection counts and coverage figures are a point-in-time snapshot and are **not** test-guarded — they will drift (see §1 and [#66](https://github.com/nubank/clojuredocs/issues/66)). The JVM-heap entities are re-verified on every test run by [entity_model_test.clj](../test/clojuredocs/entity_model_test.clj)._
+---
+type: RFC
+title: "RFC: Entity-Attribute Model EDN Schema"
+description: "Replace the entity-model CSV with an EDN schema as the source of truth."
+tags: [rfc, entity-model, edn-schema, issue-43, datomic-migration]
+created: 2026-06-09
+modified: 2026-06-09
+ai_assisted: "Claude Opus 4.6 via GitHub Copilot"
+tools: "Calva REPL, MongoDB (seed data), workspace files"
+review_maturity: L3
+review_note: "human-verified via REPL evaluation"
+---
 
 # RFC: Entity-Attribute Model EDN Schema
+
+> _All data in this RFC was verified against the running system via REPL on 2026-06-09. See [sidecar_repl.clj](../dev/sidecar_repl.clj) for the executable evidence. Caveat: the MongoDB collection counts and coverage figures are a point-in-time snapshot and are **not** test-guarded — they will drift (see §1 and [#66](https://github.com/nubank/clojuredocs/issues/66)). The JVM-heap entities are re-verified on every test run by [entity_model_test.clj](../test/clojuredocs/entity_model_test.clj)._
 
 ## Context
 

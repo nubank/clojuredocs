@@ -1,18 +1,23 @@
-> **Document metadata**
-> - **Created:** 2026-06-01
-> - **Last updated:** 2026-06-16
-> - **Tags:** entity-model, data-model, mongodb, issue-43
-> - **AI-assisted:** Yes — Claude Opus 4.6 via GitHub Copilot (original); Claude Opus 4.8 via Claude Code (2026-06-09 verification + EDN promotion)
-> - **Session:** `41bcf361` (original); `c6580eec` (2026-06-09 update)
-> - **Tools:** GitHub MCP, workspace file access; Clojure MCP (live nREPL eval) for the 2026-06-09 verification
-> - **Agents/skills:** [backseat-driver](/.vscode/extensions/betterthantomorrow.calva-backseat-driver-0.0.34/assets/skills/backseat-driver/SKILL.md), [editing-clojure-files](/.vscode/extensions/betterthantomorrow.calva-backseat-driver-0.0.34/assets/skills/editing-clojure-files/SKILL.md)
-> - **Review maturity:** L4 — human-endorsed by Jordan Miller (2026-06-09); the JVM-heap entities (Library, Namespace, Var) and DialectCompat are REPL-verified and guarded by [`entity_model_test.clj`](../test/clojuredocs/entity_model_test.clj). Exception: MongoDB cardinalities/coverage remain L2 (snapshot-derived, not test-guarded — see [#66](https://github.com/nubank/clojuredocs/issues/66)).
->
-> _AI-assisted document. JVM-heap entities (Library, Namespace, Var) and DialectCompat are REPL-verified and enforced by tests; MongoDB cardinalities are derived from a one-time snapshot and are not yet test-guarded ([#66](https://github.com/nubank/clojuredocs/issues/66)). AI-generated content may contain errors — see [errata.md](errata.md)._
->
-> _**Scope — present-state only, so far.** Issue [#43](https://github.com/nubank/clojuredocs/issues/43) is to map the full data model: both what exists today **and** what the [2026 vision](2026vison.md) will require us to build. This model currently holds only the **verified present-state** — entities and attributes checked against the running system (`:status :exists`). The **envisioned future-state** — combing the vision to enumerate the entities/attributes that still need to be created (which carry `:status :gap` / `:planned`) — has not been done yet; the lone exception is `:dialect-compat`, which already carries a few `:gap` attributes. So "verified"/L4 reflects the present-state half; it is not a claim that the model is complete against the vision._
+---
+type: Data Model
+title: "ClojureDocs Entity-Attribute Model"
+description: "The verified present-state entity-attribute model of ClojureDocs (EDN-backed)."
+tags: [entity-model, data-model, mongodb, issue-43]
+created: 2026-06-01
+modified: 2026-06-16
+ai_assisted: "Claude Opus 4.6 via GitHub Copilot (original); Claude Opus 4.8 via Claude Code (2026-06-09 verification + EDN promotion)"
+session: "41bcf361 (original); c6580eec (2026-06-09 update)"
+tools: "GitHub MCP, workspace file access; Clojure MCP (live nREPL eval) for the 2026-06-09 verification"
+agents_skills: [backseat-driver, editing-clojure-files]
+review_maturity: L4
+review_note: "human-endorsed by Jordan Miller (2026-06-09); the JVM-heap entities (Library, Namespace, Var) and DialectCompat are REPL-verified and guarded by [`entity_model_test.clj`](../test/clojuredocs/entity_model_test.clj). Exception: MongoDB cardinalities/coverage remain L2 (snapshot-derived, not test-guarded — see [#66](https://github.com/nubank/clojuredocs/issues/66))."
+---
 
 # ClojureDocs Entity-Attribute Model
+
+> _AI-assisted document. JVM-heap entities (Library, Namespace, Var) and DialectCompat are REPL-verified and enforced by tests; MongoDB cardinalities are derived from a one-time snapshot and are not yet test-guarded ([#66](https://github.com/nubank/clojuredocs/issues/66)). AI-generated content may contain errors — see [errata.md](errata.md)._
+
+> _**Scope — present-state only, so far.** Issue [#43](https://github.com/nubank/clojuredocs/issues/43) is to map the full data model: both what exists today **and** what the [2026 vision](2026vison.md) will require us to build. This model currently holds only the **verified present-state** — entities and attributes checked against the running system (`:status :exists`). The **envisioned future-state** — combing the vision to enumerate the entities/attributes that still need to be created (which carry `:status :gap` / `:planned`) — has not been done yet; the lone exception is `:dialect-compat`, which already carries a few `:gap` attributes. So "verified"/L4 reflects the present-state half; it is not a claim that the model is complete against the vision._
 
 > **Open review items:** A [research-review pass (run 1)](entity-attribute-model_research-review_run_1.md) on 2026-06-16 cross-checked this doc against the [entity-model RFC](rfcs/entity-model-rfc.md). It corrected one RFC contradiction (dialect data — see [errata #12](errata.md)) and logged deferred link/sourcing fixes.
 

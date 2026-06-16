@@ -1,16 +1,21 @@
-> **Document metadata**
-> - **Created:** 2026-06-09
-> - **Last updated:** 2026-06-16
-> - **Tags:** errata, entity-model, ai-mistakes, issue-43
-> - **AI-assisted:** Yes — Claude Opus 4.6 via GitHub Copilot
-> - **Session:** `f16cfa81`
-> - **Tools:** GitHub MCP, workspace file access, Calva REPL
-> - **Agents/skills:** [backseat-driver](/.vscode/extensions/betterthantomorrow.calva-backseat-driver-0.0.34/assets/skills/backseat-driver/SKILL.md)
-> - **Review maturity:** L3 — human-verified via REPL evaluation
->
-> _Errata document. Records errors made by AI during entity model work (issue #43, PR #57), how they were discovered, and how to reduce similar errors. See also: [research guidance on errata](https://github.com/nubank/stu-ai-projects/tree/master/research-guidance.md#write-errata-not-silent-fixes)._
+---
+type: Errata
+title: "Entity Model Errata"
+description: "Errors made by AI during entity-model work, how they were discovered, and corrections."
+tags: [errata, entity-model, ai-mistakes, issue-43]
+created: 2026-06-09
+modified: 2026-06-16
+ai_assisted: "Claude Opus 4.6 via GitHub Copilot"
+session: "f16cfa81"
+tools: "GitHub MCP, workspace file access, Calva REPL"
+agents_skills: [backseat-driver]
+review_maturity: L3
+review_note: "human-verified via REPL evaluation"
+---
 
 # Entity Model Errata
+
+> _Errata document. Records errors made by AI during entity model work (issue #43, PR #57), how they were discovered, and how to reduce similar errors. Principle: write errata, not silent fixes._
 
 <!-- Errata are errors discovered and subsequently corrected. Each entry states what was
      wrong, how the error was discovered and proved, the correction, why the AI likely
