@@ -1,6 +1,6 @@
 > **Document metadata**
 > - **Created:** 2026-06-01
-> - **Last updated:** 2026-06-09
+> - **Last updated:** 2026-06-16
 > - **Tags:** entity-model, data-model, mongodb, issue-43
 > - **AI-assisted:** Yes — Claude Opus 4.6 via GitHub Copilot (original); Claude Opus 4.8 via Claude Code (2026-06-09 verification + EDN promotion)
 > - **Session:** `41bcf361` (original); `c6580eec` (2026-06-09 update)
@@ -13,6 +13,8 @@
 > _**Scope — present-state only, so far.** Issue [#43](https://github.com/nubank/clojuredocs/issues/43) is to map the full data model: both what exists today **and** what the [2026 vision](2026vison.md) will require us to build. This model currently holds only the **verified present-state** — entities and attributes checked against the running system (`:status :exists`). The **envisioned future-state** — combing the vision to enumerate the entities/attributes that still need to be created (which carry `:status :gap` / `:planned`) — has not been done yet; the lone exception is `:dialect-compat`, which already carries a few `:gap` attributes. So "verified"/L4 reflects the present-state half; it is not a claim that the model is complete against the vision._
 
 # ClojureDocs Entity-Attribute Model
+
+> **Open review items:** A [research-review pass (run 1)](entity-attribute-model_research-review_run_1.md) on 2026-06-16 cross-checked this doc against the [entity-model RFC](rfcs/entity-model-rfc.md). It corrected one RFC contradiction (dialect data — see [errata #12](errata.md)) and logged deferred link/sourcing fixes.
 
 ### Markers
 
@@ -41,7 +43,7 @@ The machine-readable source of truth for entities and attributes is [`entity-att
 | **Deletion** | Examples: soft-delete (`deleted-at`). Notes & SeeAlsos: hard-delete (`mon/destroy!`) | Inconsistent audit trail — examples have history, notes and see-alsos vanish without trace |
 | **Authorization** | Author-only delete for all three. Example editing: any logged-in user. Note editing: author-only in UI (`can-edit?`) but no authorship check at the API level ⚠ [#54](https://github.com/nubank/clojuredocs/issues/54) | No moderation, no admin, no flagging |
 | **Export contract** | `clojuredocs-export.json` consumed by Calva, CIDER | Schema changes risk breaking downstream |
-| **Dialect data** | Static EDN file, attribute of Var | Richer dialect metadata (test links, per-dialect versioning) would likely require promoting this to its own entity, though alternatives exist |
+| **Dialect data** | Its own entity (`:dialect-compat`), loaded from `resources/dialect-compat.edn` at startup and keyed by var — **not** stored on Var documents | Already modeled as a standalone entity per [RFC §5 OQ2](rfcs/entity-model-rfc.md); vision keys (`:version`, `:test-suite-url`, `:verified-at`) are tracked as `:gap` attributes in the [EDN](entity-attribute-model.edn). No future "promotion" step needed |
 
 ## Vestigial Collections
 
@@ -81,3 +83,4 @@ The following collections are called by `add-all-indexes!` but have no active qu
 | 2026-06-09 | Promoted the EDN to source of truth (now REPL-verified and guarded by `entity_model_test.clj`). Corrected the stale "read from source, not the running system" framing. Bumped to L3 (JVM-heap entities; Mongo cardinalities remain L2 pending [#66](https://github.com/nubank/clojuredocs/issues/66)). Logged errata #8–#10 and filed [#66](https://github.com/nubank/clojuredocs/issues/66)–[#70](https://github.com/nubank/clojuredocs/issues/70) during verification. |
 | 2026-06-09 | Endorsed to L4 by Jordan Miller for the JVM-heap entities (REPL-verified + test-guarded). MongoDB cardinalities explicitly held at L2 pending [#66](https://github.com/nubank/clojuredocs/issues/66). |
 | 2026-06-09 | Corrected the claim that the canonical visual lives in Miro and that a PDF is checked into the repo (none exists). Per review with Alex, the EDN/data is the first deliverable and review artifact; the Miro visual is the eventual goal (errata #11). |
+| 2026-06-16 | Cross-checked claims against the [entity-model RFC](rfcs/entity-model-rfc.md) and corrected the "Dialect data" Key Observation, which described `dialect-compat` as an attribute of Var — the RFC ([§5 OQ2](rfcs/entity-model-rfc.md)) and the [EDN](entity-attribute-model.edn) model it as its own entity (errata #12). Ran `/research-review`; deferred link and sourcing fixes logged in [run 1](entity-attribute-model_research-review_run_1.md). |

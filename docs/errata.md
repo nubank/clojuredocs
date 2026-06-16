@@ -1,6 +1,6 @@
 > **Document metadata**
 > - **Created:** 2026-06-09
-> - **Last updated:** 2026-06-09
+> - **Last updated:** 2026-06-16
 > - **Tags:** errata, entity-model, ai-mistakes, issue-43
 > - **AI-assisted:** Yes — Claude Opus 4.6 via GitHub Copilot
 > - **Session:** `f16cfa81`
@@ -119,6 +119,14 @@ Each erratum follows this structure:
     - **Why**: The doc described the intended end-state (Miro canonical + PDF in repo) as if already done — aspirational state written as current fact, the same class as errata #1 and #2.
     - **Prevent**: Before claiming an artifact is "checked into the repo," verify it exists (`git ls-files`). Keep "the plan" and "the current state" distinct in prose.
 
+12. **Model doc described DialectCompat as an attribute of Var; it is its own entity**
+
+    - **Claimed**: [entity-attribute-model.md](entity-attribute-model.md) Key Observations listed "Dialect data | Static EDN file, attribute of Var" and said richer dialect metadata "would likely require promoting this to its own entity" — framing promotion as a future step.
+    - **Discovered**: Cross-checking the model doc against the [entity-model RFC](rfcs/entity-model-rfc.md) during a `/research-review` pass. RFC [§5 Open Question 2](rfcs/entity-model-rfc.md) marks this **Resolved**: dialect data lives in its own file (`dialect-compat.edn`), keyed by var, not on Var documents — "No 'future promotion' step needed." The [EDN](entity-attribute-model.edn) models `:dialect-compat` as a top-level entity with `:source "edn-file"`, and `entity_model_test.clj` guards it as one. The model doc's own metadata already called DialectCompat a verified entity, so the Key Observations row contradicted the rest of its own document.
+    - **Corrected**: Rewrote the "Dialect data" row to state it is its own entity (`:dialect-compat`), loaded from `resources/dialect-compat.edn` and keyed by var, with vision keys (`:version`, `:test-suite-url`, `:verified-at`) tracked as `:gap`.
+    - **Why**: Aspirational/older framing written as current fact — the same class as errata #1, #2, and #11. The "would likely require promoting" wording predates the RFC's resolution and was not reconciled when the EDN promoted dialect-compat to an entity.
+    - **Prevent**: When a decision is resolved in the RFC, grep the companion docs for the superseded framing. A doc-level consistency check (does every Key Observation match the EDN's entity/attribute structure?) would catch a summary table drifting from the source of truth.
+
 ---
 
 ## Patterns
@@ -142,3 +150,4 @@ Recurring failure modes observed across these errata:
 | 2026-06-09 | Added errata #8–#10 (Var `:type` phantom `"special-form"`, `:no-doc` omission, DialectCompat cardinality) from REPL verification of the EDN schema while reviewing the tests. Filed [#66](https://github.com/nubank/clojuredocs/issues/66)–[#70](https://github.com/nubank/clojuredocs/issues/70). Updated patterns #1 and #2. |
 | 2026-06-09 | Superseded the entity-model CSV with the EDN (banner header; retirement deferred to the #43 vision pass). Updated the "Corrected" status on errata #2 and #7 accordingly — they are resolved by the EDN plus CSV retirement, not by editing the CSV. See the [decision entry](decisions.md). |
 | 2026-06-09 | Added erratum #11 (claimed a Miro PDF was checked into the repo; none exists). Corrected the model doc and PR #57 to put data first, with the Miro visual as an eventual goal — per review with Alex. |
+| 2026-06-16 | Added erratum #12 (model doc described DialectCompat as an attribute of Var; the RFC and EDN model it as its own entity). Found during a `/research-review` cross-check against the RFC. |
