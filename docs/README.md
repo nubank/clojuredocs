@@ -1,3 +1,15 @@
+---
+type: Reference
+title: Documentation
+description: Documentation map for the nubank/clojuredocs repo.
+tags: [docs, index, navigation]
+created: 2026-06-09
+modified: 2026-06-09
+ai_assisted: "Claude Opus 4.6 via GitHub Copilot"
+review_maturity: L2
+review_note: Human-reviewed via PR.
+---
+
 # Documentation
 
 Doc map for [nubank/clojuredocs](https://github.com/nubank/clojuredocs).

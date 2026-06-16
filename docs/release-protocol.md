@@ -1,3 +1,14 @@
+---
+type: Reference
+title: Release & Announcement Protocol
+description: Status-quo audit of how we ship and announce changes.
+tags: [release, deploy, protocol, audit]
+created: 2026-03-13
+modified: 2026-03-18
+review_maturity: L1
+review_note: Status-quo audit; inherited infra not yet verified — see [goal] markers in body.
+---
+
 # Release & Announcement Protocol
 
 How we ship and communicate changes for the public Nubank fork of ClojureDocs.
