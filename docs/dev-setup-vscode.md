@@ -1,3 +1,14 @@
+---
+type: Guide
+title: VS Code + Calva
+description: Editor-specific setup notes for contributors using VS Code with Calva.
+tags: [dev-setup, vscode, calva]
+created: 2026-02-27
+modified: 2026-03-04
+review_maturity: L2
+review_note: Human-authored setup notes; frontmatter added during OKF migration.
+---
+
 # VS Code + Calva
 
 Editor-specific notes for contributors using VS Code with [Calva](https://calva.io/). See [dev-setup.md](dev-setup.md) for general environment setup (MongoDB, env vars, etc.).

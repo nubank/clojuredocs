@@ -1,3 +1,15 @@
+---
+type: Research
+title: Data Model Coupling Audit
+description: Audit of data-model coupling in the current clojuredocs architecture.
+tags: [research, data-model, coupling, audit]
+created: 2026-03-11
+modified: 2026-03-11
+ai_assisted: "Claude Opus 4.6 via GitHub Copilot"
+review_maturity: L1
+review_note: AI-drafted research; see in-body disclaimer — verify against the repo.
+---
+
 # Data Model Coupling Audit
 
 > **AI Disclaimer**: This research was conducted and drafted by Claude (Opus 4.6) via GitHub Copilot in VS Code. Trust nothing — AI-generated content may contain false statements. All code references should be verified against the repository at the time of reading.
@@ -12,7 +24,7 @@ Evaluate the accuracy of three candidate problem statements about the ClojureDoc
 
 ## Research Context
 
-- **Model**: Claude Opus 4.6 (via GitHub Copilot + Calva w Clojure MPC Server), applied "research-analyst" agent stolen from stu-ai-projects
+- **Model**: Claude Opus 4.6 (via GitHub Copilot + Calva w Clojure MCP Server), applied a "research-analyst" agent adapted from an internal agent definition
 - **Token-intensive context**: ~15 source files read across `src/clj/`, `src/cljs/`, and `src/cljc/` directories; ~3,500 lines of code inspected
 - **Search patterns used**: `schema.core|s/Str|s/Int|s/Any`, `:library-url`, `:var\.ns|:var\.name|:from-var|:to-var`, plus broad file-structure and content exploration
 - **Key files examined**:
