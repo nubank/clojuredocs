@@ -1,0 +1,7 @@
+#!/bin/sh
+# Enable this repo's git hooks (pre-commit doc-metadata validation).
+# Run once after cloning:  bin/install-hooks
+set -e
+git config core.hooksPath .githooks
+echo "Git hooks enabled (core.hooksPath = .githooks)."
+echo "pre-commit will run: bb tools/validate_metadata.clj"
