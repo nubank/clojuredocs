@@ -15,6 +15,10 @@
 
 (def schema (edn/read-string (slurp "docs/metadata-schema.edn")))
 
+;; Hints built from the schema so error messages list the actual allowed values.
+(def types-hint    (str/join ", " (sort (:types schema))))
+(def maturity-hint (str/join "/"  (sort (:review-maturity schema))))
+
 (defn md-files []
   (->> (file-seq (io/file "docs"))
        (filter #(.isFile %))
@@ -55,28 +59,38 @@
         err! #(swap! errs conj %) warn! #(swap! warns conj %)
         fm (extract-frontmatter content)]
     (if-not fm
-      (err! "missing YAML frontmatter (file must start with `---` on line 1)")
+      (err! "no YAML frontmatter — add a `---` … `---` block at the very top of the file, with at least `type:` (see CLAUDE.md)")
       (let [data (try (yaml/parse-string fm)
-                      (catch Exception e (err! (str "YAML parse error: " (.getMessage e))) nil))]
+                      (catch Exception e
+                        (err! (str "frontmatter is not valid YAML: " (.getMessage e)
+                                   " — check indentation and that values with `:` or `#` are quoted"))
+                        nil))]
         (when data
           (let [t (:type data)]
             (cond
-              (or (nil? t) (str/blank? (str t))) (err! "missing required key `type`")
+              (or (nil? t) (str/blank? (str t)))
+              (err! (str "missing required key `type` — add `type:` set to one of: " types-hint
+                         " (extend docs/metadata-schema.edn to add a new one)"))
               (not (contains? (:types schema) (str t)))
-              (warn! (str "type \"" t "\" not in taxonomy"))))
+              (warn! (str "type \"" t "\" is not in the taxonomy (" types-hint
+                          ") — fix the value, or add it to :types in docs/metadata-schema.edn if intentional"))))
           (when-let [rm (:review_maturity data)]
             (when-not (contains? (:review-maturity schema) (str rm))
-              (err! (str "invalid review_maturity \"" rm "\" (expected one of L0–L4)"))))
+              (err! (str "invalid review_maturity \"" rm "\" — use one of " maturity-hint
+                         " (L0 AI-generated → L4 human-endorsed; see CLAUDE.md)"))))
           (doseq [k (:date-keys schema)]
             (when (contains? data k)
               (let [raw (raw-value fm k)]
                 (when-not (date-ok? raw)
-                  (err! (str (name k) " is not a valid YYYY-MM-DD date: " (pr-str (or raw (get data k)))))))))
+                  (err! (str (name k) ": " (pr-str (or raw (get data k)))
+                             " is not a valid date — use a zero-padded ISO date `YYYY-MM-DD`, e.g. 2026-06-16"
+                             " (pad single-digit months/days: 2026-6-6 → 2026-06-06)"))))))
           (when (and (contains? data :tags) (not (sequential? (:tags data))))
-            (warn! "`tags` should be a YAML list, e.g. [a, b]"))
+            (warn! "`tags` must be a YAML list in square brackets, e.g. tags: [data-model, edn-schema]"))
           (doseq [k (keys data)]
             (when-not (contains? (:known-keys schema) k)
-              (warn! (str "unknown key `" (name k) "` (typo, or add it to the schema)")))))))
+              (warn! (str "unknown key `" (name k) "` — check the spelling against the field list in CLAUDE.md,"
+                          " or add it to :known-keys in docs/metadata-schema.edn")))))))
     {:path path :errors @errs :warnings @warns}))
 
 (defn validate-bundle-root [content]
@@ -99,7 +113,8 @@
   (let [ctx (-> (:context-file schema) slurp json/parse-string (get "@context"))
         expected (remove (:context-exempt schema) (:known-keys schema))
         missing (remove #(contains? ctx (name %)) expected)]
-    (map #(str "docs/context.jsonld is missing a mapping for `" (name %) "`") missing)))
+    (map #(str "docs/context.jsonld is missing a JSON-LD mapping for `" (name %)
+               "` — add it under @context (e.g. \"" (name %) "\": \"dcterms:" (name %) "\")") missing)))
 
 (defn run []
   (let [files     (md-files)
