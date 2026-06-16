@@ -4,7 +4,7 @@ title: Dev Environment Setup
 description: Notes for getting a local development environment running.
 tags: [dev-setup, mongodb, leiningen]
 created: 2026-02-27
-modified: 2026-02-27
+modified: 2026-06-16
 review_maturity: L2
 review_note: Human-authored setup notes; frontmatter added during OKF migration.
 ---
@@ -18,6 +18,23 @@ Supplementary notes for getting a local development environment running. See als
 - Java (JDK 8+)
 - [Leiningen](https://leiningen.org)
 - MongoDB running locally
+- [babashka](https://babashka.org) (`bb`) — for repo tooling and the doc-metadata pre-commit hook
+
+## Git hooks
+
+Enable the repo's pre-commit hook so document metadata is validated before each commit:
+
+```bash
+bin/install-hooks
+```
+
+This points `core.hooksPath` at `.githooks`; the hook runs `bb tools/validate_metadata.clj` — the same check CI runs. Validate manually any time with:
+
+```bash
+bb tools/validate_metadata.clj
+```
+
+See [CLAUDE.md](../CLAUDE.md) for the metadata convention and the [OKF metadata RFC](rfcs/okf-metadata-rfc.md) for rationale.
 
 ## MongoDB
 

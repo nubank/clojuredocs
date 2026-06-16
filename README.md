@@ -13,6 +13,10 @@ A few ways to contribute:
 * Suggestions on how to make development on the site more friendly
   (docs, codebase organization).
 
+Docs under `docs/` follow a metadata convention (see [CLAUDE.md](CLAUDE.md));
+run `bin/install-hooks` once to enable the pre-commit check, or validate with
+`bb tools/validate_metadata.clj`.
+
 Let's use GH issues for discussion for now
 
 If you're looking for a project:
@@ -51,6 +55,7 @@ the full release checklist, SSH setup, and smoke tests.
 * [lein](http://leiningen.org)
 * [foreman](https://github.com/ddollar/foreman) (see `Procfile`, `bin/dev`)
 * [entr](http://entrproject.org/) (available in homebrew)
+* [babashka](https://babashka.org) (`bb`) (repo tooling + doc-metadata hook)
 * MongoDB
 
 

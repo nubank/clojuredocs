@@ -34,6 +34,26 @@ Regenerate when any of these change:
 
 The generated file includes a `:versions` header for traceability.
 
+## `validate_metadata.clj`
+
+Validates the OKF + RDF YAML frontmatter on every prose doc under `docs/` against
+[`docs/metadata-schema.edn`](../docs/metadata-schema.edn) (the source of truth). Enforces the convention in
+[CLAUDE.md](../CLAUDE.md) and [docs/rfcs/okf-metadata-rfc.md](../docs/rfcs/okf-metadata-rfc.md).
+
+### How to run
+
+```sh
+bb tools/validate_metadata.clj   # from the repo root
+```
+
+Prints `PASS`/`FAIL` per document and a summary. **Exits non-zero if any document has an error**, so it can
+gate a commit or a CI job. Errors fail the run (missing frontmatter, missing required `type`, invalid
+`review_maturity`, malformed date); unknown `type` values and unknown keys are warnings. Also checks that
+every schema key has a JSON-LD mapping in [`docs/context.jsonld`](../docs/context.jsonld).
+
+Requires **babashka** (`bb`) on `$PATH` — it uses bb's bundled `clj-yaml` and `cheshire`, so no JVM or lein
+dependencies are needed.
+
 ## Other scripts
 
 | Script | Purpose |
