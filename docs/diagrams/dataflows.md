@@ -1,16 +1,21 @@
-> **Document metadata**
-> - **Created:** 2026-06-01
-> - **Last updated:** 2026-06-05
-> - **Tags:** diagrams, dataflow, architecture
-> - **AI-assisted:** Yes — Claude Opus 4.6 via GitHub Copilot
-> - **Session:** `41bcf361`
-> - **Tools:** GitHub MCP, workspace file access
-> - **Agents/skills:** [backseat-driver](/.vscode/extensions/betterthantomorrow.calva-backseat-driver-0.0.34/assets/skills/backseat-driver/SKILL.md)
-> - **Review maturity:** L1 — human-directed, not yet verified against running system
->
-> _AI-assisted document. Flows were traced by reading source code — verify against a running instance for runtime accuracy._
+---
+type: Diagram
+title: "ClojureDocs Data Flows"
+description: "Data flows through the ClojureDocs app, traced from source code."
+tags: [diagrams, dataflow, architecture]
+created: 2026-06-01
+modified: 2026-06-05
+ai_assisted: "Claude Opus 4.6 via GitHub Copilot"
+session: "41bcf361"
+tools: "GitHub MCP, workspace file access"
+agents_skills: [backseat-driver]
+review_maturity: L1
+review_note: "human-directed, not yet verified against running system"
+---
 
 # ClojureDocs Data Flows
+
+> _AI-assisted document. Flows were traced by reading source code — verify against a running instance for runtime accuracy._
 
 ## 1. Startup Flow
 

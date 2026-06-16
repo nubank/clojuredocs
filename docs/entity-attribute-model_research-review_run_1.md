@@ -1,14 +1,19 @@
-> **Document metadata**
-> - **Created:** 2026-06-16
-> - **Last updated:** 2026-06-16
-> - **Tags:** review, research-review, entity-model, issue-43
-> - **AI-assisted:** Yes — Claude Opus 4.8 (1M context) via Claude Code
-> - **Tools:** workspace files; claims-auditor + link-auditor subagents; git
-> - **Review maturity:** L1 — human-directed review log, findings not yet actioned by a human
->
-> _Review log produced by `/research-review` on [entity-attribute-model.md](entity-attribute-model.md), plus a cross-check of its claims against [entity-model-rfc.md](rfcs/entity-model-rfc.md). Straightforward fixes were applied in the same pass and are marked **FIXED**; the rest are deferred for human action. AI-generated — verify before actioning._
+---
+type: Review
+title: "Research-review run 1 — entity-attribute-model.md"
+description: "Claims/link audit of the entity-attribute model; fixes applied and items deferred."
+tags: [review, research-review, entity-model, issue-43]
+created: 2026-06-16
+modified: 2026-06-16
+ai_assisted: "Claude Opus 4.8 (1M context) via Claude Code"
+tools: "workspace files; claims-auditor + link-auditor subagents; git"
+review_maturity: L1
+review_note: "human-directed review log, findings not yet actioned by a human"
+---
 
 # Research-review run 1 — entity-attribute-model.md
+
+> _Review log produced by `/research-review` on [entity-attribute-model.md](entity-attribute-model.md), plus a cross-check of its claims against [entity-model-rfc.md](rfcs/entity-model-rfc.md). Straightforward fixes were applied in the same pass and are marked **FIXED**; the rest are deferred for human action. AI-generated — verify before actioning._
 
 Reviewed document: [entity-attribute-model.md](entity-attribute-model.md) (at commit `1483209`).
 Cross-checked against: [entity-model-rfc.md](rfcs/entity-model-rfc.md), [errata.md](errata.md), [entity-attribute-model.edn](entity-attribute-model.edn).
