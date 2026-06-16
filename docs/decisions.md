@@ -5,9 +5,10 @@ description: Design and architecture decisions; lightweight alternative to full 
 tags: [decisions, architecture, living-document]
 created: 2026-04-29
 modified: 2026-06-16
+creator: L. Jordan Miller
 ai_assisted: "Claude Opus 4.8 via Claude Code"
-review_maturity: L2
-review_note: Decisions reflect the team's choices; rationale text AI-drafted from human direction.
+review_maturity: L4
+review_note: Human-endorsed — decisions are the team's; AI-drafted rationale is owned by the author.
 ---
 
 # Decision Log
