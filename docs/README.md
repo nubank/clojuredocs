@@ -4,7 +4,7 @@ title: Documentation
 description: Documentation map for the nubank/clojuredocs repo.
 tags: [docs, index, navigation]
 created: 2026-06-09
-modified: 2026-06-09
+modified: 2026-06-16
 ai_assisted: "Claude Opus 4.6 via GitHub Copilot"
 review_maturity: L2
 review_note: Human-reviewed via PR.
@@ -22,6 +22,7 @@ Doc map for [nubank/clojuredocs](https://github.com/nubank/clojuredocs).
 | [Glossary](glossary.md) | Domain terms and definitions |
 | [Decisions](decisions.md) | Decision log — design and architecture choices |
 | [Library Layers](lib-layers.md) | Dependency layers of the codebase |
+| [OKF Metadata RFC](rfcs/okf-metadata-rfc.md) | Document-metadata convention (OKF + RDF frontmatter) and its enforcement |
 
 ## Development
 
