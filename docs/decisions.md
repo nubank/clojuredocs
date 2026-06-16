@@ -275,11 +275,11 @@ Decided
 Decided
 
 ### Context
-- Sandra reviewed PR #57 and discovered Claude produced two separate ER diagrams instead of the single unified diagram specified in the 2026-06-01 decision entry.
+- Sierra reviewed PR #57 and discovered Claude produced two separate ER diagrams instead of the single unified diagram specified in the 2026-06-01 decision entry.
 - The entity-model.md header says "Solid lines = exists today. Dashed lines = required by vision" but the diagrams don't deliver this — they are two disconnected `erDiagram` blocks.
 - No formal legend or key exists for reading the diagram.
 - No order-of-magnitude grounding: the diagram doesn't communicate that there is 1 Library (hardcoded singleton), ~30 Namespaces, ~700 Vars, and thousands of Examples.
-- Sierra's ["Developing the Language of the Domain"](https://www.cognitect.com/blog/2017/4/6/developing-the-language-of-the-domain) (Cognitect, 2017) reinforces that models need facets and ground truth to be useful — a diagram without a legend or sense of scale fails to communicate the domain.
+- Separately, Sierra's ["Developing the Language of the Domain"](https://www.cognitect.com/blog/2017/4/6/developing-the-language-of-the-domain) (Cognitect, 2017) argues for building a precise, shared vocabulary for the domain — naming entities and attributes the way the team actually talks about the system. That is a naming/vocabulary point, distinct from the legend-and-scale rationale above; the blog does not speak to diagram legends or scale.
 
 ### Decision
 - Correct the entity model to be a single unified diagram with a formal legend distinguishing current-state entities from vision-gap entities, and annotate entities with approximate cardinality.
@@ -313,7 +313,7 @@ Decided
 - The AI-generated ER diagram in PR #57 deviated from the stated design (two diagrams instead of one, no legend, no magnitude).
 - Miro is the team's standard diagramming tool. Mermaid ER diagrams have rendering limitations (no dashed lines, no annotations) that constrain what can be expressed in-repo.
 - Jordan's pedagogical framework is constructivism: learning happens through the act of constructing and correcting mental models, not through passively receiving correct output.
-- Sandra recommended correcting the diagram by hand as the most effective way to internalize the domain model.
+- Sierra observed that humans infer meaning from spatial relationships — proximity, above/below, left-to-right — which a person expresses intuitively when arranging a diagram by hand and which an algorithmically-generated layout usually lacks. (She also noted the converse advantage of generated diagrams: they show only the relationships actually expressed in the model, without hidden assumptions.) The team took this as motivation to correct the diagram by hand to internalize the domain model.
 
 ### Decision
 - Import the existing diagram into Miro and manually correct it rather than having AI regenerate it, to ensure active engagement with the domain structure.

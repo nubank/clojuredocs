@@ -79,7 +79,7 @@ Each erratum follows this structure:
 6. **PR had two Mermaid ER diagrams instead of one**
 
    - **Claimed**: The entity-attribute-model.md in PR #57 contained two separate Mermaid `erDiagram` blocks.
-   - **Discovered**: Sandra (PR reviewer) flagged this during code review — "there are 2 diagrams, should be 1."
+   - **Discovered**: Sierra (PR reviewer) flagged this during code review — "there are 2 diagrams, should be 1."
    - **Corrected**: Both diagrams were subsequently removed entirely (replaced by Miro + EDN strategy).
    - **Why**: The first diagram covered "existing" entities and the second covered "gap" entities. The AI split them because Mermaid's `erDiagram` has no built-in way to visually distinguish entity status (solid vs. dashed lines). Rather than finding a single-diagram solution, the AI created two diagrams — doubling the maintenance surface and confusing the reader.
    - **Prevent**: When a tool can't express a distinction you need, that's a signal to question the tool choice — not to work around it by duplicating artifacts. This ultimately led to the decision to drop Mermaid entirely.
@@ -132,19 +132,37 @@ Each erratum follows this structure:
     - **Why**: Aspirational/older framing written as current fact — the same class as errata #1, #2, and #11. The "would likely require promoting" wording predates the RFC's resolution and was not reconciled when the EDN promoted dialect-compat to an entity.
     - **Prevent**: When a decision is resolved in the RFC, grep the companion docs for the superseded framing. A doc-level consistency check (does every Key Observation match the EDN's entity/attribute structure?) would catch a summary table drifting from the source of truth.
 
+13. **Misattributed a statement to the PR reviewer, and got the reviewer's name wrong**
+
+    - **Claimed**: [decisions.md](decisions.md) named the PR #57 reviewer "Sandra" (also in erratum #6) and attributed to her the recommendation to correct the diagram by hand "as the most effective way to internalize the domain model."
+    - **Discovered**: PR #57 review. The reviewer is Stuart Sierra ([`lambdasierra`](https://github.com/lambdasierra)), not "Sandra." Sierra replied to the hand-correction bullet: *"Did I? I don't remember saying this. 😆"* — what she actually said was that humans infer meaning from spatial relationships a hand-arranged diagram encodes and a generated layout lacks, while generated diagrams have the converse advantage of showing only relationships actually in the model.
+    - **Corrected**: Renamed "Sandra" → "Sierra" in both 2026-06-05 decision entries and erratum #6; replaced the fabricated recommendation with Sierra's actual observation (spatial-relationship meaning + the converse advantage of generated diagrams), and framed the hand-correction as the team's own inference, not her recommendation.
+    - **Why**: Plausible fabrication (pattern #1) applied to attribution — the AI invented both a name and a named person endorsing the chosen course, neither verified against the review thread.
+    - **Prevent**: Attribute statements only to a verifiable source (the PR thread, a quoted message). Never paraphrase a reviewer's position into an endorsement of your decision.
+
+14. **Bent a cited source to support an unrelated claim**
+
+    - **Claimed**: [decisions.md](decisions.md) cited Sierra's ["Developing the Language of the Domain"](https://www.cognitect.com/blog/2017/4/6/developing-the-language-of-the-domain) as reinforcing that "a diagram without a legend or sense of scale fails to communicate the domain."
+    - **Discovered**: PR #57 review. Sierra: *"the rest of the sentence doesn't make sense… My blog post doesn't say anything about diagram legends or scale."* Two unrelated clauses had been welded across an em-dash.
+    - **Corrected**: Recast the citation to what the blog actually argues — developing a precise, shared vocabulary for the domain — and stated explicitly that it does not speak to legends or scale, separating it from the legend-and-scale rationale it had been fused to.
+    - **Why**: Citation as decoration rather than evidence — a real source attached to a sentence it does not support, to lend borrowed authority.
+    - **Prevent**: A citation must support the specific sentence it is attached to. If the source does not make the claim, cite it for what it does say, or drop it.
+
 ---
 
 ## Patterns
 
 Recurring failure modes observed across these errata:
 
-1. **Plausible fabrication** (#1, #3, #7, #10): The AI generates attributes that are plausible for the domain but not present in the system, rather than attributes it *does* have based on code. The more reasonable the fabrication, the harder it is to catch without REPL verification. Erratum #7 shows this works in both directions — fabricating presence *and* fabricating absence. Erratum #10 shows it applies to magnitudes too: a round "~1400" reads as reasonable and was never checked.
+1. **Plausible fabrication** (#1, #3, #7, #10, #13): The AI generates attributes that are plausible for the domain but not present in the system, rather than attributes it *does* have based on code. The more reasonable the fabrication, the harder it is to catch without REPL verification. Erratum #7 shows this works in both directions — fabricating presence *and* fabricating absence. Erratum #10 shows it applies to magnitudes too: a round "~1400" reads as reasonable and was never checked. Erratum #13 extends it to attribution — inventing a named person, and their name, endorsing the chosen course.
 
 2. **Code-reading ≠ data-reading** (#2, #8, #9): Reading source code that *selects for* a key is not the same as observing that key on actual runtime data. `select-keys` with a missing key omits it from the result silently — making this invisible to static analysis. Erratum #8 is the inverse: a value `type-of` *can* return, and the UI/import code *accept*, is never produced for the live data; #9 is a key `var-keys` retains but no current var carries.
 
 3. **Format limitations masked as content problems** (#4, #6): When the chosen format (CSV, Mermaid) can't express a needed distinction, the AI works around it by adding noise rather than questioning the format choice. The fix is always to choose a format that makes the distinction structural.
 
 4. **Context loss across sessions** (#5): AI cannot reliably track what it has already produced across context window boundaries. Mechanical checks (grep before append) are more reliable than memory.
+
+5. **Citations as decoration** (#14): A real source attached to a sentence it does not support, to borrow authority. The fix is to cite a source only for the claim it actually makes — or drop the citation.
 
 ## Version History
 
@@ -156,3 +174,4 @@ Recurring failure modes observed across these errata:
 | 2026-06-09 | Superseded the entity-model CSV with the EDN (banner header; retirement deferred to the #43 vision pass). Updated the "Corrected" status on errata #2 and #7 accordingly — they are resolved by the EDN plus CSV retirement, not by editing the CSV. See the [decision entry](decisions.md). |
 | 2026-06-09 | Added erratum #11 (claimed a Miro PDF was checked into the repo; none exists). Corrected the model doc and PR #57 to put data first, with the Miro visual as an eventual goal — per review with Alex. |
 | 2026-06-16 | Added erratum #12 (model doc described DialectCompat as an attribute of Var; the RFC and EDN model it as its own entity). Found during a `/research-review` cross-check against the RFC. |
+| 2026-06-16 | Added errata #13 (misattributed a recommendation to the reviewer, and got her name wrong — "Sandra" → Sierra) and #14 (cited Sierra's blog for a claim it does not make). Fixed the name in erratum #6 and both 2026-06-05 decision entries. Found in the PR #57 review. Added pattern #5 (citations as decoration). |

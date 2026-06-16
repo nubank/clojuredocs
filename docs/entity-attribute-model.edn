@@ -67,12 +67,12 @@
                      :description "GitHub tag URL for the release"
                      :status {:state :exists :verified "2026-06-09"
                               :evidence "sidecar_repl.clj — (dissoc search/clojure-lib :vars :namespaces)"}}
-    :namespaces     {:type :vector :required? true
-                     :description "Vector of namespace maps (38 entries)"
+    :namespaces     {:type :vector :refs :namespace :required? true
+                     :description "Vector of namespace maps (38 entries). Implicitly a ref to :namespace (PR #57 review, @puredanger)."
                      :status {:state :exists :verified "2026-06-09"
                               :evidence "sidecar_repl.clj — (count (:namespaces search/clojure-lib))"}}
-    :vars           {:type :vector :required? true
-                     :description "Vector of var maps (1,572 entries)"
+    :vars           {:type :vector :refs :var :required? true
+                     :description "Vector of var maps (1,572 entries). Implicitly a ref to :var (PR #57 review, @puredanger)."
                      :status {:state :exists :verified "2026-06-09"
                               :evidence "sidecar_repl.clj — (count (:vars search/clojure-lib))"}}}}
 
@@ -144,9 +144,9 @@
                    :status {:state :exists :verified "2026-06-09"
                             :evidence "sidecar_repl.clj — var key universe scan"}}
     :static       {:type :boolean :required? false :coverage "319/1572"
-                   :description "Static compilation hint (legacy)"
-                   :status {:state :exists :verified "2026-06-09"
-                            :evidence "sidecar_repl.clj — var key universe scan"}}
+                   :description "Legacy AOT-compilation hint. Present on 319 vars but no longer meaningful in modern Clojure; can be dropped (PR #57 review, @puredanger)."
+                   :status {:state :vestigial :verified "2026-06-09"
+                            :evidence "sidecar_repl.clj — var key universe scan; semantic deadness per PR #57 review"}}
     :macro        {:type :boolean :required? false :coverage "190/1572"
                    :description "True if this var is a macro"
                    :status {:state :exists :verified "2026-06-09"
@@ -385,4 +385,24 @@
                   :description "When compatibility was last verified"
                   :status {:state :gap
                            :vision "2026vison.md"
-                           :context "Verification pipeline"}}}}}}
+                           :context "Verification pipeline"}}}}}
+
+ ;; Relationships between entities. Each edge is derived from the attribute named
+ ;; in :via (a :ref-typed or FK attribute), so :via is the edge's provenance.
+ ;; Structural (read off the existing attributes); not separately REPL-verified.
+ :relationships
+ [{:from :example             :to :var       :via :example/var                 :cardinality :many-to-one  :label "documents"}
+  {:from :example             :to :user      :via :example/author              :cardinality :many-to-one  :label "authored by"}
+  {:from :example             :to :user      :via :example/editors             :cardinality :many-to-many :label "edited by"}
+  {:from :example-history     :to :example   :via :example-history/example-id  :cardinality :many-to-one  :label "edit of"}
+  {:from :example-history     :to :user      :via :example-history/editor      :cardinality :many-to-one  :label "edited by"}
+  {:from :note                :to :var       :via :note/var                    :cardinality :many-to-one  :label "annotates"}
+  {:from :note                :to :user      :via :note/author                 :cardinality :many-to-one  :label "authored by"}
+  {:from :see-also            :to :var       :via :see-also/from-var           :cardinality :many-to-one  :label "from"}
+  {:from :see-also            :to :var       :via :see-also/to-var             :cardinality :many-to-one  :label "to"}
+  {:from :see-also            :to :user      :via :see-also/author             :cardinality :many-to-one  :label "authored by"}
+  {:from :var                 :to :namespace :via :var/ns                      :cardinality :many-to-one  :label "in namespace"}
+  {:from :var                 :to :library   :via :var/library-url             :cardinality :many-to-one  :label "from library"}
+  {:from :namespace           :to :library   :via :library/namespaces          :cardinality :many-to-one  :label "part of"}
+  {:from :dialect-compat      :to :var       :via :dialect-compat/var-key      :cardinality :one-to-one   :label "compatibility of"}
+  {:from :legacy-var-redirect :to :var       :via :legacy-var-redirect/name    :cardinality :many-to-one  :label "redirects to"}]}
