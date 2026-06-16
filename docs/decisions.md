@@ -17,6 +17,44 @@ Document design and architecture decisions. Lightweight alternative to full ADRs
 
 ---
 
+## 2026-06-16 — Generate the entity-attribute ER diagram from the EDN
+
+### Status
+Decided
+
+### Context
+- With `:relationships` now first-class in [entity-attribute-model.edn](entity-attribute-model.edn) (15 edges, each carrying `:via` provenance), the data needed to draw an ER diagram lives in the source of truth.
+- The [2026-06-05 decisions](#2026-06-05--replace-mermaid-er-diagrams-with-edn-schema-and-miro-visual) concluded that Mermaid `erDiagram` could not express the intended visual language (legend, status distinction) and leaned toward Miro as the canonical visual, dropping Mermaid. That conclusion predates having relationships in the EDN and a generator that can emit a legend.
+- The PR #57 review reinforced data-first. Sierra noted the tradeoff directly: a generated (algorithmically laid-out) diagram lacks the spatial meaning a person encodes by hand, **but** has the converse advantage of showing only the relationships actually expressed in the model, with no hidden assumptions.
+
+### Decision
+- Generate the ER diagram from the EDN with a babashka script ([tools/edn_to_mermaid.clj](../tools/edn_to_mermaid.clj)) that emits a Mermaid `erDiagram` plus a Key/Legend and Sources ([docs/diagrams/entity-attribute-er.md](diagrams/entity-attribute-er.md)).
+- The generated Mermaid diagram is the in-repo, diff-able, GitHub-rendered view. A hand-arranged Miro board remains the spatial/pedagogical view. They are complementary — not a replacement for each other.
+
+### Rationale
+- Reliability ratchet: the diagram becomes a deterministic artifact derived from the source of truth, not hand-drawn prose that drifts. Identifiers are sanitized by construction, a self-lint asserts valid Mermaid, and a Kroki round-trip confirms it parses.
+- Sierra's framing splits the work cleanly: the generator gives faithfulness (only what's in the model); Miro gives spatial intuition. Keeping both captures both properties.
+- This **partially supersedes** the 2026-06-05 "drop Mermaid entirely" stance: Mermaid is used, but generated (not hand-maintained) and as a structural complement to Miro, not the sole canonical visual.
+
+### Alternatives Considered
+- Hand-maintain a Mermaid diagram — the original failure mode (drift, the two-diagram split). Rejected.
+- Miro only — no in-repo, diff-able view generated from the source of truth.
+- Graphviz / PlantUML / D2 — richer layout, but not natively rendered on GitHub (would require a committed SVG or Kroki) and still not generated from the EDN.
+
+### Impacts and Risks
+- The generated file must not be hand-edited; a banner and a Provenance & Review footer say so, and re-runs are byte-identical.
+- The legend's glyph gloss is hardcoded prose that could drift if a new cardinality is added — noted in the [review run](diagrams/entity-attribute-er_research-review_run_1.md).
+- The generator bb scripts may be extracted into a separate PR; this entry records the decision regardless of where the code lands.
+
+### Links
+- [PR #57](https://github.com/nubank/clojuredocs/pull/57)
+- [tools/edn_to_mermaid.clj](../tools/edn_to_mermaid.clj)
+- [docs/diagrams/entity-attribute-er.md](diagrams/entity-attribute-er.md)
+- [entity-attribute-model.edn](entity-attribute-model.edn)
+- [Research-review run 1](diagrams/entity-attribute-er_research-review_run_1.md)
+
+---
+
 ## 2026-06-16 — Enforce doc metadata with a bb validator (three surfaces)
 
 ### Status
