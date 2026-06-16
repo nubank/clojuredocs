@@ -4,7 +4,7 @@ title: Glossary
 description: Domain terms as used in this codebase and design docs.
 tags: [glossary, domain-terms]
 created: 2026-03-04
-modified: 2026-03-04
+modified: 2026-06-16
 ai_assisted: "Claude Opus 4.6 (1M context) via Claude Code"
 review_maturity: L1
 review_note: AI-drafted research; see in-body disclaimer — claims not individually verified.
@@ -93,6 +93,10 @@ Terms as used in [issue #4](https://github.com/nubank/clojuredocs/issues/4) anal
 *Source*: [`search/static.clj` lines 3–39](https://github.com/nubank/clojuredocs/blob/master/src/clj/clojuredocs/search/static.clj#L3-L39) (the flat list); [Clojure reference on namespaces](https://clojure.org/reference/namespaces).
 
 ## R
+
+**reliability ratchet** — Turning something an AI or engineer discovered informally into a progressively more deterministic, reusable artifact, so future runs are faster, more repeatable, and easier to trust: **LLM → REPL → Library → Enforcement**. Each step hardens the one before it — a finding checked in a REPL becomes a library/schema, which becomes an enforced test. In this repo, the [document-metadata convention](rfcs/okf-metadata-rfc.md) (Library) is enforced by [`tools/validate_metadata.clj`](../tools/validate_metadata.clj) against [`metadata-schema.edn`](metadata-schema.edn) (Enforcement).
+
+*Source*: [CLAUDE.md](../CLAUDE.md), "Reliability ratchet".
 
 **routes** — [Compojure](#c) route definitions that map URL patterns to handler functions. Three route tables exist: page routes in [`pages.clj`](https://github.com/nubank/clojuredocs/blob/master/src/clj/clojuredocs/pages.clj#L311-L358) (namespace pages, var pages, search, core-library, quickref), API routes in [`api/server.clj`](https://github.com/nubank/clojuredocs/blob/master/src/clj/clojuredocs/api/server.clj#L34-L51) (CRUD for examples, notes, see-alsos), and legacy redirect routes in [`entry.clj`](https://github.com/nubank/clojuredocs/blob/master/src/clj/clojuredocs/entry.clj#L86-L100) (old ClojureDocs URL patterns redirected to current URLs). Composed into a single handler in `entry.clj`.
 
