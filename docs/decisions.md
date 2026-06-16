@@ -17,6 +17,28 @@ Document design and architecture decisions. Lightweight alternative to full ADRs
 
 ---
 
+## 2026-06-16 — Enforce doc metadata with a bb validator (three surfaces)
+
+### Status
+Decided
+
+### Context
+The OKF + RDF frontmatter convention was adopted but unenforced — nothing prevented drift or caught a missing
+`type` / bad `review_maturity`.
+
+### Decision
+Add [tools/validate_metadata.clj](../tools/validate_metadata.clj) (babashka) validating `docs/**.md` against
+[docs/metadata-schema.edn](metadata-schema.edn), wired into three surfaces: a git pre-commit hook
+(`.githooks/pre-commit`, enabled via `bin/install-hooks`), `lein test` (`clojuredocs.metadata-test`), and CI
+(`.github/workflows/docs-metadata.yml`). The `bb` script is the single source of truth; the test and hook
+shell out to it. `metadata-schema.edn` is the editable source of truth for the taxonomy and field rules.
+
+### Consequences
+Bad frontmatter fails fast locally (hook), in the suite (`lein test`), and authoritatively on PRs (CI). New
+`type` values or fields are changed in one place (`metadata-schema.edn`).
+
+---
+
 ## 2026-06-16 — Adopt OKF + RDF-aligned YAML frontmatter for doc metadata
 
 ### Status
