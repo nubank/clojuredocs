@@ -1,3 +1,15 @@
+---
+type: Reference
+title: GitHub Templates
+description: Templates and conventions for issues and pull requests.
+tags: [github, templates, conventions]
+created: 2026-06-09
+modified: 2026-06-09
+ai_assisted: "Claude Opus 4.6 via GitHub Copilot"
+review_maturity: L2
+review_note: Human-reviewed via PR.
+---
+
 # GitHub Templates
 
 Templates and conventions for issues and pull requests in [nubank/clojuredocs](https://github.com/nubank/clojuredocs).

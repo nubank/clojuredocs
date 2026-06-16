@@ -1,3 +1,15 @@
+---
+type: Guide
+title: Issue Writing Guide
+description: How to write GitHub issues for this repo; doubles as an AI prompt.
+tags: [github, issues, guide, ai-prompt]
+created: 2026-06-09
+modified: 2026-06-09
+ai_assisted: "Claude Opus 4.6 via GitHub Copilot"
+review_maturity: L2
+review_note: Human-reviewed via PR.
+---
+
 # Issue Writing Guide
 
 How to write GitHub issues for [nubank/clojuredocs](https://github.com/nubank/clojuredocs).

@@ -1,3 +1,15 @@
+---
+type: Reference
+title: Glossary
+description: Domain terms as used in this codebase and design docs.
+tags: [glossary, domain-terms]
+created: 2026-03-04
+modified: 2026-03-04
+ai_assisted: "Claude Opus 4.6 (1M context) via Claude Code"
+review_maturity: L1
+review_note: AI-drafted research; see in-body disclaimer — claims not individually verified.
+---
+
 # Glossary
 
 > **AI Disclaimer**: This was researched and drafted using Claude Code powered by Claude Opus 4.6. AI-generated research contains false statements, unsupported assumptions, and missing context. Do not treat any claim as verified unless you have confirmed it against a primary source.

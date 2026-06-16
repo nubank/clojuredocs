@@ -1,3 +1,14 @@
+---
+type: Research
+title: "Claude Code Prompt — Create Planning Template for Issue #30"
+description: The Claude Code prompt used to generate the issue #30 planning document.
+tags: [research, issue-30, prompt]
+created: 2026-04-29
+modified: 2026-04-29
+review_maturity: L2
+review_note: Human-authored prompt; frontmatter added during OKF migration.
+---
+
 # Claude Code Prompt — Create Planning Template for Issue #30
 
 > Paste into a Claude Code Opus 4.6 session in VS Code. You should be on the `nubank/clojuredocs` repo.
