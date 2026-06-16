@@ -152,11 +152,19 @@ documents living on `feat/43` (entity model, errata, dataflows, the entity-model
 that branch lands. Out of scope: `.github/` templates (GitHub-mandated frontmatter), repo-root config, and
 data files (`*.edn`, `*.csv` — not OKF concepts).
 
-## Enforcement (follow-up PR)
+## Enforcement
 
-A `bb` validator + `schema.edn` checking: every non-reserved `docs/**.md` has parseable frontmatter; `type`
-is non-empty and in the taxonomy; `review_maturity ∈ {L0..L4}`; dates are ISO 8601. Wired into
-`clojure.test`. This is the ratchet's final rung — `vibes+prose → sidecar.clj → schema.edn → clojure.test`.
+Implemented: [`tools/validate_metadata.clj`](../../tools/validate_metadata.clj) (babashka) validates every
+non-reserved `.md` under `docs/` (recursively) against [`docs/metadata-schema.edn`](../metadata-schema.edn) —
+parseable frontmatter; non-empty `type` (warns if outside the taxonomy); `review_maturity ∈ {L0..L4}`;
+`created`/`modified` are valid `YYYY-MM-DD` dates (validated against the raw text, since clj-yaml leniently
+rolls bad dates over); and that every known frontmatter key except `okf_version` has a JSON-LD mapping in
+[`docs/context.jsonld`](../context.jsonld). One validator, three surfaces: a git pre-commit hook
+([`.githooks/pre-commit`](../../.githooks/pre-commit), enabled via [`bin/install-hooks`](../../bin/install-hooks)),
+`lein test` ([`clojuredocs.metadata-test`](../../test/clojuredocs/metadata_test.clj)), and CI
+([`.github/workflows/docs-metadata.yml`](../../.github/workflows/docs-metadata.yml)). This completes the
+**Enforcement** rung of the reliability ratchet (LLM → REPL → Library → Enforcement) — concretely,
+`vibes+prose → sidecar.clj → schema.edn → clojure.test`.
 
 ## Open questions
 
@@ -164,13 +172,14 @@ is non-empty and in the taxonomy; `review_maturity ∈ {L0..L4}`; dates are ISO 
   `prov:Person` attribution at L4? Deferred to the enforcement PR.
 - Whether to generate `docs/index.md` from frontmatter automatically (OKF §6 permits it). Deferred.
 
-> Review log: [okf-metadata-rfc_research-review_run_1.md](okf-metadata-rfc_research-review_run_1.md) — claims/link audit, fixes applied and items deferred.
+> Review logs: [run 1](okf-metadata-rfc_research-review_run_1.md) (initial claims/link audit) · [run 2](okf-metadata-rfc_research-review_run_2.md) (post-enforcement audit) — fixes applied, items deferred.
 
 ## Version history
 
 | Date | Change |
 |---|---|
 | 2026-06-16 | Initial RFC: propose OKF YAML frontmatter with Dublin Core + PROV-O semantics; supersede the blockquote block. |
+| 2026-06-16 | Enforcement implemented: `bb` validator + `metadata-schema.edn`, wired into a pre-commit hook, `lein test`, and CI. |
 
 ## Sources
 

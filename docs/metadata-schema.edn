@@ -1,0 +1,38 @@
+;; Source of truth for the OKF + RDF document-metadata convention.
+;; Consumed by tools/validate_metadata.clj. See docs/rfcs/okf-metadata-rfc.md
+;; for rationale and CLAUDE.md ("AI metadata on documents") for the human spec.
+;;
+;; This is a data file, not a prose document, so it carries no frontmatter.
+{;; OKF's one hard requirement.
+ :required        #{:type}
+
+ ;; Controlled vocabulary for `type` (= dcterms:type). Extensible: add values
+ ;; here rather than repurposing existing ones. Unknown types warn, not fail.
+ :types           #{"Reference" "Guide" "RFC" "Decision Log" "Errata"
+                    "Data Model" "Diagram" "Research" "Review" "Vision"}
+
+ ;; Review-trust ladder (our extension over OKF/RDF).
+ :review-maturity #{"L0" "L1" "L2" "L3" "L4"}
+
+ ;; Keys whose value must be an ISO 8601 date (date or datetime).
+ :date-keys       #{:created :modified}
+
+ :recommended     #{:title :description :tags :created :modified}
+
+ ;; Every key the convention defines. Unknown keys warn (possible typo), since
+ ;; OKF tolerates producer extensions.
+ :known-keys      #{:type :title :description :tags :created :modified :source
+                    :creator :contributors :ai_assisted :session :tools
+                    :agents_skills :review_maturity :review_note :okf_version}
+
+ ;; OKF-reserved filenames (skipped from concept validation).
+ :reserved-files  #{"index.md" "log.md"}
+
+ ;; The OKF bundle root: the one index.md permitted frontmatter (okf_version only).
+ :bundle-root     "docs/index.md"
+ :okf-version     "0.1"
+
+ ;; JSON-LD context that maps frontmatter keys to dcterms:/prov: IRIs. Every
+ ;; known key except those listed in :context-exempt must have a mapping there.
+ :context-file    "docs/context.jsonld"
+ :context-exempt  #{:okf_version}}
