@@ -5,8 +5,9 @@ description: Two-year vision and redesign direction for ClojureDocs.
 tags: [vision, redesign, roadmap]
 created: 2026-03-27
 modified: 2026-03-31
-review_maturity: L2
-review_note: Human-authored vision; frontmatter added during OKF migration.
+creator: L. Jordan Miller
+review_maturity: L4
+review_note: Human-endorsed — author takes ownership of this vision.
 ---
 
 # ClojureDocs: Two-Year Vision (2026–2028)
