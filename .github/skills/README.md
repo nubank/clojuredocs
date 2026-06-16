@@ -9,6 +9,7 @@ skill is a directory with a `SKILL.md`. User-invocable skills are triggered with
 | [`grill-me`](grill-me/SKILL.md) | Alignment-first interview before building; writes a plan/PRD to disk. |
 | [`handoff`](handoff/SKILL.md) | Write a resumable state-of-work note so you can `/clear` instead of `/compact`. |
 | [`ratchet`](ratchet/SKILL.md) | Harden an informal check toward enforcement: LLM → REPL → Library → Enforcement. |
+| [`narrate`](narrate/SKILL.md) | Reframe a finished session as a short story for a human (recap, retro, demo). |
 
 ## Session discipline
 
@@ -20,4 +21,4 @@ reliability-ratchet convention (see the [glossary](../../docs/glossary.md)).
 
 A typical loop: `/grill-me` to align and write a plan → implement one vertical slice → ship → `/handoff` →
 `/clear` → resume from the handoff for the next slice. Reach for `/ratchet` whenever a check starts repeating
-by hand.
+by hand, and `/narrate` to recap a finished session as a short, human-readable story.
