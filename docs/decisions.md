@@ -1,18 +1,45 @@
-> **Document metadata**
-> - **Created:** 2026-04-26
-> - **Last updated:** 2026-06-09
-> - **Tags:** decisions, architecture, living-document
-> - **AI-assisted:** Yes — Claude Opus 4.6 via GitHub Copilot (original); Claude Opus 4.8 via Claude Code (2026-06-09 entries)
-> - **Recent Session:** `c6580eec` (2026-06-09); `41bcf361`
-> - **Tools:** GitHub MCP, workspace file access
-> - **Agents/skills:** 
-> - **Review maturity:** L2 — human-reviewed via PR
->
-> _AI-assisted document. Decisions reflect the team's choices; rationale text was AI-drafted from human direction._
+---
+type: Decision Log
+title: Decision Log
+description: Design and architecture decisions; lightweight alternative to full ADRs.
+tags: [decisions, architecture, living-document]
+created: 2026-04-26
+modified: 2026-06-16
+creator: L. Jordan Miller
+ai_assisted: "Claude Opus 4.6 via GitHub Copilot (early entries); Claude Opus 4.8 via Claude Code (later entries)"
+review_maturity: L4
+review_note: Human-endorsed — decisions are the team's; AI-drafted rationale is owned by the author.
+---
 
 # Decision Log
 
 Document design and architecture decisions. Lightweight alternative to full ADRs.
+
+---
+
+## 2026-06-16 — Adopt OKF + RDF-aligned YAML frontmatter for doc metadata
+
+### Status
+Decided
+
+### Context
+Document AI-provenance/review metadata was encoded as a Markdown blockquote (`> **Document metadata**`),
+which is human-readable but not machine-parseable and is non-conformant with the
+[Open Knowledge Format (OKF) v0.1](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
+(no frontmatter, no required `type`).
+
+### Decision
+Replace the blockquote with YAML frontmatter conformant to OKF (required `type`), with field semantics aligned
+to [Dublin Core Terms](https://www.dublincore.org/specifications/dublin-core/dcmi-terms/) and
+[PROV-O](https://www.w3.org/TR/prov-o/). RDF stays additive via an optional JSON-LD context
+([docs/context.jsonld](context.jsonld)); the required surface remains pure OKF. The L0–L4 review-maturity
+model is retained as a queryable `review_maturity` field. See
+[RFC: OKF + RDF document metadata](rfcs/okf-metadata-rfc.md). A `bb` validator is a planned follow-up.
+
+### Consequences
+All prose docs under `docs/` migrate to frontmatter; `docs/` becomes an OKF bundle (`docs/index.md`). YAML
+frontmatter renders as a table on GitHub rather than the prior custom blockquote — accepted in exchange for
+machine-parseability.
 
 ---
 

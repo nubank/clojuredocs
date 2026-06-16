@@ -78,7 +78,7 @@
 
   (add-indexes-to-coll! :users [:login :account-source])
 
-  (add-indexes-to-coll! :migrate-users [:email :migraion-key]))
+  (add-indexes-to-coll! :migrate-users [:email :migration-key]))
 
 (def ^:private export-path "resources/public/clojuredocs-export.json")
 

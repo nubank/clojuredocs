@@ -1,3 +1,14 @@
+---
+type: Diagram
+title: "Multi-Library :library-url Dependency Chain"
+description: How the :library-url property for each var is resolved across architecture layers.
+tags: [diagram, library-url, architecture]
+created: 2026-03-04
+modified: 2026-03-04
+review_maturity: L2
+review_note: Traced from source code; frontmatter added during OKF migration.
+---
+
 # Multi-Library :library-url Dependency Chain
 
 This diagram shows how the `:library-url` property for each var is handled in the current clojuredocs.org architecture. Each layer is labeled in ALL CAPS, with file references below.

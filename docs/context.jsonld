@@ -1,0 +1,26 @@
+{
+  "@context": {
+    "dcterms": "http://purl.org/dc/terms/",
+    "prov": "http://www.w3.org/ns/prov#",
+    "schema": "http://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+
+    "type": "dcterms:type",
+    "title": "dcterms:title",
+    "description": "dcterms:description",
+    "tags": { "@id": "dcterms:subject", "@container": "@set" },
+    "created": { "@id": "dcterms:created", "@type": "xsd:date" },
+    "modified": { "@id": "dcterms:modified", "@type": "xsd:date" },
+    "source": { "@id": "dcterms:source", "@type": "@id" },
+    "creator": "dcterms:creator",
+    "contributors": { "@id": "dcterms:contributor", "@container": "@set" },
+
+    "ai_assisted": "prov:wasAttributedTo",
+    "session": "prov:wasGeneratedBy",
+    "tools": { "@id": "prov:used", "@container": "@set" },
+    "agents_skills": { "@id": "prov:used", "@container": "@set" },
+
+    "review_maturity": "schema:creativeWorkStatus",
+    "review_note": "dcterms:provenance"
+  }
+}
