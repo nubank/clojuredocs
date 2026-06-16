@@ -1,11 +1,22 @@
+---
+type: Research
+title: "Planning: Cross-Dialect Compatibility Indicators"
+description: Planning for Clojure/CLJS/babashka compatibility indicators (issue #30).
+tags: [research, issue-30, dialect-compat, planning]
+created: 2026-04-14
+modified: 2026-04-28
+source: https://github.com/nubank/clojuredocs/issues/30
+creator: L. Jordan Miller
+contributors: [David Nolen (ClojureScript), Michiel Borkent (babashka)]
+review_maturity: L2
+review_note: Human-directed planning; named reviewers listed as contributors.
+---
+
 # Planning: Cross-Dialect Compatibility Indicators
 
-> **Issue:** [nubank/clojuredocs#30](https://github.com/nubank/clojuredocs/issues/30)
-> **Branch:** `research/30/dialect-compat-planning`
-> **Author:** L. Jordan Miller
-> **Reviewers:** David Nolen (ClojureScript), Michiel Borkent (babashka)
-> **Date started:** 2026-04-14 ([`02c9802`](https://github.com/nubank/clojuredocs/commit/02c980200923afdc502176eba6aea62ce2fe92f3))
-> **Last updated:** 2026-04-28
+> **Issue:** [nubank/clojuredocs#30](https://github.com/nubank/clojuredocs/issues/30) ·
+> **Branch:** `research/30/dialect-compat-planning` ·
+> started [`02c9802`](https://github.com/nubank/clojuredocs/commit/02c980200923afdc502176eba6aea62ce2fe92f3)
 
 ---
 

@@ -34,21 +34,50 @@ See [docs/dev-setup.md](docs/dev-setup.md) for full setup.
 
 ## AI metadata on documents
 
-Every prose document under `docs/` must carry an inline metadata block at the top — before the first heading content — using this format:
+Every prose Markdown document under `docs/` must carry a **YAML frontmatter block** at the very top of the file — before any heading — delimited by `---`. This format is conformant with the [Open Knowledge Format (OKF) v0.1](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md): the one hard requirement is a non-empty `type` field. Field *names and semantics* align with established RDF vocabularies — [Dublin Core Terms](https://www.dublincore.org/specifications/dublin-core/dcmi-terms/) (`dcterms:`) and [W3C PROV-O](https://www.w3.org/TR/prov-o/) (`prov:`) — so the same frontmatter is liftable to RDF triples without changing how it reads.
 
-```markdown
-> **Document metadata**
-> - **Created:** YYYY-MM-DD
-> - **Last updated:** YYYY-MM-DD
-> - **Tags:** comma, separated, tags
-> - **AI-assisted:** Yes — model + interface (e.g. "Claude Opus 4.6 via GitHub Copilot")
-> - **Session:** `session-id` (from debug log or Copilot session)
-> - **Tools:** MCP servers and capabilities available (e.g. "GitHub MCP, workspace files")
-> - **Agents/skills:** links to agent or skill definitions applied
-> - **Review maturity:** L0–L4 level + short description
->
-> _AI-assisted document. [Scope-specific disclaimer about what to verify.]_
+```yaml
+---
+type: RFC                              # REQUIRED (OKF) — dcterms:type. From the taxonomy below.
+title: Entity-Attribute Model EDN Schema        # dcterms:title
+description: One-line summary used by indexes, search, and previews.   # dcterms:description
+tags: [entity-model, edn-schema, issue-43]       # dcterms:subject
+created: 2026-06-09                    # dcterms:created (ISO 8601 date)
+modified: 2026-06-09                   # dcterms:modified (was "Last updated")
+source: https://github.com/nubank/clojuredocs/issues/43   # dcterms:source / OKF resource, when one exists
+# --- provenance (PROV-O) ---
+ai_assisted: "Claude Opus 4.8 via Claude Code"   # the prov:SoftwareAgent; the doc prov:wasGeneratedBy its run. Omit when not AI-assisted.
+session: c6580eec                      # identifies the prov:Activity
+tools: [Calva REPL, MongoDB seed data, workspace files]   # prov:used
+agents_skills: []                      # permalinks to agent/skill definitions applied
+# --- review trust (extension; no OKF/RDF native equivalent) ---
+review_maturity: L3                    # machine-readable L0–L4 (see below)
+review_note: human-verified via REPL evaluation
+---
 ```
+
+**Required:** `type`. **Recommended:** `title`, `description`, `tags`, `created`, `modified`. **Provenance (when AI-assisted):** `ai_assisted`, `session`, `tools`, `agents_skills`. **Review trust:** `review_maturity`, `review_note`. Consumers must tolerate unknown fields and unknown `type` values (OKF §9). Scope/caveat disclaimers go in the **body** (an italic line under the H1, or a `> **Caveat:**` callout) — not in frontmatter.
+
+### Field → RDF vocabulary mapping
+
+| Frontmatter key | RDF term | Meaning |
+|---|---|---|
+| `type` | `dcterms:type` | Nature/genre of the doc (also OKF's one required field) |
+| `title` | `dcterms:title` | Name of the doc |
+| `description` | `dcterms:description` | One-line account |
+| `tags` | `dcterms:subject` | Topics |
+| `created` | `dcterms:created` | Date of creation |
+| `modified` | `dcterms:modified` | Date of last meaningful change |
+| `source` | `dcterms:source` / `prov:wasDerivedFrom` | Resource the doc derives from |
+| `ai_assisted` | `prov:wasAttributedTo` a `prov:SoftwareAgent` | The model/interface that generated the draft |
+| `tools` | `prov:used` | What the generating activity used |
+| `review_maturity` / `review_note` | extension; at L4 ≈ `dcterms:creator` / `prov:wasAttributedTo` a `prov:Person` | Human review trust |
+
+The optional [`docs/context.jsonld`](docs/context.jsonld) is the canonical JSON-LD `@context` mapping these keys to their `dcterms:`/`prov:` IRIs; it is out-of-band, so the doc files stay plain YAML you can `cat`.
+
+### `type` taxonomy
+
+`Reference`, `Guide`, `RFC`, `Decision Log`, `Errata`, `Data Model`, `Diagram`, `Research`, `Review`, `Vision`. Descriptive and extensible — add new values when needed; don't repurpose existing ones. (`type` ≡ `dcterms:type`; this list is our controlled vocabulary.)
 
 ### Review maturity levels
 
@@ -62,7 +91,7 @@ Review maturity levels use a progressive trust model, similar in spirit to [C2PA
 | **L3** | Human-verified | Human verified specific claims against primary sources (running system, database, upstream docs). |
 | **L4** | Human-endorsed | Human takes ownership. Content is treated as human-authored with AI assistance. |
 
-Use the level number in the metadata block: `**Review maturity:** L2 — human-reviewed via PR`.
+Use the level in the `review_maturity` frontmatter key (machine-readable), with a human-readable `review_note`: `review_maturity: L2` / `review_note: human-reviewed via PR`.
 
 ### Section-level review markers
 
@@ -94,6 +123,10 @@ This is the Markdown equivalent of Wikipedia's `[citation needed]` and C2PA's `r
 - **Agents/skills** — Permalink to the agent or skill definition files that were active. Different skills have different reliability profiles.
 - **Review maturity** — L0–L4 level. The level is a machine-readable prefix; the description after the dash is human-readable context.
 
+### OKF bundle root
+
+`docs/` is an OKF **bundle**. Its root [`docs/index.md`](docs/index.md) carries the only frontmatter an index file may have — `okf_version: "0.1"` — and lists the docs for progressive disclosure. `index.md` and `log.md` are OKF-reserved filenames; don't use them for content documents.
+
 ### Commit trailers
 
 ```
@@ -101,13 +134,16 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 Reviewed-by: Jordan Miller <jordan.miller@nubank.com.br>
 ```
 
-`Co-Authored-By` identifies the AI, following the GitHub convention for multi-author commits. `Reviewed-by` identifies the human who reviewed the diff before commit, following the Linux kernel convention for review attribution.
+`Co-Authored-By` identifies the AI, following the GitHub convention for multi-author commits. `Reviewed-by` identifies the human who reviewed the diff before commit, following the Linux kernel convention for review attribution. The `ai_assisted` frontmatter key (`prov:SoftwareAgent`) and the `Co-Authored-By` trailer carry the same fact in two places — keep them consistent.
 
 ### Rules
 
-- CSVs and data files don't need metadata blocks — only prose Markdown.
-- When updating a document, bump **Last updated** and adjust **Review maturity** if the review status changed.
-- This replaces lengthy per-session attribution logs. The commit message carries what was done; the document metadata carries the review status. No separate `docs/ai/` attribution files needed.
+- Applies to **prose Markdown under `docs/`**. Repo-root config (`README.md`, `CLAUDE.md`) and `.github/` templates are out of scope; `.github/ISSUE_TEMPLATE/*` carry their own GitHub-mandated frontmatter — don't touch it.
+- Data files (`*.edn`, `*.csv`) are not OKF concepts and need no frontmatter.
+- When updating a document, bump `modified` and adjust `review_maturity` if the review status changed.
+- Provenance is mandatory for AI-assisted docs. Citations to sources should be reproducible — commit-pinned GitHub permalinks for code, not branch names.
+- Cross-links between docs use repo-relative paths (e.g. `../glossary.md`) for GitHub navigability — a deliberate, OKF-permitted (§5.2) relative-link choice over OKF's `/`-rooted recommendation.
+- This replaces lengthy per-session attribution logs. The commit message carries what was done; the frontmatter carries provenance and review status. No separate `docs/ai/` attribution files needed.
 
 ## PR conventions
 

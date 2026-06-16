@@ -1,3 +1,14 @@
+---
+type: Guide
+title: Dev Environment Setup
+description: Notes for getting a local development environment running.
+tags: [dev-setup, mongodb, leiningen]
+created: 2026-02-27
+modified: 2026-02-27
+review_maturity: L2
+review_note: Human-authored setup notes; frontmatter added during OKF migration.
+---
+
 # Dev Environment Setup
 
 Supplementary notes for getting a local development environment running. See also the [README](../README.md#dev) for the quick-start.
