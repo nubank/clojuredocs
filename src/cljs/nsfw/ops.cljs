@@ -127,7 +127,18 @@
                 !state
                 ctx)
 
-    :else (when res (reset! !state res))))
+    ;; A terminal handler value is the new state, which must be a map.
+    ;; Guard against non-map returns: a handler whose last expression is a
+    ;; side-effecting call (e.g. util/navigate-to, which returns the string
+    ;; from aset) would otherwise reset! the state atom to that value,
+    ;; corrupting it and crashing every later handler. Warn instead of
+    ;; silently swallowing — a non-map here is always a handler bug.
+    :else (cond
+            (map? res) (reset! !state res)
+            res (println
+                  "[nsfw.ops] handle-step: ignoring non-map handler return value; state left unchanged."
+                  "Handlers that end in a side-effecting call (e.g. util/navigate-to) must return nil. Got:"
+                  (pr-str res)))))
 
 (defn gen-lock-step [handler]
   (fn [{:keys [!state] :as ctx} params]
