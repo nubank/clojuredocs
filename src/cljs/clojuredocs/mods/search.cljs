@@ -356,10 +356,12 @@
                                (or (:href res)
                                    (util/var-path
                                      (:ns res)
-                                     (:name res)))))
+                                     (:name res))))
+                             nil)
                ::var-search (fn [state text]
                               (util/navigate-to
-                                (str "/search?q=" (util/url-encode text))))})]
+                                (str "/search?q=" (util/url-encode text)))
+                              nil)})]
 
     (when-not (empty? (sel :.search-widget))
       (swap! !state assoc :search-focused? true))
