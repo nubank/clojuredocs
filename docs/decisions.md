@@ -29,7 +29,7 @@ Decided — applied by hand on the prod host during the #76 deploy session. Not 
 
 ### Decision
 - **Reboot** to activate the pending kernel + glibc updates; boot into `6.17.0-1017-aws`.
-- **Cap journald at `SystemMaxUse=200M`** in `/etc/systemd/journald.conf` (previously unbounded at the ~10% default).
+- **Cap journald at `SystemMaxUse=200M`** in `/etc/systemd/journald.conf` (previously using journald's default cap, ~10% of disk).
 - **Purge superseded kernels** after reboot (`6.14.0-1011-aws`) as routine hygiene.
 - **Keep reboots manual** — do not enable `Unattended-Upgrade::Automatic-Reboot`.
 
