@@ -82,7 +82,7 @@
 
 (def ^:private export-path "resources/public/clojuredocs-export.json")
 
-(def ^:private export-interval-hours 6)
+(def ^:private export-interval-hours (* 24 7)) ; weekly — diagnostic throttle for #76 (was 6)
 
 (defn- run-scheduled-export []
   (try

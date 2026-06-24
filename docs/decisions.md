@@ -4,7 +4,7 @@ title: Decision Log
 description: Design and architecture decisions; lightweight alternative to full ADRs.
 tags: [decisions, architecture, living-document]
 created: 2026-04-29
-modified: 2026-06-16
+modified: 2026-06-24
 creator: L. Jordan Miller
 ai_assisted: "Claude Opus 4.8 via Claude Code"
 review_maturity: L4
@@ -14,6 +14,37 @@ review_note: Human-endorsed — decisions are the team's; AI-drafted rationale i
 # Decision Log
 
 Document design and architecture decisions. Lightweight alternative to full ADRs.
+
+---
+
+## 2026-06-24 — Throttle in-process export to weekly (diagnostic for #76)
+
+### Status
+Provisional — a diagnostic experiment, not a settled decision. Revisit once the crash data is in.
+
+### Context
+- [Issue #76](https://github.com/nubank/clojuredocs/issues/76): Matomo shows a client-side crash regression beginning the week of **2026-05-11**. Crash occurrences were flat at 0 all year, then jumped to ~9–14% of visits and stayed elevated through June.
+- That is the same week PR #39 shipped the in-process scheduled export (see the 2026-05-11 entry below), which runs `export/run-export` **every 6 hours** (4×/day) starting on boot.
+- Crashes cluster on the highest-traffic page (homepage `/`, ~5% pageview crash rate) and thin out on individual var pages — the shape of a server-wide intermittent degradation (crashes ∝ traffic), consistent with a recurring job rather than one broken page.
+- Causation is **unconfirmed**: a same-week tracking-script change, dependency bump, or browser-API change could equally explain it.
+
+### Decision
+- Reduce the recurring export cadence from every 6 hours to **once per week** (`export-interval-hours` 6 → `(* 24 7)` = 168) in `start-app`.
+- Keep the initial delay at `0`, so each deploy still refreshes the export — only the recurring interval changes.
+
+### Rationale
+- Smallest reversible change that isolates a single variable. If the weekly crash rate collapses toward ~0, the in-process export is implicated; if it stays elevated, the export is exonerated and we pivot to the other candidates.
+- A one-line flip back to `6` reverts it.
+
+### Impacts and Risks
+- `clojuredocs-export.json` refreshes roughly weekly plus on each deploy, so it can be staler between deploys. Acceptable for a short diagnostic window; the editor-plugin consumers tolerate slightly stale examples.
+- This does not fix root cause — it is an experiment. The issue stays open; root-cause confirmation and a regression guard are follow-ups.
+
+### Links
+- [Issue #76](https://github.com/nubank/clojuredocs/issues/76)
+- [Issue #38](https://github.com/nubank/clojuredocs/issues/38)
+- [PR #39](https://github.com/nubank/clojuredocs/pull/39)
+- [src/clj/clojuredocs/main.clj](src/clj/clojuredocs/main.clj)
 
 ---
 
@@ -66,6 +97,8 @@ machine-parseability.
 ---
 
 ## 2026-05-11 — Schedule export JSON regeneration in-process
+
+> **Update 2026-06-24:** the 6-hour interval below was throttled to weekly pending the #76 crash investigation — see the [2026-06-24 entry](#2026-06-24--throttle-in-process-export-to-weekly-diagnostic-for-76) above. The text below records the original decision.
 
 ### Status
 Decided
