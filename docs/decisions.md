@@ -17,6 +17,38 @@ Document design and architecture decisions. Lightweight alternative to full ADRs
 
 ---
 
+## 2026-06-24 — Prod host: patch kernel/glibc, cap journald, keep reboots manual
+
+### Status
+Decided — applied by hand on the prod host during the #76 deploy session. Not captured in any IaC; this entry is the only record (see Risks).
+
+### Context
+- Deploying the [#76](https://github.com/nubank/clojuredocs/issues/76) hotfix surfaced three host warnings in the SSH banner: a pending system restart, `/` at **87%** of a small **6.8G** root volume, and 61 available updates.
+- `reboot-required.pkgs` listed accumulated kernel images plus `libc6` (glibc) — security updates that `unattended-upgrades` had installed but never activated, because the host was never rebooted. It was running `6.14.0-1011-aws`; the newest installed kernel was `6.17.0-1017-aws`.
+- The disk pressure was **not** old kernels (only one was removable). `du` showed `/usr` (3.4G, mostly JVM + kernel modules) and `/var` (2.2G) as the weight; the one genuinely reclaimable chunk was an overgrown systemd journal (~686M — journald's default cap is ~10% of disk).
+
+### Decision
+- **Reboot** to activate the pending kernel + glibc updates; boot into `6.17.0-1017-aws`.
+- **Cap journald at `SystemMaxUse=200M`** in `/etc/systemd/journald.conf` (previously using journald's default cap, ~10% of disk).
+- **Purge superseded kernels** after reboot (`6.14.0-1011-aws`) as routine hygiene.
+- **Keep reboots manual** — do not enable `Unattended-Upgrade::Automatic-Reboot`.
+
+### Rationale
+- *Manual reboots:* this is a single-box prod site whose service cold-starts via `lein run` (slow, ~45–60s). A surprise automated reboot means unannounced downtime; a human choosing a low-traffic window is safer for one host than a 2 a.m. auto-reboot.
+- *Journald cap:* the journal was the only meaningfully reclaimable space on a tight volume. An explicit 200M cap makes the one-time `journalctl --vacuum-size=200M` permanent so it can't silently regrow to ~686M — the reliability ratchet (one-off cleanup → config-enforced bound).
+- *Patching:* deferred kernel + glibc updates are a standing security exposure; activating them was overdue.
+
+### Impacts and Risks
+- Brief downtime during the reboot. The service is `enabled`, came back clean, and the #76 hotfix was verified live afterward (`Export scheduled every 168 hours`).
+- Disk recovered **87% → 80%** (~490M, almost all journal). This is housekeeping, not headroom: a 6.8G root volume is undersized for a JVM + local-Mongo box. If pressure recurs, **grow the EBS volume** rather than scrape further. [open]
+- **Config drift:** the journald cap and the reboot were applied manually on the host — there is no infra-as-code for this box, so this entry is the only durable record. A rebuild would not reproduce the cap. Capturing host config (cloud-init / Ansible) is a possible follow-up. [open]
+
+### Links
+- [Issue #76](https://github.com/nubank/clojuredocs/issues/76) — the deploy that surfaced this
+- [PR #77](https://github.com/nubank/clojuredocs/pull/77) — the export-cadence hotfix deployed in the same session
+
+---
+
 ## 2026-06-24 — Throttle in-process export to weekly (diagnostic for #76)
 
 ### Status
