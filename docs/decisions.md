@@ -35,7 +35,7 @@ Decided — applied by hand on the prod host during the #76 deploy session. Not 
 
 ### Rationale
 - *Manual reboots:* this is a single-box prod site whose service cold-starts via `lein run` (slow, ~45–60s). A surprise automated reboot means unannounced downtime; a human choosing a low-traffic window is safer for one host than a 2 a.m. auto-reboot.
-- *Journald cap:* the journal was the only meaningfully reclaimable space on a tight volume. An explicit 200M cap makes the one-time `journalctl --vacuum-size` permanent so it can't silently regrow to ~686M — the reliability ratchet (one-off cleanup → config-enforced bound).
+- *Journald cap:* the journal was the only meaningfully reclaimable space on a tight volume. An explicit 200M cap makes the one-time `journalctl --vacuum-size=200M` permanent so it can't silently regrow to ~686M — the reliability ratchet (one-off cleanup → config-enforced bound).
 - *Patching:* deferred kernel + glibc updates are a standing security exposure; activating them was overdue.
 
 ### Impacts and Risks
