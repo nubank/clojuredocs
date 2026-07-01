@@ -114,21 +114,19 @@
           comp (rea/current-component)]
       [:div.add-note
        [:div.toggle-controls
-        (if true
-          [:a.toggle-link
-           {:href "#"
-            :on-click (fn [e]
-                        (.preventDefault e)
-                        (swap! !state assoc :expanded? (not expanded?))
-                        (when (not expanded?)
-                          (anim/scroll-to
-                            (rea/dom-node comp)
-                            {:pad 10}))
-                        nil)}
-           (if-not expanded?
-             "Add Note"
-             "Collapse")]
-          [:span.muted "log in to add a note"])]
+        [:a.toggle-link
+         {:href "#"
+          :on-click (fn [e]
+                      (.preventDefault e)
+                      (swap! !state assoc :expanded? (not expanded?))
+                      (when (not expanded?)
+                        (anim/scroll-to
+                          (rea/dom-node comp)
+                          {:pad 10}))
+                      nil)}
+         (if-not expanded?
+           "Add Note"
+           "Collapse")]]
        [:div.add-note-content {:class (when-not expanded? " hidden")}
         [:h5 "New Note"]
         [$tabbed-markdown-editor !state bus]
