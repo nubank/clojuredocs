@@ -204,6 +204,43 @@ Resolved — the crash data came in and supports it; kept permanently per the [2
 
 ---
 
+## 2026-06-16 — Experiment with session-discipline skills from the "smart zone" framing
+
+### Status
+Decided (experimental)
+
+### Context
+- Read [Matt Pocock's AI-coding workshop](https://finance.biggo.com/news/e7209c094224b09c) on the "smart zone": model reasoning degrades past ~100K tokens, so a long context is a liability. His prescriptions are classic engineering — front-load alignment ("grill me"), externalize state, review in a *fresh* context, decompose into vertical slices, and avoid `/compact` in favor of fresh starts.
+- The session that produced tonight's work ran on 1M-context Opus *and* used `/compact` — against his specific advice — even though the artifacts (EDN source of truth, deterministic generators, decision log, errata) embodied his deeper point: anchor on ground truth on disk, not the model's working memory.
+- We already hold a [reliability-ratchet](glossary.md) convention (LLM → REPL → Library → Enforcement), which is the same instinct applied to checks rather than sessions.
+
+### Decision
+- Translate the session discipline into Claude Code skills and adopt them as an experiment: `/grill-me` (alignment interview → plan on disk), `/handoff` (resumable state note so you can `/clear` instead of `/compact`), and `/ratchet` (harden a check up the ladder). Run the loop *grill → implement one slice → ship → handoff → clear → resume* and see whether it improves output quality and review burden.
+- Skills committed in [PR #74](https://github.com/nubank/clojuredocs/pull/74) and installed to `~/.claude/skills/` for cross-repo use.
+
+### Rationale
+- The mechanics matter less than the substrate: if state lives in files, throwing away a degrading context is cheap and safe. The skills make that the default rather than an afterthought.
+- A fresh-context reviewer catches what the implementer's context cannot — already validated this session, where independent audit sub-agents caught real fabrications.
+- It is a low-cost experiment: skills are additive, reversible, and prune-able if a habit doesn't pay off.
+
+### Alternatives Considered
+- Keep long sessions + `/compact` — the status quo; carries the degrading context forward, the failure mode the article names.
+- Adopt Pocock's full tooling (Sand Castle / the "Ralph loop") wholesale — heavier and TypeScript-oriented; the Claude Code equivalents (subagents, worktrees, background tasks) cover most of it without new infrastructure.
+- Do nothing / treat it as reading only — forgoes the cheap chance to harden the workflow.
+
+### Impacts and Risks
+- Behavioral change: the loop competes with the "keep momentum across phases" habit. Reconciliation — momentum should be carried by files, not by context length; a phase boundary becomes a natural `/handoff` + `/clear`.
+- The skills are experimental and may be revised or dropped. `/slice` and `/fresh-review` were considered and deferred.
+- Adapting an external framework: claims about the ~100K "smart zone" are the author's; we are testing the workflow, not certifying the number.
+
+### Links
+- [PR #74](https://github.com/nubank/clojuredocs/pull/74)
+- [Matt Pocock on AI coding's "smart zone"](https://finance.biggo.com/news/e7209c094224b09c)
+- [.github/skills/README.md](../.github/skills/README.md)
+- [glossary — reliability ratchet](glossary.md)
+
+---
+
 ## 2026-06-16 — Enforce doc metadata with a bb validator (three surfaces)
 
 ### Status
