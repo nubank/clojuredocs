@@ -101,55 +101,64 @@
                [:div.null-state "Live Preview"])]]))})))
 
 (defn $add [!state bus]
-  (let [{:keys [expanded? body text error loading?]} @!state
-        comp (rea/current-component)]
-    [:div.add-note
-     [:div.toggle-controls
-      (if true
-        [:a.toggle-link
-         {:href "#"
-          :on-click (fn [e]
-                      (.preventDefault e)
-                      (swap! !state assoc :expanded? (not expanded?))
-                      (when (not expanded?)
-                        (anim/scroll-to
-                          (rea/dom-node comp)
-                          {:pad 10}))
-                      nil)}
-         (if-not expanded?
-           "Add Note"
-           "Collapse")]
-        [:span.muted "log in to add a note"])]
-     [:div.add-note-content {:class (when-not expanded? " hidden")}
-      [:h5 "New Note"]
-      [$tabbed-markdown-editor !state bus]
-      [:p.instructions "Markdown allowed, code in <pre />."]
-      (when error
-        [:div.form-group
-         [:div.error-message.text-danger
-          [:i.fa.fa-exclamation-circle]
-          error]])
-      [:div.add-example-controls.form-group.clearfix
-       [:button {:class "btn btn-default"
-                 :disabled (when loading? "disabled")
-                 :on-click (fn [e]
-                             (.preventDefault e)
-                             (swap! !state
-                               assoc
-                               :expanded? false
-                               :text nil)
-                             nil)}
-        "Cancel"]
-       [:button {:class "btn btn-success pull-right"
-                 :disabled (when (or loading? (empty? text)) "disabled")
-                 :on-click (fn [e]
-                             (.preventDefault e)
-                             (ops/send bus ::new text)
-                             nil)}
-        "Add Note"]
-       [:img.loading.pull-right
-        {:class (when-not loading? " hidden")
-         :src "/img/loading.gif"}]]]]))
+  ;; #9: $add must be form-2. As a form-1 component it received a freshly-built
+  ;; (rea/cursor !state [:add-note]) on every parent ($notes) re-render; those
+  ;; cursors are value-equal, so Reagent skipped re-rendering $add (unchanged
+  ;; args) while the per-render cursor churn dropped its deref subscription.
+  ;; The form-3 editor still updated :text live, but $add never re-rendered, so
+  ;; its (empty? text) submit gate never cleared (and :text was stale at submit
+  ;; time). A form-2 closure captures one stable cursor and derefs it in a
+  ;; persistent render fn — the reliably-reactive shape $edit-note already uses.
+  (fn []
+    (let [{:keys [expanded? body text error loading?]} @!state
+          comp (rea/current-component)]
+      [:div.add-note
+       [:div.toggle-controls
+        (if true
+          [:a.toggle-link
+           {:href "#"
+            :on-click (fn [e]
+                        (.preventDefault e)
+                        (swap! !state assoc :expanded? (not expanded?))
+                        (when (not expanded?)
+                          (anim/scroll-to
+                            (rea/dom-node comp)
+                            {:pad 10}))
+                        nil)}
+           (if-not expanded?
+             "Add Note"
+             "Collapse")]
+          [:span.muted "log in to add a note"])]
+       [:div.add-note-content {:class (when-not expanded? " hidden")}
+        [:h5 "New Note"]
+        [$tabbed-markdown-editor !state bus]
+        [:p.instructions "Markdown allowed, code in <pre />."]
+        (when error
+          [:div.form-group
+           [:div.error-message.text-danger
+            [:i.fa.fa-exclamation-circle]
+            error]])
+        [:div.add-example-controls.form-group.clearfix
+         [:button {:class "btn btn-default"
+                   :disabled (when loading? "disabled")
+                   :on-click (fn [e]
+                               (.preventDefault e)
+                               (swap! !state
+                                 assoc
+                                 :expanded? false
+                                 :text nil)
+                               nil)}
+          "Cancel"]
+         [:button {:class "btn btn-success pull-right"
+                   :disabled (when (or loading? (empty? text)) "disabled")
+                   :on-click (fn [e]
+                               (.preventDefault e)
+                               (ops/send bus ::new text)
+                               nil)}
+          "Add Note"]
+         [:img.loading.pull-right
+          {:class (when-not loading? " hidden")
+           :src "/img/loading.gif"}]]]])))
 
 (defn $edit-note [{:keys [_id error body loading? editing?] :as note} bus]
   (let [!local (rea/atom {:text body
