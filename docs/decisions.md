@@ -51,6 +51,35 @@ Decided — shipped in [PR #81](https://github.com/nubank/clojuredocs/pull/81). 
 
 ---
 
+## 2026-07-01 — Drop startup index decls for non-existent collections
+
+### Status
+Decided — shipped in [PR #82](https://github.com/nubank/clojuredocs/pull/82). Follow-on to [PR #61](https://github.com/nubank/clojuredocs/pull/61); closes [#70](https://github.com/nubank/clojuredocs/issues/70).
+
+### Context
+- `add-all-indexes!` (run at server boot) declared indexes for `:namespaces`, `:libraries`, and `:migrate-users`.
+- Audit: none are read or written anywhere in `src/clj` (every `:namespaces` occurrence is a map key, not a collection), none exist in the `data/mongodb/` dump, and the only references are in the dead `tools/old_import.clj`. So boot created three empty collections.
+- Before #61 the calls were inert — `add-indexes-to-coll!` ignored its `coll` arg and only ever indexed `:examples`. #61 made `coll` honored, which is what made these decls actually materialize the empty collections, and what makes the cleanup meaningful now.
+
+### Decision
+- Remove the `:namespaces`, `:libraries`, and `:migrate-users` index declarations. Keep the ones backed by real, queried collections: `:examples`, `:see-alsos`, `:notes`, `:users`, `:legacy-var-redirects`.
+
+### Rationale
+- Indexing collections that never receive documents is pure noise — it materializes empty collections and misleads anyone reading `add-all-indexes!` as a map of the data model.
+- `:legacy-var-redirects` is kept deliberately: it is queried (`entry.clj`) and present in the dump.
+
+### Impacts and Risks
+- No behavior change to any real feature; boot simply stops creating three empty collections.
+- **Noted, not addressed here:** the inverse gap — `:vars`, `:job-metrics`, and `:example-histories` are queried but have *no* index declarations. Adding those is a separate follow-up, kept out of this single-purpose cleanup. [open]
+
+### Links
+- [PR #82](https://github.com/nubank/clojuredocs/pull/82)
+- [Issue #70](https://github.com/nubank/clojuredocs/issues/70)
+- [PR #61](https://github.com/nubank/clojuredocs/pull/61)
+- [../src/clj/clojuredocs/main.clj](../src/clj/clojuredocs/main.clj)
+
+---
+
 ## 2026-07-01 — Pin dev BASE_URL and PORT to :4000 so GitHub login works
 
 ### Status
