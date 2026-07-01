@@ -17,6 +17,40 @@ Document design and architecture decisions. Lightweight alternative to full ADRs
 
 ---
 
+## 2026-07-01 — Make $add a form-2 component to fix Add Note reactivity
+
+### Status
+Decided — shipped in [PR #81](https://github.com/nubank/clojuredocs/pull/81). Fixes [#9](https://github.com/nubank/clojuredocs/issues/9) (the "Add Note" button, dead sitewide).
+
+### Context
+- The "Add Note" submit button never enabled. Reproduced against a running client: typing updated the textarea and live preview, but the button's `(empty? text)` gate stayed disabled — and `:text` was stale at submit time. The only console output was a benign `No handler for op ::text-change` println.
+- Root cause: `$add` was a **form-1** component receiving a freshly-built `(rea/cursor !state [:add-note])` on every parent (`$notes`) re-render. Those cursors are value-equal, so Reagent skipped re-rendering `$add` (unchanged args), and the per-render cursor churn dropped its deref subscription. The form-3 `$tabbed-markdown-editor` stayed reactive (it re-renders on its own deref); the form-1 parent did not.
+- This is **not** a cursor bug — cursors notify (the editor proves it). It's specifically form-1 + an inline-created cursor passed as an argument.
+- Two earlier hypotheses were disproven: registering a `::text-change` handler (original handoff) only silences the println — `:text` already updates directly; and "cursors don't work" is contradicted by the editor re-rendering.
+
+### Decision
+- Wrap `$add`'s body in a form-2 render fn (`(fn [] …)`), so it captures one stable cursor and derefs it in a persistent render — the reliably-reactive shape `$edit-note` already uses. No state-model or ops changes.
+
+### Rationale
+- Form-2 gives a stable render closure and a single long-lived cursor subscription, sidestepping both the arg-equality skip and the per-render cursor churn.
+- Minimal and pattern-matched: `$edit-note` (form-2 + local `rea/atom`) already works; this brings `$add` to the same shape without rewiring `handle-new-note`.
+
+### Alternatives Considered
+- **Remove the `(empty? text)` gate** (gate only on `loading?`, like every other button) — rejected: `$add` still wouldn't re-render, so `text` would be stale at submit and post an empty note. Treats the symptom, not the cause.
+- **Refactor `$add` to a local `rea/atom`** (fully mirroring `$edit-note`) — rejected as larger: `handle-new-note` resets/loads through the parent `[:add-note]` cursor, so a local atom would require rewiring the ops handler.
+
+### Impacts and Risks
+- Verified live: the button enables on input and a note posts with the typed text (round-trips), editor collapses.
+- No ClojureScript component-test harness exists, so this is verified by live-client repro — consistent with the project's [REPL/manual verification convention](#2026-04-28--verify-dialect-compat-via-rich-comment-blocks-not-unit-tests). A reactivity regression test is a follow-up if a cljs test setup is stood up. [open]
+- **Latent pattern:** other form-1 components that deref an inline-created cursor could hit the same trap. None currently gate their render on live cursor state, so none are user-visible today — new form-1 + cursor code should prefer form-2. [open]
+
+### Links
+- [PR #81](https://github.com/nubank/clojuredocs/pull/81)
+- [Issue #9](https://github.com/nubank/clojuredocs/issues/9)
+- [../src/cljs/clojuredocs/notes.cljs](../src/cljs/clojuredocs/notes.cljs)
+
+---
+
 ## 2026-07-01 — Pin dev BASE_URL and PORT to :4000 so GitHub login works
 
 ### Status
