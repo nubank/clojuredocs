@@ -17,6 +17,35 @@ Document design and architecture decisions. Lightweight alternative to full ADRs
 
 ---
 
+## 2026-07-01 — Keep the weekly export throttle as the durable fix (#76)
+
+### Status
+Decided — resolves the provisional [2026-06-24 throttle entry](#2026-06-24--throttle-in-process-export-to-weekly-diagnostic-for-76). The throttle already shipped in [PR #77](https://github.com/nubank/clojuredocs/pull/77); this settles it as permanent.
+
+### Context
+- The weekly throttle (`export-interval-hours` 6 → 168) was landed as a *diagnostic* to isolate whether the in-process export ([#38](https://github.com/nubank/clojuredocs/issues/38)/[#39](https://github.com/nubank/clojuredocs/pull/39)) caused the client-crash regression (~2026-05-11 → mid-June).
+- The crash data is now in: Matomo (idSite=15) shows crash occurrences and the visits-crash-rate dropped to near-zero right after the throttle landed (~Jun 17) and have stayed down. Jordan reviewed the chart and commented it on [#76](https://github.com/nubank/clojuredocs/issues/76).
+
+### Decision
+- Keep the weekly cadence permanently. Do **not** revert #38, and do not move the export out-of-process for now.
+
+### Rationale
+- The diagnostic did its job: the crash rate collapsing right after the cadence change implicates export resource-contention, and the weekly cadence removes the symptom while keeping the export fresh enough for the editor plugins (weekly, plus a refresh on every deploy).
+- Reverting #38 would lose the automated export refresh for no benefit now that crashes are down; moving the export out-of-process is more work than the current problem justifies.
+
+### Impacts and Risks
+- `clojuredocs-export.json` refreshes ~weekly plus on each deploy — acceptable staleness for the editor-plugin consumers.
+- **Monitoring is manual:** the regression guard is Jordan reading Matomo by hand (chart commented on #76), not an automated alert — an automated crash-rate monitor needs Matomo API access that isn't set up. Wiring one is the outstanding ratchet so the regression can't silently return. [open]
+- The `export-interval-hours` comment in `main.clj` still reads "diagnostic throttle"; a wording refresh to "permanent" is a trivial optional follow-up (deliberately not bundled — the throttle value itself is unchanged). [open]
+
+### Links
+- [Issue #76](https://github.com/nubank/clojuredocs/issues/76)
+- [PR #77](https://github.com/nubank/clojuredocs/pull/77) — the throttle
+- [2026-06-24 — Throttle in-process export to weekly (diagnostic for #76)](#2026-06-24--throttle-in-process-export-to-weekly-diagnostic-for-76)
+- [../src/clj/clojuredocs/main.clj](../src/clj/clojuredocs/main.clj)
+
+---
+
 ## 2026-07-01 — Make $add a form-2 component to fix Add Note reactivity
 
 ### Status
@@ -147,7 +176,7 @@ Decided — applied by hand on the prod host during the #76 deploy session. Not 
 ## 2026-06-24 — Throttle in-process export to weekly (diagnostic for #76)
 
 ### Status
-Provisional — a diagnostic experiment, not a settled decision. Revisit once the crash data is in.
+Resolved — the crash data came in and supports it; kept permanently per the [2026-07-01 resolution](#2026-07-01--keep-the-weekly-export-throttle-as-the-durable-fix-76). (Originally provisional — a diagnostic experiment to isolate the #76 cause.)
 
 ### Context
 - [Issue #76](https://github.com/nubank/clojuredocs/issues/76): Matomo shows a client-side crash regression beginning the week of **2026-05-11**. Crash occurrences were flat at 0 all year, then jumped to ~9–14% of visits and stayed elevated through June.
