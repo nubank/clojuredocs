@@ -2,7 +2,10 @@
 
 export SESSION_KEY=Uy9V4nWSL2g92OGe
 
-export BASE_URL=http://localhost:5000
+# BASE_URL builds the GitHub OAuth redirect_uri, so it must match the port the
+# server actually listens on — otherwise GitHub rejects the callback (issue #9).
+export BASE_URL=http://localhost:4000
+export PORT=4000
 
 export CLJS_DEV=true
 

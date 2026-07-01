@@ -4,7 +4,7 @@ title: Decision Log
 description: Design and architecture decisions; lightweight alternative to full ADRs.
 tags: [decisions, architecture, living-document]
 created: 2026-04-29
-modified: 2026-06-24
+modified: 2026-07-01
 creator: L. Jordan Miller
 ai_assisted: "Claude Opus 4.8 via Claude Code"
 review_maturity: L4
@@ -14,6 +14,38 @@ review_note: Human-endorsed — decisions are the team's; AI-drafted rationale i
 # Decision Log
 
 Document design and architecture decisions. Lightweight alternative to full ADRs.
+
+---
+
+## 2026-07-01 — Pin dev BASE_URL and PORT to :4000 so GitHub login works
+
+### Status
+Decided — shipped in [PR #80](https://github.com/nubank/clojuredocs/pull/80). Fixes the [#9](https://github.com/nubank/clojuredocs/issues/9) login *blocker*, not #9's Add Note button itself.
+
+### Context
+- Resuming the "Now" tier, #9's investigation was blocked because local GitHub OAuth login returned HTTP 403, leaving the logged-in "Add Note" widget unreachable.
+- The OAuth `redirect_uri` is built from `BASE_URL` (`pages/common.clj` → `github/auth-redirect-url`). `bin/.devenv` set `BASE_URL=http://localhost:5000`, but `bin/dev` runs the server on `:4000` (it forces `PORT=4000`) — so dev advertised a `:5000` callback while listening on `:4000`.
+- Verified against the running server: the app never emits a 403 — `gh_auth.clj`'s `callback-handler` only ever `302`s. The 403 is GitHub-side, from the `redirect_uri` mismatch against the dev OAuth app's registered callback. Login already worked under `bin/prod-local`, which uses `:4000` consistently.
+- The prior handoff's leading theory — "dev reuses the *prod* OAuth app whose callback is `clojuredocs.org`" — was **disproven**: dev and prod are separate OAuth apps (`00c7…` vs `d024…`).
+
+### Decision
+- Pin **both** `BASE_URL` and `PORT` to `:4000` in `bin/.devenv`, so the advertised URL and the actual listening port always agree, however the server is started.
+
+### Rationale
+- The root cause is a coupling: `redirect_uri` is derived from `BASE_URL`, so `BASE_URL` must match the real port. Flipping `BASE_URL` alone would leave the manual `source .devenv && lein repl` path broken (server defaults to `:8080`, `main.clj:38`); pinning `PORT` too makes the pair consistent regardless of start method.
+- `:5000` only ever matched the nginx upstream (`resources/nginx.conf`), which is deploy-time and irrelevant when hitting `localhost` directly in dev.
+
+### Impacts and Risks
+- `bin/dev` and manual REPL starts now log in. Verified by equivalence: dev now sends the same `redirect_uri` (`localhost:4000/gh-callback`) that prod-local sent and that a live login succeeded through.
+- Does not touch #9's actual defect (the Add Note button staying disabled) — a separate client-side fix.
+- The `BASE_URL`↔`PORT` coupling is enforced only by these pinned values, not by code; a future divergence could reintroduce the mismatch. A startup assertion (`BASE_URL` port == jetty port) is a possible follow-up ratchet. [open]
+
+### Links
+- [PR #80](https://github.com/nubank/clojuredocs/pull/80)
+- [Issue #9](https://github.com/nubank/clojuredocs/issues/9)
+- [../bin/.devenv](../bin/.devenv)
+- [../src/clj/clojuredocs/pages/gh_auth.clj](../src/clj/clojuredocs/pages/gh_auth.clj)
+- [dev-setup.md](dev-setup.md)
 
 ---
 
