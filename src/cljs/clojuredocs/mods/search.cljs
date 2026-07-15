@@ -336,7 +336,7 @@
                                     :results-empty? (and (empty? data) (not (empty? ac-text)))
                                     :ac-results data
                                     :search-loading? false})))
-                             #_(metrics/track-search ac-text)))))
+                             (metrics/track-search ac-text (count data))))))
                      (close! ch))
                    ch))
 
@@ -352,13 +352,15 @@
                                  (dissoc state :search-loading? :ac-results :ac-text :results-empty?))
 
                ::ac-select (fn [state res]
-                             (util/navigate-to
-                               (or (:href res)
-                                   (util/var-path
-                                     (:ns res)
-                                     (:name res))))
+                             (let [href (or (:href res)
+                                            (util/var-path
+                                              (:ns res)
+                                              (:name res)))]
+                               (metrics/track-search-choose (:ac-text state) href)
+                               (util/navigate-to href))
                              nil)
                ::var-search (fn [state text]
+                              (metrics/track-event "search" "submit-full-search" text)
                               (util/navigate-to
                                 (str "/search?q=" (util/url-encode text)))
                               nil)})]
