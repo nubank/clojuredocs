@@ -51,7 +51,7 @@
 
 (defn add-indexes-to-coll! [coll ks]
   (doseq [k ks]
-    (mon/add-index! :examples [k])))
+    (mon/add-index! coll [k])))
 
 (defn add-all-indexes! []
   (add-indexes-to-coll!
@@ -59,14 +59,10 @@
                :author.login :author.account-source
                :editors.login :editors.account-source])
 
-  (add-indexes-to-coll! :namespaces [:name])
-
   (add-indexes-to-coll!
     :see-alsos [:from-var.name :from-var.ns :from-var.library-url
                 :to-var.ns :to-var.name :to-var.library-url
                 :account.login :account.account-source])
-
-  (add-indexes-to-coll! :libraries [:namespaces])
 
   (add-indexes-to-coll!
     :notes [:var.ns :var.name :var.library-url
@@ -76,13 +72,11 @@
     :legacy-var-redirects [:function-id
                            :editor.login :editor.account-source])
 
-  (add-indexes-to-coll! :users [:login :account-source])
-
-  (add-indexes-to-coll! :migrate-users [:email :migration-key]))
+  (add-indexes-to-coll! :users [:login :account-source]))
 
 (def ^:private export-path "resources/public/clojuredocs-export.json")
 
-(def ^:private export-interval-hours 6)
+(def ^:private export-interval-hours (* 24 7)) ; weekly — diagnostic throttle for #76 (was 6)
 
 (defn- run-scheduled-export []
   (try

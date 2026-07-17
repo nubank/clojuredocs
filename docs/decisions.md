@@ -3,8 +3,8 @@ type: Decision Log
 title: Decision Log
 description: Design and architecture decisions; lightweight alternative to full ADRs.
 tags: [decisions, architecture, living-document]
-created: 2026-04-26
-modified: 2026-06-16
+created: 2026-04-29
+modified: 2026-07-01
 creator: L. Jordan Miller
 ai_assisted: "Claude Opus 4.6 via GitHub Copilot (early entries); Claude Opus 4.8 via Claude Code (later entries)"
 review_maturity: L4
@@ -14,6 +14,193 @@ review_note: Human-endorsed — decisions are the team's; AI-drafted rationale i
 # Decision Log
 
 Document design and architecture decisions. Lightweight alternative to full ADRs.
+
+---
+
+## 2026-07-01 — Keep the weekly export throttle as the durable fix (#76)
+
+### Status
+Decided — resolves the provisional [2026-06-24 throttle entry](#2026-06-24--throttle-in-process-export-to-weekly-diagnostic-for-76). The throttle already shipped in [PR #77](https://github.com/nubank/clojuredocs/pull/77); this settles it as permanent.
+
+### Context
+- The weekly throttle (`export-interval-hours` 6 → 168) was landed as a *diagnostic* to isolate whether the in-process export ([#38](https://github.com/nubank/clojuredocs/issues/38)/[#39](https://github.com/nubank/clojuredocs/pull/39)) caused the client-crash regression (~2026-05-11 → mid-June).
+- The crash data is now in: Matomo (idSite=15) shows crash occurrences and the visits-crash-rate dropped to near-zero right after the throttle landed (~Jun 17) and have stayed down. Jordan reviewed the chart and commented it on [#76](https://github.com/nubank/clojuredocs/issues/76).
+
+### Decision
+- Keep the weekly cadence permanently. Do **not** revert #38, and do not move the export out-of-process for now.
+
+### Rationale
+- The diagnostic did its job: the crash rate collapsing right after the cadence change implicates export resource-contention, and the weekly cadence removes the symptom while keeping the export fresh enough for the editor plugins (weekly, plus a refresh on every deploy).
+- Reverting #38 would lose the automated export refresh for no benefit now that crashes are down; moving the export out-of-process is more work than the current problem justifies.
+
+### Impacts and Risks
+- `clojuredocs-export.json` refreshes ~weekly plus on each deploy — acceptable staleness for the editor-plugin consumers.
+- **Monitoring is manual:** the regression guard is Jordan reading Matomo by hand (chart commented on #76), not an automated alert — an automated crash-rate monitor needs Matomo API access that isn't set up. Wiring one is the outstanding ratchet so the regression can't silently return. [open]
+- The `export-interval-hours` comment in `main.clj` still reads "diagnostic throttle"; a wording refresh to "permanent" is a trivial optional follow-up (deliberately not bundled — the throttle value itself is unchanged). [open]
+
+### Links
+- [Issue #76](https://github.com/nubank/clojuredocs/issues/76)
+- [PR #77](https://github.com/nubank/clojuredocs/pull/77) — the throttle
+- [2026-06-24 — Throttle in-process export to weekly (diagnostic for #76)](#2026-06-24--throttle-in-process-export-to-weekly-diagnostic-for-76)
+- [../src/clj/clojuredocs/main.clj](../src/clj/clojuredocs/main.clj)
+
+---
+
+## 2026-07-01 — Make $add a form-2 component to fix Add Note reactivity
+
+### Status
+Decided — shipped in [PR #81](https://github.com/nubank/clojuredocs/pull/81). Fixes [#9](https://github.com/nubank/clojuredocs/issues/9) (the "Add Note" button, dead sitewide).
+
+### Context
+- The "Add Note" submit button never enabled. Reproduced against a running client: typing updated the textarea and live preview, but the button's `(empty? text)` gate stayed disabled — and `:text` was stale at submit time. The only console output was a benign `No handler for op ::text-change` println.
+- Root cause: `$add` was a **form-1** component receiving a freshly-built `(rea/cursor !state [:add-note])` on every parent (`$notes`) re-render. Those cursors are value-equal, so Reagent skipped re-rendering `$add` (unchanged args), and the per-render cursor churn dropped its deref subscription. The form-3 `$tabbed-markdown-editor` stayed reactive (it re-renders on its own deref); the form-1 parent did not.
+- This is **not** a cursor bug — cursors notify (the editor proves it). It's specifically form-1 + an inline-created cursor passed as an argument.
+- Two earlier hypotheses were disproven: registering a `::text-change` handler (original handoff) only silences the println — `:text` already updates directly; and "cursors don't work" is contradicted by the editor re-rendering.
+
+### Decision
+- Wrap `$add`'s body in a form-2 render fn (`(fn [] …)`), so it captures one stable cursor and derefs it in a persistent render — the reliably-reactive shape `$edit-note` already uses. No state-model or ops changes.
+
+### Rationale
+- Form-2 gives a stable render closure and a single long-lived cursor subscription, sidestepping both the arg-equality skip and the per-render cursor churn.
+- Minimal and pattern-matched: `$edit-note` (form-2 + local `rea/atom`) already works; this brings `$add` to the same shape without rewiring `handle-new-note`.
+
+### Alternatives Considered
+- **Remove the `(empty? text)` gate** (gate only on `loading?`, like every other button) — rejected: `$add` still wouldn't re-render, so `text` would be stale at submit and post an empty note. Treats the symptom, not the cause.
+- **Refactor `$add` to a local `rea/atom`** (fully mirroring `$edit-note`) — rejected as larger: `handle-new-note` resets/loads through the parent `[:add-note]` cursor, so a local atom would require rewiring the ops handler.
+
+### Impacts and Risks
+- Verified live: the button enables on input and a note posts with the typed text (round-trips), editor collapses.
+- No ClojureScript component-test harness exists, so this is verified by live-client repro — consistent with the project's [REPL/manual verification convention](#2026-04-28--verify-dialect-compat-via-rich-comment-blocks-not-unit-tests). A reactivity regression test is a follow-up if a cljs test setup is stood up. [open]
+- **Latent pattern:** other form-1 components that deref an inline-created cursor could hit the same trap. None currently gate their render on live cursor state, so none are user-visible today — new form-1 + cursor code should prefer form-2. [open]
+
+### Links
+- [PR #81](https://github.com/nubank/clojuredocs/pull/81)
+- [Issue #9](https://github.com/nubank/clojuredocs/issues/9)
+- [../src/cljs/clojuredocs/notes.cljs](../src/cljs/clojuredocs/notes.cljs)
+
+---
+
+## 2026-07-01 — Drop startup index decls for non-existent collections
+
+### Status
+Decided — shipped in [PR #82](https://github.com/nubank/clojuredocs/pull/82). Follow-on to [PR #61](https://github.com/nubank/clojuredocs/pull/61); closes [#70](https://github.com/nubank/clojuredocs/issues/70).
+
+### Context
+- `add-all-indexes!` (run at server boot) declared indexes for `:namespaces`, `:libraries`, and `:migrate-users`.
+- Audit: none are read or written anywhere in `src/clj` (every `:namespaces` occurrence is a map key, not a collection), none exist in the `data/mongodb/` dump, and the only references are in the dead `tools/old_import.clj`. So boot created three empty collections.
+- Before #61 the calls were inert — `add-indexes-to-coll!` ignored its `coll` arg and only ever indexed `:examples`. #61 made `coll` honored, which is what made these decls actually materialize the empty collections, and what makes the cleanup meaningful now.
+
+### Decision
+- Remove the `:namespaces`, `:libraries`, and `:migrate-users` index declarations. Keep the ones backed by real, queried collections: `:examples`, `:see-alsos`, `:notes`, `:users`, `:legacy-var-redirects`.
+
+### Rationale
+- Indexing collections that never receive documents is pure noise — it materializes empty collections and misleads anyone reading `add-all-indexes!` as a map of the data model.
+- `:legacy-var-redirects` is kept deliberately: it is queried (`entry.clj`) and present in the dump.
+
+### Impacts and Risks
+- No behavior change to any real feature; boot simply stops creating three empty collections.
+- **Noted, not addressed here:** the inverse gap — `:vars`, `:job-metrics`, and `:example-histories` are queried but have *no* index declarations. Adding those is a separate follow-up, kept out of this single-purpose cleanup. [open]
+
+### Links
+- [PR #82](https://github.com/nubank/clojuredocs/pull/82)
+- [Issue #70](https://github.com/nubank/clojuredocs/issues/70)
+- [PR #61](https://github.com/nubank/clojuredocs/pull/61)
+- [../src/clj/clojuredocs/main.clj](../src/clj/clojuredocs/main.clj)
+
+---
+
+## 2026-07-01 — Pin dev BASE_URL and PORT to :4000 so GitHub login works
+
+### Status
+Decided — shipped in [PR #80](https://github.com/nubank/clojuredocs/pull/80). Fixes the [#9](https://github.com/nubank/clojuredocs/issues/9) login *blocker*, not #9's Add Note button itself.
+
+### Context
+- Resuming the "Now" tier, #9's investigation was blocked because local GitHub OAuth login returned HTTP 403, leaving the logged-in "Add Note" widget unreachable.
+- The OAuth `redirect_uri` is built from `BASE_URL` (`pages/common.clj` → `github/auth-redirect-url`). `bin/.devenv` set `BASE_URL=http://localhost:5000`, but `bin/dev` runs the server on `:4000` (it forces `PORT=4000`) — so dev advertised a `:5000` callback while listening on `:4000`.
+- Verified against the running server: the app never emits a 403 — `gh_auth.clj`'s `callback-handler` only ever `302`s. The 403 is GitHub-side, from the `redirect_uri` mismatch against the dev OAuth app's registered callback. Login already worked under `bin/prod-local`, which uses `:4000` consistently.
+- The prior handoff's leading theory — "dev reuses the *prod* OAuth app whose callback is `clojuredocs.org`" — was **disproven**: dev and prod are separate OAuth apps (`00c7…` vs `d024…`).
+
+### Decision
+- Pin **both** `BASE_URL` and `PORT` to `:4000` in `bin/.devenv`, so the advertised URL and the actual listening port always agree, however the server is started.
+
+### Rationale
+- The root cause is a coupling: `redirect_uri` is derived from `BASE_URL`, so `BASE_URL` must match the real port. Flipping `BASE_URL` alone would leave the manual `source .devenv && lein repl` path broken (server defaults to `:8080`, `main.clj:38`); pinning `PORT` too makes the pair consistent regardless of start method.
+- `:5000` only ever matched the nginx upstream (`resources/nginx.conf`), which is deploy-time and irrelevant when hitting `localhost` directly in dev.
+
+### Impacts and Risks
+- `bin/dev` and manual REPL starts now log in. Verified by equivalence: dev now sends the same `redirect_uri` (`localhost:4000/gh-callback`) that prod-local sent and that a live login succeeded through.
+- Does not touch #9's actual defect (the Add Note button staying disabled) — a separate client-side fix.
+- The `BASE_URL`↔`PORT` coupling is enforced only by these pinned values, not by code; a future divergence could reintroduce the mismatch. A startup assertion (`BASE_URL` port == jetty port) is a possible follow-up ratchet. [open]
+
+### Links
+- [PR #80](https://github.com/nubank/clojuredocs/pull/80)
+- [Issue #9](https://github.com/nubank/clojuredocs/issues/9)
+- [../bin/.devenv](../bin/.devenv)
+- [../src/clj/clojuredocs/pages/gh_auth.clj](../src/clj/clojuredocs/pages/gh_auth.clj)
+- [dev-setup.md](dev-setup.md)
+
+---
+
+## 2026-06-24 — Prod host: patch kernel/glibc, cap journald, keep reboots manual
+
+### Status
+Decided — applied by hand on the prod host during the #76 deploy session. Not captured in any IaC; this entry is the only record (see Risks).
+
+### Context
+- Deploying the [#76](https://github.com/nubank/clojuredocs/issues/76) hotfix surfaced three host warnings in the SSH banner: a pending system restart, `/` at **87%** of a small **6.8G** root volume, and 61 available updates.
+- `reboot-required.pkgs` listed accumulated kernel images plus `libc6` (glibc) — security updates that `unattended-upgrades` had installed but never activated, because the host was never rebooted. It was running `6.14.0-1011-aws`; the newest installed kernel was `6.17.0-1017-aws`.
+- The disk pressure was **not** old kernels (only one was removable). `du` showed `/usr` (3.4G, mostly JVM + kernel modules) and `/var` (2.2G) as the weight; the one genuinely reclaimable chunk was an overgrown systemd journal (~686M — journald's default cap is ~10% of disk).
+
+### Decision
+- **Reboot** to activate the pending kernel + glibc updates; boot into `6.17.0-1017-aws`.
+- **Cap journald at `SystemMaxUse=200M`** in `/etc/systemd/journald.conf` (previously using journald's default cap, ~10% of disk).
+- **Purge superseded kernels** after reboot (`6.14.0-1011-aws`) as routine hygiene.
+- **Keep reboots manual** — do not enable `Unattended-Upgrade::Automatic-Reboot`.
+
+### Rationale
+- *Manual reboots:* this is a single-box prod site whose service cold-starts via `lein run` (slow, ~45–60s). A surprise automated reboot means unannounced downtime; a human choosing a low-traffic window is safer for one host than a 2 a.m. auto-reboot.
+- *Journald cap:* the journal was the only meaningfully reclaimable space on a tight volume. An explicit 200M cap makes the one-time `journalctl --vacuum-size=200M` permanent so it can't silently regrow to ~686M — the reliability ratchet (one-off cleanup → config-enforced bound).
+- *Patching:* deferred kernel + glibc updates are a standing security exposure; activating them was overdue.
+
+### Impacts and Risks
+- Brief downtime during the reboot. The service is `enabled`, came back clean, and the #76 hotfix was verified live afterward (`Export scheduled every 168 hours`).
+- Disk recovered **87% → 80%** (~490M, almost all journal). This is housekeeping, not headroom: a 6.8G root volume is undersized for a JVM + local-Mongo box. If pressure recurs, **grow the EBS volume** rather than scrape further. [open]
+- **Config drift:** the journald cap and the reboot were applied manually on the host — there is no infra-as-code for this box, so this entry is the only durable record. A rebuild would not reproduce the cap. Capturing host config (cloud-init / Ansible) is a possible follow-up. [open]
+
+### Links
+- [Issue #76](https://github.com/nubank/clojuredocs/issues/76) — the deploy that surfaced this
+- [PR #77](https://github.com/nubank/clojuredocs/pull/77) — the export-cadence hotfix deployed in the same session
+
+---
+
+## 2026-06-24 — Throttle in-process export to weekly (diagnostic for #76)
+
+### Status
+Resolved — the crash data came in and supports it; kept permanently per the [2026-07-01 resolution](#2026-07-01--keep-the-weekly-export-throttle-as-the-durable-fix-76). (Originally provisional — a diagnostic experiment to isolate the #76 cause.)
+
+### Context
+- [Issue #76](https://github.com/nubank/clojuredocs/issues/76): Matomo shows a client-side crash regression beginning the week of **2026-05-11**. Crash occurrences were flat at 0 all year, then jumped to ~9–14% of visits and stayed elevated through June.
+- That is the same week PR #39 shipped the in-process scheduled export (see the 2026-05-11 entry below), which runs `export/run-export` **every 6 hours** (4×/day) starting on boot.
+- Crashes cluster on the highest-traffic page (homepage `/`, ~5% pageview crash rate) and thin out on individual var pages — the shape of a server-wide intermittent degradation (crashes ∝ traffic), consistent with a recurring job rather than one broken page.
+- Causation is **unconfirmed**: a same-week tracking-script change, dependency bump, or browser-API change could equally explain it.
+
+### Decision
+- Reduce the recurring export cadence from every 6 hours to **once per week** (`export-interval-hours` 6 → `(* 24 7)` = 168) in `start-app`.
+- Keep the initial delay at `0`, so each deploy still refreshes the export — only the recurring interval changes.
+
+### Rationale
+- Smallest reversible change that isolates a single variable. If the weekly crash rate collapses toward ~0, the in-process export is implicated; if it stays elevated, the export is exonerated and we pivot to the other candidates.
+- A one-line flip back to `6` reverts it.
+
+### Impacts and Risks
+- `clojuredocs-export.json` refreshes roughly weekly plus on each deploy, so it can be staler between deploys. Acceptable for a short diagnostic window; the editor-plugin consumers tolerate slightly stale examples.
+- This does not fix root cause — it is an experiment. The issue stays open; root-cause confirmation and a regression guard are follow-ups.
+
+### Links
+- [Issue #76](https://github.com/nubank/clojuredocs/issues/76)
+- [Issue #38](https://github.com/nubank/clojuredocs/issues/38)
+- [PR #39](https://github.com/nubank/clojuredocs/pull/39)
+- [src/clj/clojuredocs/main.clj](src/clj/clojuredocs/main.clj)
 
 ---
 
@@ -52,6 +239,43 @@ Decided
 - [docs/diagrams/entity-attribute-er.md](diagrams/entity-attribute-er.md)
 - [entity-attribute-model.edn](entity-attribute-model.edn)
 - [Research-review run 1](diagrams/entity-attribute-er_research-review_run_1.md)
+
+---
+
+## 2026-06-16 — Experiment with session-discipline skills from the "smart zone" framing
+
+### Status
+Decided (experimental)
+
+### Context
+- Read [Matt Pocock's AI-coding workshop](https://finance.biggo.com/news/e7209c094224b09c) on the "smart zone": model reasoning degrades past ~100K tokens, so a long context is a liability. His prescriptions are classic engineering — front-load alignment ("grill me"), externalize state, review in a *fresh* context, decompose into vertical slices, and avoid `/compact` in favor of fresh starts.
+- The session that produced tonight's work ran on 1M-context Opus *and* used `/compact` — against his specific advice — even though the artifacts (EDN source of truth, deterministic generators, decision log, errata) embodied his deeper point: anchor on ground truth on disk, not the model's working memory.
+- We already hold a [reliability-ratchet](glossary.md) convention (LLM → REPL → Library → Enforcement), which is the same instinct applied to checks rather than sessions.
+
+### Decision
+- Translate the session discipline into Claude Code skills and adopt them as an experiment: `/grill-me` (alignment interview → plan on disk), `/handoff` (resumable state note so you can `/clear` instead of `/compact`), and `/ratchet` (harden a check up the ladder). Run the loop *grill → implement one slice → ship → handoff → clear → resume* and see whether it improves output quality and review burden.
+- Skills committed in [PR #74](https://github.com/nubank/clojuredocs/pull/74) and installed to `~/.claude/skills/` for cross-repo use.
+
+### Rationale
+- The mechanics matter less than the substrate: if state lives in files, throwing away a degrading context is cheap and safe. The skills make that the default rather than an afterthought.
+- A fresh-context reviewer catches what the implementer's context cannot — already validated this session, where independent audit sub-agents caught real fabrications.
+- It is a low-cost experiment: skills are additive, reversible, and prune-able if a habit doesn't pay off.
+
+### Alternatives Considered
+- Keep long sessions + `/compact` — the status quo; carries the degrading context forward, the failure mode the article names.
+- Adopt Pocock's full tooling (Sand Castle / the "Ralph loop") wholesale — heavier and TypeScript-oriented; the Claude Code equivalents (subagents, worktrees, background tasks) cover most of it without new infrastructure.
+- Do nothing / treat it as reading only — forgoes the cheap chance to harden the workflow.
+
+### Impacts and Risks
+- Behavioral change: the loop competes with the "keep momentum across phases" habit. Reconciliation — momentum should be carried by files, not by context length; a phase boundary becomes a natural `/handoff` + `/clear`.
+- The skills are experimental and may be revised or dropped. `/slice` and `/fresh-review` were considered and deferred.
+- Adapting an external framework: claims about the ~100K "smart zone" are the author's; we are testing the workflow, not certifying the number.
+
+### Links
+- [PR #74](https://github.com/nubank/clojuredocs/pull/74)
+- [Matt Pocock on AI coding's "smart zone"](https://finance.biggo.com/news/e7209c094224b09c)
+- [.github/skills/README.md](../.github/skills/README.md)
+- [glossary — reliability ratchet](glossary.md)
 
 ---
 
@@ -476,6 +700,8 @@ Decided
 ---
 
 ## 2026-05-11 — Schedule export JSON regeneration in-process
+
+> **Update 2026-06-24:** the 6-hour interval below was throttled to weekly pending the #76 crash investigation — see the [2026-06-24 entry](#2026-06-24--throttle-in-process-export-to-weekly-diagnostic-for-76) above. The text below records the original decision.
 
 ### Status
 Decided
