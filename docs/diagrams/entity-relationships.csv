@@ -1,0 +1,16 @@
+From,To,Via,Cardinality,Label
+dialect-compat,var,dialect-compat/var-key,one-to-one,compatibility of
+example,user,example/author,many-to-one,authored by
+example,user,example/editors,many-to-many,edited by
+example,var,example/var,many-to-one,documents
+example-history,example,example-history/example-id,many-to-one,edit of
+example-history,user,example-history/editor,many-to-one,edited by
+legacy-var-redirect,var,legacy-var-redirect/name,many-to-one,redirects to
+namespace,library,library/namespaces,many-to-one,part of
+note,user,note/author,many-to-one,authored by
+note,var,note/var,many-to-one,annotates
+see-also,user,see-also/author,many-to-one,authored by
+see-also,var,see-also/from-var,many-to-one,from
+see-also,var,see-also/to-var,many-to-one,to
+var,library,var/library-url,many-to-one,from library
+var,namespace,var/ns,many-to-one,in namespace

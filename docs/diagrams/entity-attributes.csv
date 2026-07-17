@@ -1,0 +1,69 @@
+Entity,Source,Cardinality,Attribute,Type,Refs,Required,Coverage,Status,Verified,Description,Evidence / Gap notes
+dialect-compat,edn-file,715 vars / 1880 var-dialect pairs,dialects,set,,yes,,exists,2026-06-09,"Set of dialect keywords, e.g. #{:bb :clj :cljs}","sidecar_repl.clj — (compat/dialects-for ""clojure.core"" ""map"")"
+dialect-compat,edn-file,715 vars / 1880 var-dialect pairs,test-suite-url,string,,no,,gap,,URL to test suite that verified compatibility,vision: 2026vison.md — Verification pipeline
+dialect-compat,edn-file,715 vars / 1880 var-dialect pairs,var-key,string,,yes,,exists,2026-06-09,"Qualified var name, e.g. ""clojure.core/map""","sidecar_repl.clj — (compat/dialects-for ""clojure.core"" ""map"")"
+dialect-compat,edn-file,715 vars / 1880 var-dialect pairs,verified-at,instant,,no,,gap,,When compatibility was last verified,vision: 2026vison.md — Verification pipeline
+dialect-compat,edn-file,715 vars / 1880 var-dialect pairs,version,string,,no,,gap,,Clojure version when compatibility was last verified,vision: 2026vison.md — Verification pipeline
+example,mongodb,2671,_id,object-id,,yes,,exists,2026-06-09,MongoDB ObjectId,sidecar_repl.clj — examples key universe scan
+example,mongodb,2671,author,ref,embedded-user,yes,,exists,2026-06-09,User who created the example,sidecar_repl.clj — examples key universe scan
+example,mongodb,2671,body,string,,yes,,exists,2026-06-09,The example source code,sidecar_repl.clj — examples key universe scan
+example,mongodb,2671,created-at,integer,,yes,,exists,2026-06-09,Unix epoch millis when created,sidecar_repl.clj — examples key universe scan
+example,mongodb,2671,deleted-at,integer,,no,54/2671,exists,2026-06-09,Unix epoch millis when soft-deleted. nil for active examples.,sidecar_repl.clj — examples key universe scan
+example,mongodb,2671,editors,vector,embedded-user,no,1708/2671,exists,2026-06-09,Users who have edited this example (may contain duplicates — see issue #65),sidecar_repl.clj — examples key universe scan
+example,mongodb,2671,updated-at,integer,,yes,,exists,2026-06-09,Unix epoch millis when last updated,sidecar_repl.clj — examples key universe scan
+example,mongodb,2671,var,ref,embedded-var,yes,,exists,2026-06-09,Which var this example is for,sidecar_repl.clj — examples key universe scan
+example-history,mongodb,3358,_id,object-id,,yes,,exists,2026-06-09,MongoDB ObjectId,sidecar_repl.clj — example-histories key universe scan
+example-history,mongodb,3358,body,string,,yes,,exists,2026-06-09,The NEW body after edit (not the old body — see issue for bug),sidecar_repl.clj — example-histories key universe scan
+example-history,mongodb,3358,created-at,integer,,yes,,exists,2026-06-09,Unix epoch millis when this edit occurred,sidecar_repl.clj — example-histories key universe scan
+example-history,mongodb,3358,editor,ref,embedded-user,yes,,exists,2026-06-09,User who made this edit,sidecar_repl.clj — example-histories key universe scan
+example-history,mongodb,3358,example-id,object-id,,yes,,exists,2026-06-09,ObjectId of the example this history entry belongs to,sidecar_repl.clj — example-histories key universe scan
+legacy-var-redirect,mongodb,1654,_id,object-id,,yes,,exists,2026-06-09,MongoDB ObjectId,sidecar_repl.clj — legacy-var-redirects key universe scan
+legacy-var-redirect,mongodb,1654,function-id,integer,,yes,,exists,2026-06-09,Legacy numeric function ID,sidecar_repl.clj — legacy-var-redirects key universe scan
+legacy-var-redirect,mongodb,1654,library-url,string,,yes,,exists,2026-06-09,Library GitHub URL,sidecar_repl.clj — legacy-var-redirects key universe scan
+legacy-var-redirect,mongodb,1654,name,string,,yes,,exists,2026-06-09,Var name,sidecar_repl.clj — legacy-var-redirects key universe scan
+legacy-var-redirect,mongodb,1654,ns,string,,yes,,exists,2026-06-09,Namespace name,sidecar_repl.clj — legacy-var-redirects key universe scan
+library,jvm-heap,1,gh-tag-url,string,,yes,,exists,2026-06-09,GitHub tag URL for the release,sidecar_repl.clj — (dissoc search/clojure-lib :vars :namespaces)
+library,jvm-heap,1,library-url,string,,yes,,exists,2026-06-09,GitHub repo URL,sidecar_repl.clj — (dissoc search/clojure-lib :vars :namespaces)
+library,jvm-heap,1,namespaces,vector,namespace,yes,,exists,2026-06-09,"Vector of namespace maps (38 entries). Implicitly a ref to :namespace (PR #57 review, @puredanger).",sidecar_repl.clj — (count (:namespaces search/clojure-lib))
+library,jvm-heap,1,source-base-url,string,,yes,,exists,2026-06-09,GitHub blob URL prefix for source links,sidecar_repl.clj — (dissoc search/clojure-lib :vars :namespaces)
+library,jvm-heap,1,vars,vector,var,yes,,exists,2026-06-09,"Vector of var maps (1,572 entries). Implicitly a ref to :var (PR #57 review, @puredanger).",sidecar_repl.clj — (count (:vars search/clojure-lib))
+library,jvm-heap,1,version,string,,yes,,exists,2026-06-09,"Clojure version string, e.g. ""1.12.4""",sidecar_repl.clj — (dissoc search/clojure-lib :vars :namespaces)
+namespace,jvm-heap,38,added,string,,no,2/38,exists,2026-06-09,Version when namespace was added. Only clojure.pprint and clojure.reflect.,sidecar_repl.clj — namespace key coverage
+namespace,jvm-heap,38,doc,string,,no,32/38,exists,2026-06-09,"Namespace docstring. Nil for 6 namespaces (core.logic.*, core.protocols, instant, tools.build.api).",entity_model_test.clj — namespace-universal-keys
+namespace,jvm-heap,38,name,string,,yes,,exists,2026-06-09,Fully qualified namespace name,sidecar_repl.clj — (keys (first (:namespaces search/clojure-lib)))
+note,mongodb,497,_id,object-id,,yes,,exists,2026-06-09,MongoDB ObjectId,sidecar_repl.clj — notes key universe scan
+note,mongodb,497,author,ref,embedded-user,yes,,exists,2026-06-09,User who created the note,sidecar_repl.clj — notes key universe scan
+note,mongodb,497,body,string,,yes,,exists,2026-06-09,Note text (markdown),sidecar_repl.clj — notes key universe scan
+note,mongodb,497,created-at,integer,,yes,,exists,2026-06-09,Unix epoch millis when created,sidecar_repl.clj — notes key universe scan
+note,mongodb,497,updated-at,integer,,yes,,exists,2026-06-09,Unix epoch millis when last updated,sidecar_repl.clj — notes key universe scan
+note,mongodb,497,var,ref,embedded-var,yes,,exists,2026-06-09,Which var this note is for,sidecar_repl.clj — notes key universe scan
+see-also,mongodb,2494,_id,object-id,,yes,,exists,2026-06-09,MongoDB ObjectId,sidecar_repl.clj — see-alsos key universe scan
+see-also,mongodb,2494,author,ref,embedded-user,yes,,exists,2026-06-09,User who created this see-also,sidecar_repl.clj — see-alsos key universe scan
+see-also,mongodb,2494,created-at,integer,,yes,,exists,2026-06-09,Unix epoch millis when created,sidecar_repl.clj — see-alsos key universe scan
+see-also,mongodb,2494,from-var,ref,embedded-var,yes,,exists,2026-06-09,Source var of the see-also relationship,sidecar_repl.clj — see-alsos key universe scan
+see-also,mongodb,2494,to-var,ref,embedded-var,yes,,exists,2026-06-09,Target var of the see-also relationship,sidecar_repl.clj — see-alsos key universe scan
+user,mongodb,4902,_id,object-id,,yes,,exists,2026-06-09,MongoDB ObjectId,sidecar_repl.clj — users key universe scan
+user,mongodb,4902,account-source,string,,yes,,exists,2026-06-09,"Auth provider: ""github"" or ""clojuredocs""",sidecar_repl.clj — users key universe scan
+user,mongodb,4902,avatar-url,string,,yes,,exists,2026-06-09,Avatar image URL,sidecar_repl.clj — users key universe scan
+user,mongodb,4902,login,string,,yes,,exists,2026-06-09,Username,sidecar_repl.clj — users key universe scan
+var,jvm-heap,1572,added,string,,no,907/1572,exists,2026-06-09,Version when this var was added,sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,arglists,list,,yes,,exists,2026-06-09,List of argument list strings,sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,column,integer,,no,1482/1572,exists,2026-06-09,Source column number,sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,deprecated,string,,no,18/1572,exists,2026-06-09,Deprecation version string,sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,doc,string,,no,1293/1572,exists,2026-06-09,Docstring,sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,dynamic,boolean,,no,56/1572,exists,2026-06-09,True if this var is dynamic (e.g. *out*),sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,file,string,,no,1482/1572,exists,2026-06-09,Source file path relative to project root,sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,forms,list,,no,4/1572,exists,2026-06-09,Usage form strings for special forms,sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,href,string,,yes,,exists,2026-06-09,"URL path for this var's page, e.g. ""/clojure.core/map""",sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,library-url,string,,yes,,exists,2026-06-09,Library GitHub URL (denormalized from Library),sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,line,integer,,no,1482/1572,exists,2026-06-09,Source line number,sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,macro,boolean,,no,190/1572,exists,2026-06-09,True if this var is a macro,sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,name,string,,yes,,exists,2026-06-09,Var name (stringified),sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,no-doc,boolean,,no,0/1572,absent,2026-06-09,"Documentation-visibility flag. Listed in search/var-keys, so the gather pipeline retains it when present, but no var in Clojure 1.12.4 carries it. (On namespaces, :no-doc is meaningful — gather-namespaces removes flagged namespaces.)",entity_model_test.clj — var key universe scan (no var carries :no-doc)
+var,jvm-heap,1572,ns,string,,yes,,exists,2026-06-09,Namespace name (stringified),sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,skip-wiki,boolean,,no,31/1572,exists,2026-06-09,True if var should be hidden from documentation,sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,special-form,boolean,,no,4/1572,exists,2026-06-09,"True for let, fn, letfn, loop",sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,static,boolean,,no,319/1572,vestigial,2026-06-09,"Legacy AOT-compilation hint. Present on 319 vars but no longer meaningful in modern Clojure; can be dropped (PR #57 review, @puredanger).",sidecar_repl.clj — var key universe scan; semantic deadness per PR #57 review
+var,jvm-heap,1572,tag,string,,no,122/1572,exists,2026-06-09,Return type hint (stringified from class),sidecar_repl.clj — var key universe scan
+var,jvm-heap,1572,type,string,,yes,,exists,2026-06-09,"Observed values on search/clojure-lib: ""function"" (1225), ""macro"" (190), ""var"" (157). type-of has a ""special-form"" branch and import.clj/UI accept that value, but no var here produces it — the 15 static special forms lose their :type in transform-var-meta (select-keys var-keys drops :type) and surface as ""var"". See issue #67.","entity_model_test.clj — var-type-values (type set = #{""function"" ""macro"" ""var""})"
+var,jvm-heap,1572,url,string,,no,1/1572,vestigial,2026-06-09,Present only on letfn with nil value. Vestigial annotation from Clojure source.,sidecar_repl.clj — letfn :url investigation
