@@ -4,7 +4,7 @@ title: Dev Environment Setup
 description: Notes for getting a local development environment running.
 tags: [dev-setup, mongodb, leiningen]
 created: 2026-02-27
-modified: 2026-06-16
+modified: 2026-07-01
 review_maturity: L2
 review_note: Human-authored setup notes; frontmatter added during OKF migration.
 ---
@@ -97,5 +97,7 @@ The `:repl-options :init` in `project.clj` loads `reup.clj` on REPL start, which
 ## Web Server
 
 - Default port: **8080** (or whatever `PORT` env var is set to)
-- `bin/dev` sets `PORT=4000`; `bin/.devenv` does not set `PORT`
-- Visit http://localhost:8080 (or your configured port) to verify
+- `bin/.devenv` pins `PORT=4000` and `BASE_URL=http://localhost:4000`; `bin/dev` also sets `PORT=4000`
+- Visit http://localhost:4000 (or your configured port) to verify
+
+> **GitHub login:** `BASE_URL` builds the OAuth `redirect_uri`, so it must match the port the server actually listens on. If they diverge (e.g. `BASE_URL` on `:5000` but the server on `:4000`), GitHub rejects the callback and login fails — see [issue #9](https://github.com/nubank/clojuredocs/issues/9).
