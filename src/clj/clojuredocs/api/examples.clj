@@ -26,18 +26,28 @@
 
   Identity is [:login :account-source]. When the same editor returns with a
   changed :avatar-url, replace the existing entry so the list does not grow
-  with near-duplicates (issue #65)."
+  with near-duplicates (issue #65). If historical duplicates already exist,
+  collapse them to a single refreshed entry at the first occurrence."
   (fn [editors]
     (let [user-id (select-keys user [:login :account-source])
           editors-vec (vec editors)
-          idx (->> editors-vec
-                   (map-indexed (fn [i e]
-                                  (when (= user-id (select-keys e [:login :account-source]))
-                                    i)))
-                   (remove nil?)
-                   first)]
-      (if idx
-        (assoc editors-vec idx user)
+          match-idxs (->> editors-vec
+                          (map-indexed (fn [i e]
+                                         (when (= user-id (select-keys e [:login :account-source]))
+                                           i)))
+                          (remove nil?)
+                          vec)]
+      (if (seq match-idxs)
+        (let [first-idx (first match-idxs)
+              ;; Drop all matching identities, then re-insert refreshed user
+              ;; at the original first-occurrence index.
+              without-dups (vec (keep-indexed
+                                 (fn [i e]
+                                   (when-not (some #{i} match-idxs) e))
+                                 editors-vec))]
+          (into [] (concat (take first-idx without-dups)
+                           [user]
+                           (drop first-idx without-dups))))
         (conj editors-vec user)))))
 
 (defn body-not-empty [{:keys [body]}]
