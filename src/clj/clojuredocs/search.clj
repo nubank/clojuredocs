@@ -37,7 +37,7 @@
      :skip-wiki])
 
 (defn impl-var?
-  "Returns true if a var is an implementation detail — either marked
+  "Returns true if a var is an implementation detail â€” either marked
    ^:skip-wiki or lacking a docstring (the same heuristic Clojure's
    official docs use to omit internal vars)."
   [{:keys [skip-wiki doc special-form]}]
@@ -189,7 +189,7 @@ Still maintains the O(n*m) guarantee.
 (defn drop-leading-stars
   "Strip leading '*' characters that users type as a wildcard prefix.
 
-  Only leading stars are removed (`^*+`). Names that *are* the stars-plus-rest
+  Only leading stars are removed (`^\*+`, regex `#"^\*+"`). Names that *are* the stars-plus-rest
   identifier (e.g. `*'`, `*1`) are recovered via `exact-name-matches` before
   this runs, so we do not erase the identifier itself."
   [q]
@@ -218,8 +218,7 @@ Still maintains the O(n*m) guarantee.
       (filterv #(= (str/lower-case (:name %)) q') searchable-vars))))
 
 (defn query [q]
-  (let [trimmed (some-> q str/trim)
-        exact (exact-name-matches trimmed)]
+  (let [trimmed (some-> q str/trim)]
     (cond
       ;; Bare `*` is both a wildcard and the real var `clojure.core/*`.
       (= "*" trimmed)
@@ -229,8 +228,15 @@ Still maintains the O(n*m) guarantee.
       ;; short-circuit: `drop-leading-stars` would otherwise strip the leading
       ;; asterisks and Lucene would never see the real identifier.
       ;; See https://github.com/nubank/clojuredocs/issues/87
-      (and (seq exact) trimmed (.startsWith trimmed "*"))
-      exact
+      ;; Only run the O(n) exact-name scan for star-prefixed queries.
+      (and trimmed (.startsWith trimmed "*"))
+      (let [exact (exact-name-matches trimmed)]
+        (if (seq exact)
+          exact
+          (when-let [formatted (format-query trimmed)]
+            (->> (clucy/search search-index formatted 1000 :default-field "keywords")
+                 (map #(assoc % :edit-distance (levenshtein-distance (str (:name %)) formatted)))
+                 (sort-by :edit-distance)))))
 
       :else
       (when-let [formatted (format-query trimmed)]
