@@ -108,9 +108,9 @@
                    :status {:state :exists :verified "2026-06-09"
                             :evidence "sidecar_repl.clj — var key universe scan"}}
     :type         {:type :string  :required? true :coverage nil
-                   :description "Observed values on search/clojure-lib: \"function\" (1225), \"macro\" (190), \"var\" (157). type-of has a \"special-form\" branch and import.clj/UI accept that value, but no var here produces it — the 15 static special forms lose their :type in transform-var-meta (select-keys var-keys drops :type) and surface as \"var\". See issue #67."
-                   :status {:state :exists :verified "2026-06-09"
-                            :evidence "entity_model_test.clj — var-type-values (type set = #{\"function\" \"macro\" \"var\"})"}}
+                   :description "Observed values on search/clojure-lib: \"function\", \"macro\", \"var\", and \"special-form\". Static special forms keep :type through transform-var-meta (var-keys includes :type) so type-of prefers it (issue #67)."
+                   :status {:state :exists :verified "2026-08-03"
+                            :evidence "entity_model_test.clj — var-type-values (type set includes \"special-form\")"}}
     :arglists     {:type :list    :required? true :coverage nil
                    :description "List of argument list strings"
                    :status {:state :exists :verified "2026-06-09"

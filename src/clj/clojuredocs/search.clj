@@ -34,7 +34,10 @@
      :deprecated
      :url
      :no-doc
-     :skip-wiki])
+     :skip-wiki
+     ;; Keep static/special-forms :type through transform-var-meta so
+     ;; type-of can prefer it (issue #67).
+     :type])
 
 (defn impl-var?
   "Returns true if a var is an implementation detail — either marked
