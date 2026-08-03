@@ -191,16 +191,20 @@
       (is (nil? (:url (first with-url)))))))
 
 (deftest var-type-values
-  (testing "var :type set is exactly the observed values — no phantom types"
-    ;; Strict equality (not subset?) so the schema cannot claim a type that never
-    ;; occurs. "special-form" is intentionally absent: the 15 static special forms
-    ;; lose their :type in transform-var-meta and surface as "var" (issue #67).
-    ;; See the :var/:type entry in entity-attribute-model.edn.
+  (testing "var :type set includes special-form for static special forms"
+    ;; :type is retained through transform-var-meta (var-keys) so static/special-forms
+    ;; keep "special-form" and type-of prefers it (issue #67).
     (let [actual-types (->> (:vars search/clojure-lib)
                             (map :type)
-                            set)]
-      (is (= #{"function" "macro" "var"} actual-types)
-          (str "var :type set drifted from documented values: " actual-types)))))
+                            set)
+          special-form-count (->> (:vars search/clojure-lib)
+                                  (filter #(= "special-form" (:type %)))
+                                  count)]
+      (is (= #{"function" "macro" "var" "special-form"} actual-types)
+          (str "var :type set drifted from documented values: " actual-types))
+      (is (= (count static/special-forms) special-form-count)
+          (str "expected " (count static/special-forms)
+               " special-form vars, got " special-form-count)))))
 
 ;; --- Embedded sub-schema consistency ---
 
