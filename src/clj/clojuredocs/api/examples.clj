@@ -22,12 +22,23 @@
    :example-id (:_id example)})
 
 (defn add-editor [user]
-  (fn [editors]
-    (let [eds (map #(select-keys % [:login :account-source]) editors)]
-      (if (get (set eds) (select-keys user [:login :account-source]))
-        editors
-        (concat editors [user])))))
+  "Append user to editors, or refresh their entry if already present.
 
+  Identity is [:login :account-source]. When the same editor returns with a
+  changed :avatar-url, replace the existing entry so the list does not grow
+  with near-duplicates (issue #65)."
+  (fn [editors]
+    (let [user-id (select-keys user [:login :account-source])
+          editors-vec (vec editors)
+          idx (->> editors-vec
+                   (map-indexed (fn [i e]
+                                  (when (= user-id (select-keys e [:login :account-source]))
+                                    i)))
+                   (remove nil?)
+                   first)]
+      (if idx
+        (assoc editors-vec idx user)
+        (conj editors-vec user)))))
 
 (defn body-not-empty [{:keys [body]}]
   (when (empty? body)
