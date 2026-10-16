@@ -274,9 +274,18 @@ document.location.href = noddy.href;
 
 (defn $library-nav [{:keys [namespaces]} & [current-ns]]
   (when-not (empty? namespaces)
-    [:div.library-nav
-     [:h5 "Namespaces"]
-     ($namespaces (map :name namespaces) current-ns)]))
+    (let [by-library (group-by #(get search/library-namespaces %) (map :name namespaces))
+          core-names (get by-library nil)
+          library-groups (->> (dissoc by-library nil)
+                              (sort-by key))]
+      [:div.library-nav
+       [:div.library-section
+        [:h5 "Clojure core"]
+        ($namespaces core-names current-ns)]
+       (for [[library-name names] library-groups]
+         [:div.library-section
+          [:h5 library-name]
+          ($namespaces names current-ns)])])))
 
 (defn ellipsis [s n]
   (cond
