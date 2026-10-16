@@ -539,42 +539,6 @@
       {:line-height "50px"
        :margin 0}]]]])
 
-(def jobs
-  [[:.job-preview
-    [:.job-location :.comp :.remote-ok :.comp-equity :.comp-cash
-     {:color "var(--gray-400)"}]]
-   [:.jobs-page
-    [:.job-preview-wrapper
-     :.list-jobs-header
-     {:border-bottom "solid var(--gray-50) 1px"}]
-    [:.job-preview-wrapper
-     {:padding "var(--space-md) 0"}]
-    [:.job-preview
-     [:.comp
-      {:margin-top "3px"
-       :color "var(--gray-200)"
-       :font-size "var(--font-size-sm)"}]]
-    [:.job-info
-     [:.section-header
-      {:border-bottom "solid var(--gray-50) 1px"
-       :color "var(--gray-400)"
-       :font-size "var(--font-size-xl)"}]
-     [:ul {:margin-bottom "var(--space-md)"}]
-     [:h1 {:font-size "var(--font-size-xl)"
-           :font-weight 'bold}]]
-    [:.btn {:border-radius 0}]
-    [:.job-description :.company-description
-     [:ul {:margin-left "var(--space-md)"}]
-     [:li {:margin-bottom "0.5em"
-           :list-style-type 'disc}]]
-    [:.apply-now
-     {:border-top "solid var(--gray-100) 1px"
-      :border-bottom "solid var(--gray-100) 1px"
-      :padding "var(--space-sm) 0"
-      :text-align 'center}
-     [:.btn {:width "75%"
-             :border-radius 0}]]]])
-
 (def app
   [root-vars
 
@@ -1216,8 +1180,6 @@
     [:.search-controls
      {:text-align 'center
       :color "var(--gray-400)"}]]
-
-   jobs
 
    [:.header-banner
     {:background-color "var(--color-banner-header)"
