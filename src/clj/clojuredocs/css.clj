@@ -2,46 +2,86 @@
   (:require [garden.stylesheet :refer [at-media]]
             [nsfw.css :as nc]))
 
+(defn light-dark
+  [light dark]
+  (str "light-dark(" light ", " dark ")"))
+
+(defn mix
+  "`color` at `pct`% opacity."
+  [color pct]
+  (str "color-mix(in srgb, " color " " pct "%, transparent)"))
+
 (def root-vars
   [":root"
-   {:--gray-900 "#333"
-    :--gray-800 "#444"
-    :--gray-700 "#555"
-    :--gray-600 "#666"
-    :--gray-500 "#777"
-    :--gray-400 "#888"
-    :--gray-300 "#999"
-    :--gray-200 "#aaa"
-    :--gray-150 "#bbb"
-    :--gray-100 "#ccc"
-    :--gray-75 "#ddd"
-    :--gray-50 "#eee"
-    :--gray-25 "#f8f8f8"
-    :--gray-10 "#fafafa"
+   {:color-scheme "light dark"
+
+    :--gray-900 (light-dark "#333" "#e4e7e8")
+    :--gray-800 (light-dark "#444" "#d2d6d8")
+    :--gray-700 (light-dark "#555" "#c2c7ca")
+    :--gray-600 (light-dark "#666" "#b2b8bc")
+    :--gray-500 (light-dark "#777" "#a1a7ac")
+    :--gray-400 (light-dark "#888" "#8f959b")
+    :--gray-300 (light-dark "#999" "#7b8187")
+    :--gray-200 (light-dark "#aaa" "#686e73")
+    :--gray-150 (light-dark "#bbb" "#555a5f")
+    :--gray-100 (light-dark "#ccc" "#484d52")
+    :--gray-75 (light-dark "#ddd" "#3a3e42")
+    :--gray-50 (light-dark "#eee" "#2e3235")
+    :--gray-25 (light-dark "#f8f8f8" "#24272a")
+    :--gray-10 (light-dark "#fafafa" "#202325")
 
     :--rgb-white "255,255,255"
     :--rgb-black "0,0,0"
-    :--rgb-brand "66, 139, 202"
 
-    :--color-brand "#428bca"
-    :--color-brand-hover "#2a6496"
-    :--color-brand-soft "rgba(var(--rgb-brand), 0.8)"
-    :--color-brand-faint "rgba(var(--rgb-brand), 0.1)"
-    :--color-brand-nav-bg "#47a3da"
-    :--color-brand-nav-hover "#258ecd"
+    ;; Surfaces
+    :--bg (light-dark "#fff" "#181a1b")
+    :--bg-input (light-dark "#fff" "#202325")
+    :--bg-pre (light-dark "#f5f5f5" "#202325")
+    :--bg-hover (light-dark "#e6e6e6" "#2e3235")
+    :--border-strong (light-dark "#adadad" "#5a6065")
+    :--color-shade (light-dark "#000" "#fff")
+    :--color-on-solid "#fff"
 
-    :--color-warning-text "#856404"
-    :--color-warning-bg "#fff3cd"
-    :--color-warning-border "#ffc107"
-    :--color-warning-border-soft "#ffeaa0"
-    :--color-test-pass "#5a5"
-    :--color-test-fail "#a55"
+    :--color-brand (light-dark "#428bca" "#6fa8dc")
+    :--color-brand-hover (light-dark "#2a6496" "#9cc3e8")
+    :--color-brand-soft (mix "var(--color-brand)" 80)
+    :--color-brand-muted (mix "var(--color-brand)" 70)
+    :--color-brand-nav-bg (light-dark "#47a3da" "#2b6f9a")
+    :--color-brand-nav-hover (light-dark "#258ecd" "#235c80")
+
+    :--color-warning-text (light-dark "#856404" "#ffd966")
+    :--color-warning-bg (light-dark "#fff3cd" "rgba(255,193,7,0.12)")
+    :--color-warning-border (light-dark "#ffc107" "#8a6d1a")
+    :--color-warning-border-soft (light-dark "#ffeaa0" "#6b5614")
+    :--color-test-pass (light-dark "#5a5" "#3f8f3f")
+    :--color-test-fail (light-dark "#a55" "#a04848")
+    :--color-test-error (light-dark "#555" "#666")
+    :--color-test-pending (light-dark "#999" "#777")
+    :--color-error-bg (light-dark "#fcc" "#5a2a2a")
+    :--color-checker (light-dark "#f0f0f0" "#262a2c")
     :--color-highlight "#ffa500"
 
-    :--color-banner-staging "rgb(201,48,44)"
-    :--color-banner-survey "rgb(91,164,207)"
+    :--color-code-text (light-dark "#c7254e" "#ee8aa3")
+    :--color-code-bg (light-dark "#f9f2f4" "rgba(255,255,255,0.08)")
+    :--color-close (light-dark "#000" "#fff")
+    :--color-close-shadow (light-dark "#fff" "transparent")
+
+    :--color-logo-bg (light-dark "transparent" "#fff")
+
+    ;; Clojure syntax
+    :--syntax-comment (light-dark "#008200" "#6dbb6d")
+    :--syntax-string (light-dark "#2d2dfe" "#8d9bff")
+    :--syntax-keyword (light-dark "#77f" "#a0a0ff")
+    :--syntax-builtin (light-dark "#687868" "#9fb09f")
+    :--syntax-def (light-dark "#55c" "#9d9dee")
+    :--syntax-paren-0 (light-dark "#272" "#7ec27e")
+    :--syntax-paren-1 (light-dark "#940" "#d99a5e")
+    :--syntax-paren-2 (light-dark "#44a" "#8c8cdf")
+
+    :--color-banner-staging (light-dark "rgb(201,48,44)" "rgb(160,40,37)")
+    :--color-banner-survey (light-dark "rgb(91,164,207)" "rgb(52,112,150)")
     :--color-banner-conj "rgb(68,138,88)"
-    :--color-banner-header "#3498db"
+    :--color-banner-header (light-dark "#3498db" "#2b78ad")
 
     :--space-3xs "3px"
     :--space-2xs "5px"
@@ -65,11 +105,9 @@
 
 (def light-blue "var(--color-brand-soft)")
 
-(def lightest-blue "var(--color-brand-faint)")
+(def light-black (str (mix "var(--color-shade)" 5) ";"))
 
-(def light-black "rgba(var(--rgb-black), 0.05);")
-
-(def code-bg "rgba(var(--rgb-black), 0.01)")
+(def code-bg (mix "var(--color-shade)" 1))
 
 (def monospace-font "Monaco, Menlo, Consolas, \"Courier New\", monospace")
 
@@ -84,7 +122,7 @@
      {:margin-bottom "var(--space-xl)"}
      (nc/at-bp {:margin-bottom "var(--space-md)"})]
     [:.quick-lookup-wrapper
-     {:background-color 'white
+     {:background-color "var(--bg)"
       :margin "-30px -25px"
       :padding "30px 25px"}
      (nc/at-bp {:margin 0
@@ -138,7 +176,10 @@
            :margin-right "var(--space-lg)"
            :margin-bottom "var(--space-md)"}]
      [:img {:max-width "200px"
-            :max-height "50px"}
+            :max-height "50px"
+            :background-color "var(--color-logo-bg)"
+            :box-shadow "0 0 0 5px var(--color-logo-bg)"
+            :border-radius "4px"}
       (nc/at-bp :md {:max-height "35px"})
       (nc/at-bp :sm {:max-height "50px"})]]
     [:.recently-updated
@@ -177,7 +218,7 @@
           :margin-top "var(--space-2xs)"
           :margin-bottom "var(--space-2xs)"
           :padding-bottom "var(--space-sm)"}
-     [:&.highlighted {:background-color "rgba(var(--rgb-black),0.02)"}]
+     [:&.highlighted {:background-color (mix "var(--color-shade)" 2)}]
      [:p {:margin-bottom 0}]
      [:i {:margin-left 0
           :color "var(--gray-600)"
@@ -412,7 +453,7 @@
            :margin-bottom 0
            :line-height "1.5em"}]]]
    [:.quickref-mobile-toc
-    [:h5 {:color 'white
+    [:h5 {:color "var(--color-on-solid)"
           :margin-bottom "var(--space-2xs)"
           :margin-top 0}]
     [:.categories {:font-size "var(--font-size-xs)"
@@ -481,7 +522,7 @@
 
 (def example-editor
   [[:.example-editor
-    {:background-color 'white
+    {:background-color "var(--bg)"
      :margin-bottom "var(--space-xs)"}
     [:&.disabled {:background-color "var(--gray-50)"}]
     [:form {:margin-bottom "var(--space-md)"}]
@@ -502,7 +543,7 @@
      :color "var(--gray-400)"}]])
 
 (def styleguide-page
-  [(let [color "#f0f0f0"
+  [(let [color "var(--color-checker)"
          size 40]
      [:.checker-bg
       {:background-color "var(--gray-10)"
@@ -539,6 +580,64 @@
       {:line-height "50px"
        :margin 0}]]]])
 
+;; bootstrap.min.css has hardcoded colors, this overrides them
+(def bootstrap-theme
+  [[:a {:color "var(--color-brand)"}
+    [:&:hover :&:focus {:color "var(--color-brand-hover)"}]]
+   [:hr {:border-top-color "var(--gray-50)"}]
+   [:.text-muted {:color "var(--gray-500)"}]
+   [:blockquote {:border-left-color "var(--gray-50)"}]
+   [:code {:color "var(--color-code-text)"
+           :background-color "var(--color-code-bg)"}]
+   [:pre {:color "var(--gray-900)"
+          :background-color "var(--bg-pre)"
+          :border-color "var(--gray-100)"}]
+   ["pre code" {:color 'inherit
+                :background-color 'transparent}]
+   [:.form-control {:color "var(--gray-700)"
+                    :background-color "var(--bg-input)"
+                    :border-color "var(--gray-100)"}]
+   [".form-control::placeholder" {:color "var(--gray-500)"}]
+   [".form-control[disabled]" ".form-control[readonly]"
+    {:background-color "var(--gray-50)"}]
+   [:.btn-default {:color "var(--gray-900)"
+                   :background-color "var(--bg-input)"
+                   :border-color "var(--gray-100)"}]
+   [".btn-default:hover" ".btn-default:focus" ".btn-default:active"
+    ".btn-default.active"
+    {:color "var(--gray-900)"
+     :background-color "var(--bg-hover)"
+     :border-color "var(--border-strong)"}]
+   [".nav > li > a:hover" ".nav > li > a:focus"
+    {:background-color "var(--gray-50)"}]
+   [:.nav-tabs {:border-bottom-color "var(--gray-75)"}]
+   [".nav-tabs > li > a:hover"
+    {:border-color "var(--gray-50) var(--gray-50) var(--gray-75)"}]
+   [".nav-tabs > li.active > a" ".nav-tabs > li.active > a:hover"
+    ".nav-tabs > li.active > a:focus"
+    {:color "var(--gray-700)"
+     :background-color "var(--bg)"
+     :border-color "var(--gray-75)"
+     :border-bottom-color 'transparent}]
+   [".table > thead > tr > th" ".table > tbody > tr > th"
+    ".table > tfoot > tr > th" ".table > thead > tr > td"
+    ".table > tbody > tr > td" ".table > tfoot > tr > td"
+    {:border-top-color "var(--gray-75)"}]
+   [".table > thead > tr > th" {:border-bottom-color "var(--gray-75)"}]
+   [:.close {:color "var(--color-close)"
+             :text-shadow "0 1px 0 var(--color-close-shadow)"}]
+   [".close:hover" ".close:focus" {:color "var(--color-close)"}]])
+
+(def syntax-theme
+  [[:.tok-comment {:color "var(--syntax-comment)"}]
+   [:.tok-string {:color "var(--syntax-string)"}]
+   [:.tok-keyword {:color "var(--syntax-keyword)"}]
+   [:.tok-builtin {:color "var(--syntax-builtin)"}]
+   [:.tok-def {:color "var(--syntax-def)"}]
+   [:.tok-paren-0 {:color "var(--syntax-paren-0)"}]
+   [:.tok-paren-1 {:color "var(--syntax-paren-1)"}]
+   [:.tok-paren-2 {:color "var(--syntax-paren-2)"}]])
+
 (def app
   [root-vars
 
@@ -547,7 +646,12 @@
    [:html :body {:-webkit-font-smothing 'antialiased
                  :height "100%"
                  :font-family "\"Helvetica Neue\", Helvetica, sans-serif"
-                 :color "var(--gray-800)"}]
+                 :color "var(--gray-800)"
+                 :background-color "var(--bg)"}]
+
+   bootstrap-theme
+   syntax-theme
+
    [:body {:font-size "16px"
            :line-height "1.5em"
            :transition "all 0.2s ease-in"
@@ -585,7 +689,7 @@
    [:code {:font-size "var(--font-size-base)"}]
    ["a > code" {:color blue}]
    [:.badge {:background-color 'transparent
-             :color "rgba(var(--rgb-black), 0.2)"
+             :color (mix "var(--color-shade)" 20)
              :border-radius "3px"
              :padding "1px 5px"
              :font-weight 500
@@ -635,7 +739,7 @@
     {:position 'sticky
      :top 0
      :z-index 1000
-     :background-color 'white}]
+     :background-color "var(--bg)"}]
 
    [:header.navbar
     {:border-radius 0
@@ -723,7 +827,7 @@
                             :z-index 1001
                             :max-height "60vh"
                             :overflow-y 'auto
-                            :background-color 'white
+                            :background-color "var(--bg)"
                             :box-shadow "0 2px 4px rgba(var(--rgb-black),0.1)"
                             :margin "0 -20px"
                             :padding "0 20px"}]]]
@@ -737,7 +841,7 @@
      [:.desktop-nav-bar :.desktop-side-nav {:display 'none}]
      [:.mobile-nav-bar
       (nc/transition "all 0.2s ease")
-      {:background-color 'white
+      {:background-color "var(--bg)"
        :position 'sticky
        :top 0
        :width "100%"
@@ -752,7 +856,7 @@
        :width "200px"
        :z-index 10000
        :background-color "var(--color-brand-nav-bg)"
-       :color 'white
+       :color "var(--color-on-solid)"
        :font-weight 300
        :top 0
        :bottom 0
@@ -768,7 +872,7 @@
             :font-weight 500}
        [:i {:margin-right "var(--space-2xs)"}]]
       [:li {:margin 0}
-       [:a {:color 'white}
+       [:a {:color "var(--color-on-solid)"}
         [:&:hover {:background-color "var(--color-brand-nav-hover)"}]]]
       [:.navbar-nav {:margin 0}]]
      [:.mobile-push-wrapper.mobile-push
@@ -799,7 +903,7 @@
                   :padding "var(--space-md)"
                   :color "var(--gray-400)"}
     [:code {:color "var(--gray-400)"}]
-    [:a {:color "rgba(var(--rgb-brand), 0.7)"}]]
+    [:a {:color "var(--color-brand-muted)"}]]
 
    intro-page
 
@@ -984,7 +1088,7 @@
                          :padding "0 20px"}]
    [:.search-active
     [:ac-results-widget
-     {:background-color 'white}
+     {:background-color "var(--bg)"}
      [:ul.ac-results
       {:overflow 'auto}]
      ["ul.ac-results > li"
@@ -1041,11 +1145,11 @@
     [:.aside {:font-size "var(--font-size-xs)"}]]
    [:.test-result
     {:padding "3px"
-     :color 'white}
+     :color "var(--color-on-solid)"}
     [:&.pass {:background-color "var(--color-test-pass)"}]
     [:&.fail {:background-color "var(--color-test-fail)"}]
-    [:&.error {:background-color "var(--gray-700)"}]
-    [:&.pending {:background-color "var(--gray-300)"}]]
+    [:&.error {:background-color "var(--color-test-error)"}]
+    [:&.pending {:background-color "var(--color-test-pending)"}]]
    [:.add-example-page
     [:.syntaxify
      [:code {:font-size "var(--font-size-xs)"}]]
@@ -1060,7 +1164,7 @@
        :color "var(--gray-100)"
        :margin 0}]]
     [:.null-state
-     {:background-color 'white
+     {:background-color "var(--bg)"
       :border 'none
       :border-top 'none}]
     [:textarea
@@ -1107,7 +1211,7 @@
       {:width "100%"
        :border "solid var(--gray-50) 1px"
        :padding "var(--space-2xs)"}
-      [:&.error {:background-color "#fcc"}]]]
+      [:&.error {:background-color "var(--color-error-bg)"}]]]
     [:.sg-inspector-outlets
      [:.message
       {:margin-bottom "var(--space-xs)"}
@@ -1183,10 +1287,10 @@
 
    [:.header-banner
     {:background-color "var(--color-banner-header)"
-     :color 'white
+     :color "var(--color-on-solid)"
      :text-align 'center
      :padding "3px"
      :font-weight '300
      :font-size "var(--font-size-sm)"}
-    [:a {:color 'white
+    [:a {:color "var(--color-on-solid)"
          :text-decoration 'underline}]]])
