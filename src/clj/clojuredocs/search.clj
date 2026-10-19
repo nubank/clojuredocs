@@ -37,7 +37,7 @@
      :skip-wiki])
 
 (defn impl-var?
-  "Returns true if a var is an implementation detail — either marked
+  "Returns true if a var is an implementation detail â€” either marked
    ^:skip-wiki or lacking a docstring (the same heuristic Clojure's
    official docs use to omit internal vars)."
   [{:keys [skip-wiki doc special-form]}]
@@ -186,12 +186,15 @@ Still maintains the O(n*m) guarantee.
       (map #(identity %2) (cons nil b) (range))
       a)))
 
-(defn drop-leading-stars [q]
+(defn drop-leading-stars
+  "Strip leading '*' characters that users type as a wildcard prefix.
+
+  Only leading stars are removed (`^\*+`, regex `#"^\*+"`). Names that *are* the stars-plus-rest
+  identifier (e.g. `*'`, `*1`) are recovered via `exact-name-matches` before
+  this runs, so we do not erase the identifier itself."
+  [q]
   (when q
-    (let [stripped (if (.startsWith q "*")
-                     (->> (str/replace q #"\**" "")
-                          (apply str))
-                     q)]
+    (let [stripped (str/replace q #"^\*+" "")]
       (when-not (empty? stripped)
         stripped))))
 
@@ -207,12 +210,36 @@ Still maintains the O(n*m) guarantee.
     lucene-escape
     (str "*")))
 
-(defn query [q]
-  (cond
-    (= "*" q) [(lookup "clojure.core/*")]
+(defn exact-name-matches
+  "Return searchable vars whose `:name` equals `q` (case-insensitive, trimmed)."
+  [q]
+  (when-not (str/blank? q)
+    (let [q' (str/lower-case (str/trim q))]
+      (filterv #(= (str/lower-case (:name %)) q') searchable-vars))))
 
-    :else
-    (when-let [q (format-query q)]
-      (->> (clucy/search search-index q 1000 :default-field "keywords")
-           (map #(assoc % :edit-distance (levenshtein-distance (str (:name %)) q)))
-           (sort-by :edit-distance)))))
+(defn query [q]
+  (let [trimmed (some-> q str/trim)]
+    (cond
+      ;; Bare `*` is both a wildcard and the real var `clojure.core/*`.
+      (= "*" trimmed)
+      [(lookup "clojure.core/*")]
+
+      ;; Vars whose names start with `*` (e.g. `*'`, `*1`, `*agent*`) must
+      ;; short-circuit: `drop-leading-stars` would otherwise strip the leading
+      ;; asterisks and Lucene would never see the real identifier.
+      ;; See https://github.com/nubank/clojuredocs/issues/87
+      ;; Only run the O(n) exact-name scan for star-prefixed queries.
+      (and trimmed (.startsWith trimmed "*"))
+      (let [exact (exact-name-matches trimmed)]
+        (if (seq exact)
+          exact
+          (when-let [formatted (format-query trimmed)]
+            (->> (clucy/search search-index formatted 1000 :default-field "keywords")
+                 (map #(assoc % :edit-distance (levenshtein-distance (str (:name %)) formatted)))
+                 (sort-by :edit-distance)))))
+
+      :else
+      (when-let [formatted (format-query trimmed)]
+        (->> (clucy/search search-index formatted 1000 :default-field "keywords")
+             (map #(assoc % :edit-distance (levenshtein-distance (str (:name %)) formatted)))
+             (sort-by :edit-distance))))))
