@@ -63,14 +63,12 @@
           [:a {:href (gh-auth-url page-uri)}
            [:i.fa.fa-github-square] "Log In"]])
        (when show-stars?
-         [:li
-          [:iframe.gh-starred-count
-           {:src "/github-btn.html?user=nubank&repo=clojuredocs&type=watch&count=true"
-            :allowtransparency "true"
-            :frameborder "0"
-            :scrolling "0"
-            :width "100"
-            :height "20"}]])]
+         (when-let [{:keys [stars]} (gh/repo-stats "nubank/clojuredocs")]
+           [:li
+            [:a.gh-stars {:href "https://github.com/nubank/clojuredocs"
+                          :target "_blank"
+                          :rel "noopener"}
+             [:i.fa.fa-star] stars]]))]
       (when-not hide-search
         [:div.nav-search-widget.navbar-right.navbar-form
          [:form.search
@@ -200,7 +198,7 @@
       [:div.row
        [:div.col-sm-12
         [:div.divider
-         "- ❦ -"]]]]]
+          "powered by " [:a {:href "https://nu.com/en/about"} "Nu"]]]]]]
     (when (env/bool :cljs-dev)
       [:script {:src "/js/fastclick.min.js"}])
     (when (env/bool :cljs-dev)

@@ -735,12 +735,11 @@
    ;; check
    [:.sticky-wrapper {:min-height "100px"
                       :height ["auto !important" "100%"]}]
-   [:footer :.sticky-push {:height "200px"}]
    [:footer
     {:text-align 'center
      :font-size "var(--font-size-xs)"
-     :padding-top "130px"}
-    [:.divider {:font-size "16px"}]
+     :padding "var(--space-xs)"}
+    [:.divider {:font-size "var(--font-size-2xs)"}]
     [:.ctas {:line-height "30px"}
      [:iframe {:margin-bottom "-6px"
                :margin-left "var(--space-xs)"}]
@@ -800,10 +799,11 @@
     [:.nav-search-widget
      [:form
       {:margin-right "var(--space-xs)"}]]
-    [:.gh-starred-count
-     {:margin-top "15px"
-      :line-height "20px"
-      :margin-left "var(--space-xs)"}]
+    [:.gh-stars
+     {:color "var(--text-muted)"}
+     [:i {:color "var(--color-highlight)"}]
+     [:&:hover {:color "var(--text)"
+                :text-decoration 'none}]]
     [:.clojure-version
      {:font-weight 300
       :font-size "var(--font-size-xs)"
