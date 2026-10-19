@@ -44,9 +44,9 @@
   :repl-options {:init (load-file "reup.clj")}
   :plugins [[lein-cljsbuild "1.1.8"]
             [cider/cider-nrepl "0.58.0"]]
-  :aliases {"fig"       ["trampoline" "run" "-m" "figwheel.main"]
-            "fig:build" ["trampoline" "run" "-m" "figwheel.main" "-b" "dev" "-r"]
-            "fig:prod"  ["run" "-m" "figwheel.main" "-O" "advanced" "-bo" "prod"]}
+  :aliases {"fig"         ["trampoline" "run" "-m" "figwheel.main"]
+            "fig:build"   ["trampoline" "run" "-m" "figwheel.main" "-b" "dev" "-r"]
+            "fig:prod"    ["run" "-m" "figwheel.main" "-O" "advanced" "-bo" "prod"]}
   :cljsbuild {:builds
               {:dev  {:source-paths ["src/cljs" "src/cljc"]
                       :compiler {:output-to "resources/public/cljs/clojuredocs.js"
