@@ -86,6 +86,7 @@
       (println "Scheduled export failed:" (.getMessage e)))))
 
 (defn start-app []
+  (compile-css)
   (let [{:keys [mongo-url port entry] :as app} (create-app)
         mongo-conn (data/connect! mongo-url)]
     (report-and-exit-on-missing-env-vars!)
