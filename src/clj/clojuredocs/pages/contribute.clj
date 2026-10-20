@@ -2,28 +2,30 @@
   (:require [clojuredocs.util :as util]
             [clojuredocs.data :as data]
             [clojuredocs.search :as search]
-            [clojuredocs.pages.common :as common]))
+            [clojuredocs.pages.common :as common]
+            [clojure.core.memoize :as memo]))
 
 (def ^:private core-lib-url (:library-url search/clojure-lib))
 
 ;; --- Vars still needing an example ---
 
-(def ^:private needs-examples-candidates
-  ["halt-when" "iteration" "partitionv" "partitionv-all" "splitv-at"
-   "update-keys" "parse-uuid"])
+(defn- compute-needs-examples []
+  (let [have-examples (data/vars-with-examples-for-library core-lib-url)]
+    (->> (:vars search/clojure-lib)
+         (remove search/impl-var?)
+         (remove #(contains? have-examples (select-keys % [:ns :name])))
+         (map #(select-keys % [:ns :name]))
+         (sort-by (juxt :ns :name)))))
 
-(defn needs-examples []
-  (->> needs-examples-candidates
-       (filter #(zero? (data/count-examples-for
-                          {:ns "clojure.core" :name % :library-url core-lib-url})))
-       (take 4)))
+(def needs-examples
+  (memo/ttl compute-needs-examples :ttl/threshold (* 1000 3600)))
 
 (defn $needs-examples [vs]
   (when (seq vs)
     [:div.wanted
      [:span.wanted-label "Still need an example: "]
-     (for [v vs]
-       (util/$var-link "clojure.core" v v))]))
+     (for [{:keys [ns name]} vs]
+       [:li (util/$var-link ns name ns "/" name)])]))
 
 (defn $content [needs-examples]
   [:div.row

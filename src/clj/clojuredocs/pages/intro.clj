@@ -1,5 +1,6 @@
 (ns clojuredocs.pages.intro
   (:require [clojure.string :as str]
+            [clojure.core.memoize :as memo]
             [clojuredocs.util :as util]
             [clojuredocs.data :as data]
             [clojuredocs.search :as search]
@@ -68,21 +69,17 @@
     " ago."]
    [:div.clear]])
 
-;; --- Example of the day ---
-;; Rotates daily through a small pool of illustrative clojure.core vars,
-;; featuring whichever already has a real submitted example.
-
 (def ^:private eotd-candidates
   ["frequencies" "group-by" "map" "reduce" "filter" "partition-by" "juxt" "comp"])
 
-(defn example-of-the-day []
-  (let [n (count eotd-candidates)
-        day (quot (System/currentTimeMillis) 86400000)
-        ordered (map #(nth eotd-candidates (mod (+ day %) n)) (range n))]
-    (some (fn [nm]
-            (last (data/find-examples-for
-                    {:ns "clojure.core" :name nm :library-url core-lib-url})))
-      ordered)))
+(defn- compute-example-of-the-day []
+  (some (fn [nm]
+          (last (data/find-examples-for
+                  {:ns "clojure.core" :name nm :library-url core-lib-url})))
+    (shuffle eotd-candidates)))
+
+(def example-of-the-day
+  (memo/ttl compute-example-of-the-day :ttl/threshold (* 1000 60 60 24)))
 
 (defn $example-of-the-day [example]
   (when example
@@ -95,10 +92,7 @@
        [:div.example-body (syntax/syntaxify body)]
        (vars/$dialect-badges ns name)])))
 
-;; --- clojure.core, by purpose ---
-;; A curated preview built from the same category data that backs
-;; /quickref, capped per-category with a link out to the rest.
-
+;; Preview built from the same category data that backs /quickref
 (def ^:private core-index-picks
   [["Collections" "Sequences" nil]
    ["Collections" "Maps" nil]
@@ -147,9 +141,8 @@
        [:dd [:a {:href (str "/quickref#" anchor)}
              (str "+" (- total (count syms)) " more")]]])]])
 
-;; --- More namespaces ---
-;; A small, hand-picked set of commonly used namespaces beyond clojure.core.
 
+;; A set of commonly used namespaces beyond clojure.core.
 (def ^:private featured-namespaces
   [["clojure.string" ["split" "join" "replace" "trim" "blank?"]]
    ["clojure.set" ["union" "difference" "index" "rename-keys"]]
@@ -184,15 +177,12 @@
     (for [v var-names]
       (util/$var-link ns-name v v))]])
 
-;; --- Contribute teaser ---
-;; Full content lives on /contribute; this is a short pointer to it.
-
 (defn $contribute-teaser []
   [:section.contribute-teaser
    [:div.sec-head.clearfix
     [:h5 "Contribute to ClojureDocs"]]
-   [:p "Give feedback, add examples, or link related vars — here's how to pitch in."]
-   [:span.sec-head-link [:a {:href "/contribute"} "Learn how →"]]])
+   [:p "Give feedback, add examples, or add link related vars."]
+   [:span.sec-head-link [:a {:href "/contribute"} "Learn how to pitch in →"]]])
 
 (defn $index [{:keys [recently-updateds example-of-the-day]}]
   [:div
@@ -216,7 +206,8 @@
    [:div.row
     [:div.col-md-6
      [:section
-      [:h5 "Recently Updated"]
+      [:div.sec-head.clearfix
+       [:h5 "Recently Updated"]]
       (map $render-recently-updated recently-updateds)]]
     [:div.col-md-6
      ($contribute-teaser)]]

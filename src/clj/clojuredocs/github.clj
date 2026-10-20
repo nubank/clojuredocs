@@ -17,6 +17,7 @@
    more information."
 
   (:require [clj-http.client :as hc]
+            [clojure.core.memoize :as memo]
             [clojuredocs.util :as u]))
 
 (def login-base-url "https://github.com/login/oauth")
@@ -52,24 +53,16 @@
                 {:basic-auth ["token" token]})]
       (-> res :body u/from-json))))
 
-(def ^:private repo-stats-ttl-ms (* 60 60 1000))
+(defn- fetch-repo-stats [repo]
+  (try
+    (let [res (hc/get (str "https://api.github.com/repos/" repo)
+                {:headers {"Accept" "application/vnd.github+json"}})]
+      (when (= 200 (:status res))
+        {:stars (-> res :body u/from-json :stargazers_count)}))
+    (catch Exception _ nil)))
 
-(defonce ^:private repo-stats-cache (atom {}))
-
-(defn repo-stats
+(def repo-stats
   "Returns {:stars n} for a public repo, e.g. \"nubank/clojuredocs\".
-   Cached for an hour per repo; falls back to the last known value
-   (or nil) if the GitHub API call fails."
-  [repo]
-  (let [{:keys [at stats]} (get @repo-stats-cache repo)]
-    (if (and stats (< (- (System/currentTimeMillis) at) repo-stats-ttl-ms))
-      stats
-      (if-let [stats' (try
-                         (let [res (hc/get (str "https://api.github.com/repos/" repo)
-                                     {:headers {"Accept" "application/vnd.github+json"}})]
-                           (when (= 200 (:status res))
-                             {:stars (-> res :body u/from-json :stargazers_count)}))
-                         (catch Exception _ nil))]
-        (do (swap! repo-stats-cache assoc repo {:at (System/currentTimeMillis) :stats stats'})
-            stats')
-        stats))))
+   Cached for an hour per repo; returns nil if the GitHub API call
+   fails (and nothing is cached until a call succeeds)."
+  (memo/ttl fetch-repo-stats :ttl/threshold (* 60 60 1000)))
