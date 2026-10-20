@@ -120,13 +120,6 @@
    "clojure.tools.build.api"    "tools.build"
    "clojure.tools.deps.interop" "tools.deps"})
 
-;; Namespaces in the clojure/clojure repository
-(def clojure-repo-namespaces
-  (->> static/clojure-namespaces
-       (map str)
-       (remove library-namespaces)
-       set))
-
 (def clojure-lib
   (-> {:library-url "https://github.com/clojure/clojure"
        :version "1.12.4"
