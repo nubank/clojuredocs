@@ -231,6 +231,27 @@
        :margin-bottom "var(--space-2xs)"}]
      [:.dialect-badges {:margin-top "var(--space-xs)"}]]
     [:.core-index-section
+     [:.sphere
+      {:display 'grid
+       :grid-template-columns "1fr 1fr"
+       :column-gap "var(--space-lg)"}
+      (nc/at-bp :<md {:grid-template-columns "1fr"})
+      [:.dl-row {:display 'flex
+                 :align-items 'center}]
+      [:dt {:flex "0 0 90px"
+            :width "90px"
+            :padding 0
+            :text-align 'right}]
+      [:dd {:flex "1 1 auto"
+            :width 'auto
+            :min-width 0
+            :max-width "300px"
+            :margin-left "var(--space-xs)"
+            :padding 0
+            :border-bottom 'none
+            :overflow 'hidden
+            :text-overflow 'ellipsis
+            :white-space 'nowrap}]]
      [:.category [:h3 [:span.n
                        {:margin-left "var(--space-2xs)"
                         :font-size "var(--font-size-xs)"
@@ -265,6 +286,21 @@
                    :line-height "18px"
                    :opacity 0.8
                    :margin-top "var(--space-2xs)"}]])
+
+(def contribute-page
+  [[:.contribute-page
+    [:section
+     {:margin-bottom "var(--space-xl)"}]
+    [:ul
+     [:h4
+      [:i {:margin-right "12px"
+           :margin-left "-30px"}]]]
+    [:.wanted
+     {:margin-top "var(--space-sm)"
+      :font-size "var(--font-size-sm)"}
+     [:.wanted-label {:color "var(--text-muted)"}]
+     [:a {:margin-right "var(--space-xs)"
+          :font-family monospace-font}]]]])
 
 (def autocomplete
   [[:.ac-result-link:hover {:text-decoration 'none
@@ -737,8 +773,8 @@
                       :height ["auto !important" "100%"]}]
    [:footer
     {:text-align 'center
-     :font-size "var(--font-size-xs)"
-     :padding "var(--space-xs)"}
+     :font-size "var(--font-size-sm)"
+     :padding "var(--space-sm)"}
     [:.divider {:font-size "var(--font-size-2xs)"}]
     [:.ctas {:line-height "30px"}
      [:iframe {:margin-bottom "-6px"
@@ -941,6 +977,7 @@
     [:a {:color "var(--color-brand-muted)"}]]
 
    intro-page
+   contribute-page
 
    [:.see-also
     {:margin-bottom "var(--space-md)"}

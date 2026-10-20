@@ -100,20 +100,10 @@
 ;; /quickref, capped per-category with a link out to the rest.
 
 (def ^:private core-index-picks
-  [["Simple Values" "Numbers" nil]
-   ["Simple Values" "Strings / Characters" nil]
-   ["Simple Values" "Regular Expressions" nil]
-   ["Operations" "Flow Control" nil]
-   ["Operations" "Concurrency" nil]
-   ["Functions" "General" "Functions"]
-   ["Functions" "Macros" nil]
-   ["Collections" "Sequences" nil]
+  [["Collections" "Sequences" nil]
    ["Collections" "Maps" nil]
    ["Collections" "Vectors" nil]
-   ["Collections" "Sets" nil]
-   ["Code Structure" "Variables" nil]
-   ["Code Structure" "Namespaces" nil]
-   ["Environment" "IO" nil]])
+   ["Collections" "Sets" nil]])
 
 (def ^:private core-index-cap 10)
 
@@ -146,11 +136,10 @@
       (fn [s]
         [[:div.dl-row
           [:dt (util/$var-link "clojure.core" (str s) (str s))]
-          [:dd (->> (str "clojure.core/" s)
-                    search/lookup-vars
-                    :doc
-                    (take 70)
-                    (apply str))]]])
+          [:dd (-> (str "clojure.core/" s)
+                   search/lookup-vars
+                   :doc
+                   (vars/truncate-docstring 40))]]])
       syms)
     (when (> total (count syms))
       [:div.dl-row
@@ -195,29 +184,20 @@
     (for [v var-names]
       (util/$var-link ns-name v v))]])
 
-;; --- Contribute: vars still needing an example ---
+;; --- Contribute teaser ---
+;; Full content lives on /contribute; this is a short pointer to it.
 
-(def ^:private needs-examples-candidates
-  ["halt-when" "iteration" "partitionv" "partitionv-all" "splitv-at"
-   "update-keys" "parse-uuid"])
+(defn $contribute-teaser []
+  [:section.contribute-teaser
+   [:div.sec-head.clearfix
+    [:h5 "Contribute to ClojureDocs"]]
+   [:p "Give feedback, add examples, or link related vars — here's how to pitch in."]
+   [:span.sec-head-link [:a {:href "/contribute"} "Learn how →"]]])
 
-(defn needs-examples []
-  (->> needs-examples-candidates
-       (filter #(zero? (data/count-examples-for
-                          {:ns "clojure.core" :name % :library-url core-lib-url})))
-       (take 4)))
-
-(defn $needs-examples [vs]
-  (when (seq vs)
-    [:div.wanted
-     [:span.wanted-label "Still need an example: "]
-     (for [v vs]
-       (util/$var-link "clojure.core" v v))]))
-
-(defn $index [{:keys [recently-updateds example-of-the-day needs-examples]}]
+(defn $index [{:keys [recently-updateds example-of-the-day]}]
   [:div
    [:div.row
-    [:div.col-md-5
+    [:div.col-md-12
      [:section
       [:h1 "Community-powered documentation and examples for " [:a {:href "http://clojure.org"} "Clojure"]]]
      [:section
@@ -229,19 +209,17 @@
           :placeholder "Looking for?"
           :autoFocus "autofocus"
           :autoComplete "off"}]
-        [:ul.ac-results]]]]]
-    [:div.col-md-7
-     ($example-of-the-day example-of-the-day)]]
+        [:ul.ac-results]]]]]]
    [:div.row
     [:div.col-md-12
+     ($example-of-the-day example-of-the-day)]]
+   [:div.row
+    [:div.col-md-6
      [:section
       [:h5 "Recently Updated"]
-      [:div.row
-       (->> recently-updateds
-            (map $render-recently-updated)
-            (partition-all 3)
-            (map (fn [rs]
-                   [:div.col-sm-6 rs])))]]]]
+      (map $render-recently-updated recently-updateds)]]
+    [:div.col-md-6
+     ($contribute-teaser)]]
    [:div.row
     [:div.col-md-12
      [:section.core-index-section
@@ -257,29 +235,11 @@
        [:h5 "More namespaces"]
        [:span.sec-head-link [:a {:href "/clojure.core"} "Browse all namespaces →"]]]
       [:div.namespace-cards
-       (map $namespace-card featured-namespaces)]]]]
-   [:div.row
-    [:div.col-md-12
-     [:section
-      [:h5 "Contribute to ClojureDocs"]
-      [:p "We need your help to make ClojureDocs a great community resource. Here are a couple of ways you can contribute."]
-      [:ul
-       [:li
-        [:h4 [:i.fa.fa-comment-o] "Give Feedback"]
-        [:p "Please " [:a {:href "https://github.com/nubank/clojuredocs/issues"} "open a ticket"] " if you have an idea of how we can improve ClojureDocs."]]
-       [:li
-        [:h4 [:i.fa.fa-indent] "Add an Example"]
-        [:p "Sharing your knowledge with fellow Clojurists is easy:"]
-        [:p
-         "First, take a look at the "
-         [:a {:href "/examples-styleguide"} "examples style guide"]
-         ", and then add an example for your favorite var (or pick one from the list)."]
-        [:p "In addition to examples, you also have the ability to add 'see also' references between vars."]
-        ($needs-examples needs-examples)]]]]]])
+       (map $namespace-card featured-namespaces)]]]]])
 
 
 (defn recently-updated []
-  (let [limit 6
+  (let [limit 3
         examples (->> (data/find-recent-examples limit)
                       (map #(assoc % :type :example)))
         see-alsos (->> (data/find-recent-see-alsos limit)
@@ -296,8 +256,7 @@
 
 (defn page-handler [{:keys [user]}]
     (-> {:content ($index {:recently-updateds (recently-updated)
-                           :example-of-the-day (example-of-the-day)
-                           :needs-examples (needs-examples)})
+                           :example-of-the-day (example-of-the-day)})
       :body-class "intro-page"
       :user user
       :hide-search true

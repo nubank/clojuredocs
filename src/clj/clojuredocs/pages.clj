@@ -9,6 +9,7 @@
             [clojuredocs.search.static :as search.static]
             [clojuredocs.pages.common :as common]
             [clojuredocs.pages.intro :as intro]
+            [clojuredocs.pages.contribute :as contribute]
             [clojuredocs.pages.user :as user]
             [clojuredocs.pages.dev :as dev]
             [clojuredocs.pages.gh-auth :as gh-auth]
@@ -306,6 +307,7 @@
   (GET "/robots.txt" [] robots-resp)
   (GET "/logout" [] logout-resp)
   (GET "/examples-styleguide" [] examples-styleguide-handler)
+  (GET "/contribute" [] contribute/page-handler)
 
   (GET "/core-library" [] core-library-handler)
   (GET "/core-library/vars" [] core-library-vars-handler)

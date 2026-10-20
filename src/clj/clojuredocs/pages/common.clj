@@ -43,7 +43,6 @@
                 "col-md-12"
                 "col-md-10 col-md-offset-1")}
       [:a.navbar-brand {:href "/"}
-       [:i.fa.fa-rocket]
        "ClojureDocs"]
       #_[:div.navbar-brand.clojure-version
          (:version search/clojure-lib)]
