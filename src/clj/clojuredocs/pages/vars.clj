@@ -276,7 +276,7 @@
               :content [:div
                         [:div.row
                          [:div.col-sm-2.sidenav
-                          [:div.desktop-side-nav {:data-sticky-offset "10"}
+                          [:div.desktop-side-nav
                            [:div.var-page-nav]
                            (common/$library-nav library ns)]]
                          [:div.col-sm-10

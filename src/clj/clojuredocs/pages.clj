@@ -61,7 +61,6 @@
      [:div.row
       [:div.col-sm-2
        [:div.sidenav
-        {:data-sticky-offset "20"}
         [:h5 "Core Library"]
         [:ul
          [:li [:a {:href "/core-library"} "Overview"]]
@@ -110,7 +109,6 @@
      [:div.row
       [:div.col-sm-2
        [:div.sidenav
-        {:data-sticky-offset "20"}
         [:h5 "Core Library"]
         [:ul
          [:li [:a {:href "/core-library"} "Overview"]]

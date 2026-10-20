@@ -862,8 +862,6 @@
      :-webkit-overflow-scrolling 'touch
      :height "100%"}]
    [:.desktop-side-nav
-    {:overflow-y 'scroll
-     :max-height "100%"}
     [:.badge
      {:float 'right}]]
    [:.mobile-nav-menu
@@ -1123,9 +1121,8 @@
     [:.current {:font-weight 'bold}]
     (nc/at-bp :xs {:display 'none})
 
-    [:.library-nav {:max-height "100%"
-                    :overflow-y 'scroll
-                    :overflow-x 'hidden}]]
+    [:.library-nav
+     [:.library-section {:margin-bottom "var(--space-sm)"}]]]
    [:.live-preview
     {:background-color "var(--bg-subtle)"
      :margin-bottom "var(--space-xs)"
