@@ -17,6 +17,7 @@
    more information."
 
   (:require [clj-http.client :as hc]
+            [clojure.core.memoize :as memo]
             [clojuredocs.util :as u]))
 
 (def login-base-url "https://github.com/login/oauth")
@@ -51,3 +52,15 @@
     (let [res (hc/get "https://api.github.com/user"
                 {:basic-auth ["token" token]})]
       (-> res :body u/from-json))))
+
+(defn- fetch-repo-stats [repo]
+  (try
+    (let [res (hc/get (str "https://api.github.com/repos/" repo)
+                {:headers {"Accept" "application/vnd.github+json"}})]
+      (when (= 200 (:status res))
+        {:stars (-> res :body u/from-json :stargazers_count)}))
+    (catch Exception _ nil)))
+
+(def repo-stats
+  "Returns {:stars n} for a public repo. Cached for an hour per repo."
+  (memo/ttl fetch-repo-stats :ttl/threshold (* 60 60 1000)))

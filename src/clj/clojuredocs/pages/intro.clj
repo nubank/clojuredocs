@@ -1,8 +1,16 @@
 (ns clojuredocs.pages.intro
-  (:require [clojuredocs.util :as util]
+  (:require [clojure.string :as str]
+            [clojure.core.memoize :as memo]
+            [clojuredocs.util :as util]
             [clojuredocs.data :as data]
+            [clojuredocs.search :as search]
             [clojuredocs.pages.common :as common]
+            [clojuredocs.pages.vars :as vars]
+            [clojuredocs.pages.quickref :as quickref]
+            [clojuredocs.pages.quickref.static :as quickref-static]
             [clojuredocs.syntax :as syntax]))
+
+(def ^:private core-lib-url (:library-url search/clojure-lib))
 
 (defmulti $render-recently-updated :type)
 
@@ -61,12 +69,127 @@
     " ago."]
    [:div.clear]])
 
-(defn $index [recently-updateds]
+(def ^:private eotd-candidates
+  ["frequencies" "group-by" "map" "reduce" "filter" "partition-by" "juxt" "comp"])
+
+(defn- compute-example-of-the-day []
+  (some (fn [nm]
+          (last (data/find-examples-for
+                  {:ns "clojure.core" :name nm :library-url core-lib-url})))
+    (shuffle eotd-candidates)))
+
+(def example-of-the-day
+  (memo/ttl compute-example-of-the-day :ttl/threshold (* 1000 60 60 24)))
+
+(defn $example-of-the-day [example]
+  (when example
+    (let [{:keys [body var]} example
+          {:keys [ns name]} var]
+      [:div.example-of-the-day.var-example
+       [:div.eotd-head
+        [:span "Example of the day"]
+        (util/$var-link ns name (str ns "/" name))]
+       [:div.example-body (syntax/syntaxify body)]
+       (vars/$dialect-badges ns name)])))
+
+;; Preview built from the same category data that backs /quickref
+(def ^:private core-index-picks
+  [["Collections" "Sequences" nil]
+   ["Collections" "Maps" nil]
+   ["Collections" "Vectors" nil]
+   ["Collections" "Sets" nil]])
+
+(def ^:private core-index-cap 10)
+
+(defn- category-syms [sphere-title category-title]
+  (->> quickref-static/quickref-data
+       (filter #(= sphere-title (:title %)))
+       first
+       :categories
+       (filter #(= category-title (:title %)))
+       first
+       :groups
+       (mapcat :syms)
+       distinct))
+
+(def core-index
+  (vec
+    (for [[sphere-title category-title display-title] core-index-picks
+          :let [syms (category-syms sphere-title category-title)]]
+      {:title (or display-title category-title)
+       :anchor (quickref/title->id category-title)
+       :total (count syms)
+       :syms (take core-index-cap syms)})))
+
+(defn $core-index-group [{:keys [title anchor total syms]}]
+  [:div.category
+   [:div.category-header.clearfix
+    [:h3 title [:span.n total]]]
+   [:dl.dl-horizontal
+    (mapcat
+      (fn [s]
+        [[:div.dl-row
+          [:dt (util/$var-link "clojure.core" (str s) (str s))]
+          [:dd (-> (str "clojure.core/" s)
+                   search/lookup-vars
+                   :doc
+                   (vars/truncate-docstring 40))]]])
+      syms)
+    (when (> total (count syms))
+      [:div.dl-row
+       [:dt]
+       [:dd [:a {:href (str "/quickref#" anchor)}
+             (str "+" (- total (count syms)) " more")]]])]])
+
+
+;; A set of commonly used namespaces beyond clojure.core.
+(def ^:private featured-namespaces
+  [["clojure.string" ["split" "join" "replace" "trim" "blank?"]]
+   ["clojure.set" ["union" "difference" "index" "rename-keys"]]
+   ["clojure.walk" ["postwalk" "prewalk" "keywordize-keys"]]
+   ["clojure.edn" ["read-string" "read"]]
+   ["clojure.java.io" ["reader" "writer" "file" "resource"]]
+   ["clojure.test" ["deftest" "is" "testing" "are"]]])
+
+(defn- first-sentence [doc]
+  (when doc
+    (-> doc
+        (str/replace #"\s+" " ")
+        str/trim
+        (str/split #"(?<=\.) ")
+        first
+        (vars/ellipsis 90))))
+
+(defn- ns-doc [ns-name]
+  (->> search/clojure-lib
+       :namespaces
+       (filter #(= ns-name (:name %)))
+       first
+       :doc
+       first-sentence))
+
+(defn $namespace-card [[ns-name var-names]]
+  [:div.namespace-card
+   [:h4 [:a {:href (str "/" ns-name)} ns-name]]
+   (when-let [doc (ns-doc ns-name)]
+     [:p.doc doc])
+   [:p.vars
+    (for [v var-names]
+      (util/$var-link ns-name v v))]])
+
+(defn $contribute-teaser []
+  [:section.contribute-teaser
+   [:div.sec-head.clearfix
+    [:h5 "Contribute to ClojureDocs"]]
+   [:p "Give feedback, add examples, or add link related vars."]
+   [:span.sec-head-link [:a {:href "/contribute"} "Learn how to pitch in →"]]])
+
+(defn $index [{:keys [recently-updateds example-of-the-day]}]
   [:div
    [:div.row
     [:div.col-md-12
      [:section
-      [:h1 "ClojureDocs is a community-powered documentation and examples repository for the " [:a {:href "http://clojure.org"} "Clojure programming language"] "."]]
+      [:h1 "Community-powered documentation and examples for " [:a {:href "http://clojure.org"} "Clojure"]]]
      [:section
       [:div.search-widget
        [:form.search {:method :get :action "/search" :autocomplete "off"}
@@ -79,102 +202,35 @@
         [:ul.ac-results]]]]]]
    [:div.row
     [:div.col-md-12
-     [:section
-      [:h5 "Recently Updated"]
-      [:div.row
-       (->> recently-updateds
-            (map $render-recently-updated)
-            (partition-all 3)
-            (map (fn [rs]
-                   [:div.col-sm-6 rs])))]]]]
-   [:div.row
-    [:div.col-md-12
-     [:section.used-by
-      [:h5 "Clojure in Production"]
-      [:ul
-       (for [{:keys [src url]}
-             [{:src "/img/nubank-logo.png"
-               :url "https://nubank.com.br/en/"}
-              {:src "/img/netflix-logo.png"
-               :url "https://www.netflix.com"}
-              {:src "/img/amazon-logo.png"
-               :url "http://www.amazon.com"}
-              {:src "/img/climate-corporation-logo.png"
-               :url "http://www.climate.com/"}
-              {:src "/img/funding-circle-logo.png"
-               :url "https://www.fundingcircle.com"}
-              {:src "https://help.twitter.com/content/dam/help-twitter/brand/logo.png"
-               :url "https://twitter.com"}
-              {:src "/img/factual-logo.png"
-               :url "http://www.factual.com"}
-              {:src "/img/exoscale-logo.png"
-               :url "https://www.exoscale.com/"}
-              {:src "/img/heroku-logo.png"
-               :url "https://www.heroku.com"}
-              {:src "/img/brightcove-logo.png"
-               :url "http://www.brightcove.com"}
-              {:src "/img/soundcloud-logo.png"
-               :url "https://soundcloud.com"}
-              {:src "/img/puppet-logo.jpg"
-               :url "https://puppet.com"}
-              {:src "/img/living-social-logo.png"
-               :url "https://livingsocial.com"}
-              {:src "/img/circleci-logo.png"
-               :url "https://circleci.com"}
-              {:src "/img/walmart-labs.png"
-               :url "http://www.walmartlabs.com"}
-              {:src "/img/oscaro-logo.png"
-               :url "https://www.oscaro.com/"}
-              {:src "/img/rjmetrics-logo.png"
-               :url "https://rjmetrics.com"}
-              {:src "/img/cognician-logo.png"
-               :url "https://www.cognician.com"}
-              {:src "/img/qubit-logo.png"
-               :url "https://qubit.com/"}
-              {:src "/img/kira-logo.png"
-               :url "https://kirasystems.com"}
-              {:src "/img/farmlogs-logo.png"
-               :url "http://www.farmlogs.com"}
-              {:src "/img/adzerk-logo.png"
-               :url "http://adzerk.com"}
-              {:src "/img/witai-logo.png"
-               :url "http://wit.ai"}
-              {:src "/img/clearwater-logo.png"
-               :url "https://clearwateranalytics.com/"}
-              {:src "/img/griffin-logo.png"
-               :url "https://griffin.sh/"}
-              {:src "/img/whimsical-logo.png"
-               :url "https://whimsical.com/"}
-              {:src "/img/pitch-logo.png"
-               :url "https://pitch.com/"}
-              {:src "/img/fluent-logo.png"
-               :url "https://fluent.to/"}
-              {:src "/img/reify-health-logo.png"
-               :url "https://www.reifyhealth.com/"}
-              {:src "/img/pisano-logo.jpg"
-               :url "https://www.pisano.co"}]]
-         [:li [:a {:href url} [:img {:src src}]]])]]]]
+     ($example-of-the-day example-of-the-day)]]
    [:div.row
     [:div.col-md-6
      [:section
-      [:h5 "Contribute to ClojureDocs"]
-      [:p "We need your help to make ClojureDocs a great community resource. Here are a couple of ways you can contribute."]
-      [:ul
-       [:li
-        [:h4 [:i.fa.fa-comment-o] "Give Feedback"]
-        [:p "Please " [:a {:href "https://github.com/nubank/clojuredocs/issues"} "open a ticket"] " if you have an idea of how we can improve ClojureDocs."]]
-       [:li
-        [:h4 [:i.fa.fa-indent] "Add an Example"]
-        [:p "Sharing your knowledge with fellow Clojurists is easy:"]
-        [:p
-         "First, take a look at the "
-         [:a {:href "/examples-styleguide"} "examples style guide"]
-         ", and then add an example for your favorite var (or pick one from the list)."]
-        [:p "In addition to examples, you also have the ability to add 'see also' references between vars."]]]]]]])
+      [:div.sec-head.clearfix
+       [:h5 "Recently Updated"]]
+      (map $render-recently-updated recently-updateds)]]
+    [:div.col-md-6
+     ($contribute-teaser)]]
+   [:div.row
+    [:div.col-md-12
+     [:section.core-index-section
+      [:div.sec-head.clearfix
+       [:h5 [:code "clojure.core"] ", by purpose"]
+       [:span.sec-head-link [:a {:href "/quickref"} "Full quick reference →"]]]
+      [:div.sphere
+       (map $core-index-group core-index)]]]]
+   [:div.row
+    [:div.col-md-12
+     [:section.namespaces-section
+      [:div.sec-head.clearfix
+       [:h5 "More namespaces"]
+       [:span.sec-head-link [:a {:href "/clojure.core"} "Browse all namespaces →"]]]
+      [:div.namespace-cards
+       (map $namespace-card featured-namespaces)]]]]])
 
 
 (defn recently-updated []
-  (let [limit 6
+  (let [limit 3
         examples (->> (data/find-recent-examples limit)
                       (map #(assoc % :type :example)))
         see-alsos (->> (data/find-recent-see-alsos limit)
@@ -190,7 +246,8 @@
          (take limit))))
 
 (defn page-handler [{:keys [user]}]
-    (-> {:content ($index (recently-updated))
+    (-> {:content ($index {:recently-updateds (recently-updated)
+                           :example-of-the-day (example-of-the-day)})
       :body-class "intro-page"
       :user user
       :hide-search true

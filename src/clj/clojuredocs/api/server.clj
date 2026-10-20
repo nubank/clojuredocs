@@ -5,7 +5,7 @@
             [clojuredocs.data :as data]
             [compojure.core :refer [DELETE GET PATCH POST defroutes]]
             [compojure.route :refer [not-found]]
-            [fogus.unk :as unk]
+            [clojure.core.memoize :as memo]
             [nsfw.util :as nu]
             [slingshot.slingshot :refer [throw+ try+]])
   (:import [org.bson.types ObjectId]))
@@ -23,8 +23,8 @@
        nu/pp-str))
 
 (def memo-all-see-alsos-relations-map
-  (unk/memo-ttl all-see-alsos-relations-map
-    (* 1000 60 60 1)))
+  (memo/ttl all-see-alsos-relations-map
+    :ttl/threshold (* 1000 60 60 1)))
 
 (defn see-alsos-relations-handler [r]
   {:body (memo-all-see-alsos-relations-map)

@@ -58,8 +58,6 @@
     :--color-close (light-dark "#000" "#fff")
     :--color-close-shadow (light-dark "#fff" "transparent")
 
-    :--color-logo-bg (light-dark "transparent" "#fff")
-
     ;; Clojure syntax
     :--syntax-comment (light-dark "#008200" "#6dbb6d")
     :--syntax-string (light-dark "#2d2dfe" "#8d9bff")
@@ -199,18 +197,6 @@
       [:i {:margin-right "12px"
            :margin-left "-30px"}]
       [:i.fa-map-marker {:padding "0 3px"}]]]
-    [:.used-by
-     [:ul {:text-align 'center}]
-     [:li {:display 'inline-block
-           :margin-right "var(--space-lg)"
-           :margin-bottom "var(--space-md)"}]
-     [:img {:max-width "200px"
-            :max-height "50px"
-            :background-color "var(--color-logo-bg)"
-            :box-shadow "0 0 0 5px var(--color-logo-bg)"
-            :border-radius "4px"}
-      (nc/at-bp :md {:max-height "35px"})
-      (nc/at-bp :sm {:max-height "50px"})]]
     [:.recently-updated
      {:margin-bottom "var(--space-2xs)"
       :font-size "var(--font-size-sm)"
@@ -222,12 +208,99 @@
       {:margin-right "var(--space-xs)"
        :float 'left
        :display 'inline-block
-       :padding-top "2px"}]]]
+       :padding-top "2px"}]]
+    [:.sec-head
+     {:display 'flex
+      :justify-content 'space-between
+      :align-items 'baseline
+      :flex-wrap 'wrap
+      :gap "var(--space-xs)"
+      :margin-bottom "var(--space-sm)"}
+     [:h5 {:margin-bottom 0}]]
+    [:.sec-head-link
+     {:font-size "var(--font-size-sm)"
+      :color "var(--text-muted)"}]
+    [:.example-of-the-day
+     [:.eotd-head
+      {:display 'flex
+       :justify-content 'space-between
+       :align-items 'baseline
+       :gap "var(--space-xs)"
+       :font-size "var(--font-size-sm)"
+       :color "var(--text-muted)"
+       :margin-bottom "var(--space-2xs)"}]
+     [:.dialect-badges {:margin-top "var(--space-xs)"}]]
+    [:.core-index-section
+     [:.sphere
+      {:display 'grid
+       :grid-template-columns "1fr 1fr"
+       :column-gap "var(--space-lg)"}
+      (nc/at-bp :<md {:grid-template-columns "1fr"})
+      [:.dl-row {:display 'flex
+                 :align-items 'center}]
+      [:dt {:flex "0 0 90px"
+            :width "90px"
+            :padding 0
+            :text-align 'right}]
+      [:dd {:flex "1 1 auto"
+            :width 'auto
+            :min-width 0
+            :max-width "300px"
+            :margin-left "var(--space-xs)"
+            :padding 0
+            :border-bottom 'none
+            :overflow 'hidden
+            :text-overflow 'ellipsis
+            :white-space 'nowrap}]]
+     [:.category [:h3 [:span.n
+                       {:margin-left "var(--space-2xs)"
+                        :font-size "var(--font-size-xs)"
+                        :font-weight 'normal
+                        :color "var(--text-faint)"}]]]]
+    [:.namespace-cards
+     {:display 'grid
+      :grid-template-columns "repeat(auto-fill, minmax(230px, 1fr))"
+      :gap "var(--space-md)"
+      :margin-bottom "var(--space-md)"}]
+    [:.namespace-card
+     {:border "solid var(--border-subtle) 1px"
+      :border-radius "4px"
+      :padding "var(--space-sm)"}
+     [:h4 {:margin-bottom "var(--space-2xs)"
+           :font-size "var(--font-size-md)"}]
+     [:.doc {:color "var(--text-muted)"
+             :font-size "var(--font-size-sm)"
+             :margin-bottom "var(--space-2xs)"}]
+     [:.vars {:font-family monospace-font
+              :font-size "var(--font-size-sm)"
+              :margin-bottom 0}
+      [:a {:margin-right "var(--space-xs)"}]]]
+    [:.wanted
+     {:margin-top "var(--space-sm)"
+      :font-size "var(--font-size-sm)"}
+     [:.wanted-label {:color "var(--text-muted)"}]
+     [:a {:margin-right "var(--space-xs)"
+          :font-family monospace-font}]]]
    [:.not-finding {:text-align 'right
                    :font-size "var(--font-size-xs)"
                    :line-height "18px"
                    :opacity 0.8
                    :margin-top "var(--space-2xs)"}]])
+
+(def contribute-page
+  [[:.contribute-page
+    [:section
+     {:margin-bottom "var(--space-xl)"}]
+    [:ul
+     [:h4
+      [:i {:margin-right "12px"
+           :margin-left "-30px"}]]]
+    [:.wanted
+     {:margin-top "var(--space-sm)"
+      :font-size "var(--font-size-sm)"}
+     [:.wanted-label {:color "var(--text-muted)"}]
+     [:a {:margin-right "var(--space-xs)"
+          :font-family monospace-font}]]]])
 
 (def autocomplete
   [[:.ac-result-link:hover {:text-decoration 'none
@@ -698,12 +771,11 @@
    ;; check
    [:.sticky-wrapper {:min-height "100px"
                       :height ["auto !important" "100%"]}]
-   [:footer :.sticky-push {:height "200px"}]
    [:footer
     {:text-align 'center
-     :font-size "var(--font-size-xs)"
-     :padding-top "130px"}
-    [:.divider {:font-size "16px"}]
+     :font-size "var(--font-size-sm)"
+     :padding "var(--space-sm)"}
+    [:.divider {:font-size "var(--font-size-2xs)"}]
     [:.ctas {:line-height "30px"}
      [:iframe {:margin-bottom "-6px"
                :margin-left "var(--space-xs)"}]
@@ -763,10 +835,11 @@
     [:.nav-search-widget
      [:form
       {:margin-right "var(--space-xs)"}]]
-    [:.gh-starred-count
-     {:margin-top "15px"
-      :line-height "20px"
-      :margin-left "var(--space-xs)"}]
+    [:.gh-stars
+     {:color "var(--text-muted)"}
+     [:i {:color "var(--color-highlight)"}]
+     [:&:hover {:color "var(--text)"
+                :text-decoration 'none}]]
     [:.clojure-version
      {:font-weight 300
       :font-size "var(--font-size-xs)"
@@ -902,6 +975,7 @@
     [:a {:color "var(--color-brand-muted)"}]]
 
    intro-page
+   contribute-page
 
    [:.see-also
     {:margin-bottom "var(--space-md)"}

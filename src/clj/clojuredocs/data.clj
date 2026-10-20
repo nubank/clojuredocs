@@ -38,6 +38,17 @@
             :var.library-url library-url
             :deleted-at nil}))
 
+(defn vars-with-examples-for-library
+  "Set of {:ns :name} maps for vars in library-url that have at least
+   one non-deleted example."
+  [library-url]
+  (->> (mon/fetch :examples
+         :where {:var.library-url library-url
+                 :deleted-at nil}
+         :only [:var.ns :var.name])
+       (map #(select-keys (:var %) [:ns :name]))
+       set))
+
 (defn find-example-by-id [id]
   (mon/fetch-one :examples :where {:_id id}))
 
