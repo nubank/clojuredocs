@@ -62,7 +62,5 @@
     (catch Exception _ nil)))
 
 (def repo-stats
-  "Returns {:stars n} for a public repo, e.g. \"nubank/clojuredocs\".
-   Cached for an hour per repo; returns nil if the GitHub API call
-   fails (and nothing is cached until a call succeeds)."
+  "Returns {:stars n} for a public repo. Cached for an hour per repo."
   (memo/ttl fetch-repo-stats :ttl/threshold (* 60 60 1000)))

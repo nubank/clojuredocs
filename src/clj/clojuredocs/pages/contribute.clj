@@ -7,8 +7,6 @@
 
 (def ^:private core-lib-url (:library-url search/clojure-lib))
 
-;; --- Vars still needing an example ---
-
 (defn- compute-needs-examples []
   (let [have-examples (data/vars-with-examples-for-library core-lib-url)]
     (->> (:vars search/clojure-lib)
