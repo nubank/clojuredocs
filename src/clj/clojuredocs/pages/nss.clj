@@ -71,9 +71,7 @@
            :content [:div
                      [:div.row
                       [:div.col-sm-2.sidenav
-                       [:div
-                        {:data-sticky-offset "20"}
-                        (common/$library-nav lib)]]
+                       (common/$library-nav lib)]
                       [:div.col-sm-10
                        [:h1 ns-str]
                        [:section.markdown

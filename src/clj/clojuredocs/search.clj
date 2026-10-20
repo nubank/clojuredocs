@@ -108,6 +108,18 @@
          (map gather-namespace)
          (remove :no-doc))))
 
+;; Namespaces that ship as separate artifacts from org.clojure/clojure
+;; mapped to the artifact name they belong to
+(def library-namespaces
+  {"clojure.core.async"         "core.async"
+   "clojure.core.logic"         "core.logic"
+   "clojure.core.logic.fd"      "core.logic"
+   "clojure.core.logic.pldb"    "core.logic"
+   "clojure.data.csv"           "data.csv"
+   "clojure.spec.alpha"         "spec.alpha"
+   "clojure.tools.build.api"    "tools.build"
+   "clojure.tools.deps.interop" "tools.deps"})
+
 (def clojure-lib
   (-> {:library-url "https://github.com/clojure/clojure"
        :version "1.12.4"
