@@ -13,10 +13,12 @@
 (defn insert! [payload]
   (data/insert-example! payload))
 
-(defn create-example-history [example user new-body]
+(defn create-example-history
+  "Creates a history record capturing the example body being replaced."
+  [example user previous-body]
   {:_id (org.bson.types.ObjectId.)
    :editor user
-   :body new-body
+   :body previous-body
    :created-at (util/now)
    :example-id (:_id example)})
 
@@ -83,7 +85,7 @@
           example-history (create-example-history
                             example
                             user
-                            (:body example-update))]
+                            (:body example))]
       (when-not example
         (throw+
           (-> (edn-response {:error "Couldn't find the example you're trying to update."})
