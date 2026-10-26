@@ -228,6 +228,16 @@
     (is (map? (:vars compat/dialect-compat)))
     (is (map? (:versions compat/dialect-compat)))))
 
+(deftest dialect-compat-cardinality
+  ;; Guards the EDN `:cardinality` string against silent drift (#69).
+  (let [vars-count  (count (:vars compat/dialect-compat))
+        pairs-count (reduce + 0 (map count (vals (:vars compat/dialect-compat))))
+        expected    (str vars-count " vars / " pairs-count " var-dialect pairs")
+        documented  (get-in schema [:entities :dialect-compat :cardinality])]
+    (is (= documented expected)
+        (str "dialect-compat cardinality drift: EDN has " (pr-str documented)
+             " but data has " expected))))
+
 (deftest dialect-compat-lookup-works
   (testing "known vars return expected dialect sets"
     (is (= #{:bb :clj :cljs} (compat/dialects-for "clojure.core" "map")))
@@ -241,6 +251,17 @@
       (doseq [d dialects]
         (is (keyword? d)
             (str var-key " contains non-keyword dialect: " d))))))
+
+;; --- Clojure version guard (#68) ---
+
+(deftest schema-verified-against-classpath-clojure
+  (testing "search/clojure-lib version matches the classpath Clojure version"
+    (let [pinned (:version search/clojure-lib)
+          running (clojure-version)]
+      (is (= pinned running)
+          (str "entity-model counts are pinned to Clojure " pinned
+               " but classpath has " running
+               " — bump search.clj / regenerate the model")))))
 
 ;; --- Cross-entity consistency ---
 
