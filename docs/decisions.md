@@ -4,7 +4,7 @@ title: Decision Log
 description: Design and architecture decisions; lightweight alternative to full ADRs.
 tags: [decisions, architecture, living-document]
 created: 2026-04-29
-modified: 2026-07-01
+modified: 2026-07-17
 creator: L. Jordan Miller
 ai_assisted: "Claude Opus 4.6 via GitHub Copilot (early entries); Claude Opus 4.8 via Claude Code (later entries)"
 review_maturity: L4
@@ -14,6 +14,42 @@ review_note: Human-endorsed — decisions are the team's; AI-drafted rationale i
 # Decision Log
 
 Document design and architecture decisions. Lightweight alternative to full ADRs.
+
+---
+
+## 2026-07-17 — Commit to Datomic as the MongoDB migration target
+
+### Status
+Decided — supersedes the [2026-06-01 decision](#2026-06-01--dual-format-entity-model-documentation)'s rejection of a schema-bearing database.
+
+### Context
+- The [2026-06-01 entry](#2026-06-01--dual-format-entity-model-documentation) ruled out a relational DDL / schema-bearing database, reasoning "the system uses MongoDB (schemaless); a relational DDL would be misleading about the actual storage model."
+- Since then, [entity-model-rfc.md](rfcs/entity-model-rfc.md) (2026-06-09) already named Datomic as "under evaluation as the migration target," and the [2026 vision](2026vison.md) names an explicit, extensible data model as the keystone investment that the verification pipeline, quality signals, REPL embed, multi-library support, and community/resource graph workstreams all depend on.
+- Produced via a `/grill-me` alignment interview that sequenced the vision's workstreams into a roadmap and surfaced this reversal explicitly, rather than letting new schema work silently contradict the standing 2026-06-01 decision.
+
+### Decision
+- Commit to migrating ClojureDocs' primary datastore from MongoDB to Datomic. The REPL-verified present-state inventory in [entity-attribute-model.edn](entity-attribute-model.edn) is the starting point for the schema translation.
+- Migration mechanics (big-bang vs. dual-write cutover, downtime window, rollback plan) are deliberately deferred to a separate implementation plan — not decided here.
+- Datomic edition/hosting choice (Datomic Cloud vs. on-prem Pro/Free, storage backend) is also deferred. The current prod host is a single small-disk EC2 box ([2026-06-24 decision](#2026-06-24--prod-host-patch-kernelglibc-cap-journald-keep-reboots-manual)), so this has real infra consequences that need their own decision.
+
+### Rationale
+- An explicit, extensible data model is the prerequisite for nearly every other vision workstream — the current implicit MongoDB model already scatters the schema across business logic ([data model coupling audit](research/data-model-coupling-audit.md)), which the 2026-06-01-era CSV/EDN work documented but did not fix.
+- Datomic's EAV datom model maps naturally onto entity-attribute-model.edn's existing `:status`-tagged attribute structure, and is structurally close to RDF triples — useful groundwork if the vision's "docs as a graph" bullet becomes an RDF-alignable knowledge graph later, building on the dcterms/PROV-O vocabulary already adopted for doc metadata ([2026-06-16 decision](#2026-06-16--adopt-okf--rdf-aligned-yaml-frontmatter-for-doc-metadata)).
+- Reversing 2026-06-01 explicitly, with a written rationale, keeps the decision log honest rather than letting the schema work silently contradict a standing decision.
+
+### Alternatives Considered
+- Stay on MongoDB, keep the data model implicit but documented (the 2026-06-01 approach) — rejected: doesn't unlock the vision's dependent workstreams, and the original "misleading DDL" concern was about a rigid relational schema, which doesn't apply the same way to Datomic's additive, schema-flexible attribute model.
+- Exploratory-only Datomic schema, no migration commitment — considered, but doesn't give contributors (or a manager-facing roadmap) a real target to build against.
+
+### Impacts and Risks
+- This is a significant scope commitment with mechanics, hosting, and timeline all still open. [open]
+- No migration plan exists yet; this entry commits to the *target*, not a timeline or cutover method. [open]
+
+### Links
+- [entity-model-rfc.md](rfcs/entity-model-rfc.md)
+- [2026 vision](2026vison.md)
+- [2026-06-01 — Dual-format entity model documentation](#2026-06-01--dual-format-entity-model-documentation)
+- [entity-attribute-model.edn](entity-attribute-model.edn)
 
 ---
 
