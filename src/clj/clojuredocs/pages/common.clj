@@ -136,6 +136,15 @@
           :type "application/opensearchdescription+xml"
           :title "ClojureDocs"}])
 
+;; The survey closes Nov 30 (https://clojure.org/news/2026/11/09/clojure-survey-2026).
+;; Gated on the UTC date so the banner retires itself without a removal PR.
+(def survey-last-day (java.time.LocalDate/of 2026 11 30))
+
+(defn show-survey-banner?
+  ([] (show-survey-banner? (java.time.LocalDate/now java.time.ZoneOffset/UTC)))
+  ([^java.time.LocalDate today]
+   (not (.isAfter today survey-last-day))))
+
 (defn $main [{:keys [content
                      title
                      body-class
@@ -179,6 +188,13 @@
       (when config/staging-banner?
         [:div.staging-banner
          "This is the ClojureDocs staging site, where you'll find all the neat things we're working on."])
+      (when (show-survey-banner?)
+        [:div.survey-banner
+         "Take the 2026 State of Clojure Survey! Help shape the future of Clojure — open through Nov 30. "
+         [:a {:href "https://www.surveymonkey.com/r/clojure2026"
+              :target "_blank"
+              :onclick "_paq.push(['trackEvent', 'Banner', 'Click', 'State of Clojure 2026']);"}
+          "Take Survey →"]])
       [:div.desktop-nav-bar
        ($navbar opts)]
       [:div
