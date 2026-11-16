@@ -13,7 +13,7 @@ Changes are relative to the upstream [zk/clojuredocs](https://github.com/zk/cloj
 - **State of Clojure 2026 survey banner**: site-wide banner linking to the
   [2026 State of Clojure Survey](https://clojure.org/news/2026/11/09/clojure-survey-2026)
   (open through Nov 30) with Matomo click tracking; hides itself after
-  Nov 30 (UTC)
+  Dec 5 (UTC)
 
 ## [2026.04.29]
 

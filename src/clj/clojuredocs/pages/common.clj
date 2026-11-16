@@ -136,14 +136,16 @@
           :type "application/opensearchdescription+xml"
           :title "ClojureDocs"}])
 
-;; The survey closes Nov 30 (https://clojure.org/news/2026/11/09/clojure-survey-2026).
-;; Gated on the UTC date so the banner retires itself without a removal PR.
-(def survey-last-day (java.time.LocalDate/of 2026 11 30))
+;; The survey is advertised as closing Nov 30
+;; (https://clojure.org/news/2026/11/09/clojure-survey-2026); the banner
+;; deliberately stays up a few days longer. Gated on the UTC date so the
+;; banner retires itself without a removal PR.
+(def survey-banner-last-day (java.time.LocalDate/of 2026 12 5))
 
 (defn show-survey-banner?
   ([] (show-survey-banner? (java.time.LocalDate/now java.time.ZoneOffset/UTC)))
   ([^java.time.LocalDate today]
-   (not (.isAfter today survey-last-day))))
+   (not (.isAfter today survey-banner-last-day))))
 
 (defn $main [{:keys [content
                      title
