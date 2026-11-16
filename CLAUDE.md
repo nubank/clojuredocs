@@ -19,7 +19,7 @@ ClojureDocs is a community-powered documentation site for Clojure. It's currentl
 | `resources/` | Static assets, nginx config |
 | `data/mongodb/` | Seed data (BSON dumps) |
 | `docs/` | Design docs, research, diagrams, glossary |
-| `bin/` | Dev scripts (`dev`, `prod`, `db-reset`, etc.) |
+| `bin/` | Dev scripts (`db-reset`, `clean`, `install-hooks`, `deploy.sh`) and `.devenv` |
 | `tools/` | One-off scripts (import, export, sanity checks) |
 
 ## Dev environment
@@ -27,7 +27,8 @@ ClojureDocs is a community-powered documentation site for Clojure. It's currentl
 ```bash
 mongod --dbpath ./dev-db      # start MongoDB
 source bin/.devenv             # load env vars
-bin/dev                        # start REPL + Figwheel
+lein repl                      # backend REPL (starts the web server)
+lein fig:build                 # CLJS build, only if touching src/cljs (separate terminal, source bin/.devenv first)
 ```
 
 See [docs/dev-setup.md](docs/dev-setup.md) for full setup.
